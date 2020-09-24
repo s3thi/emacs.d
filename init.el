@@ -45,5 +45,8 @@
 ;; Window management settings.
 (require 'init-windows)
 
+;; Settings for editing text.
+(require 'init-editing)
+
 ;; JavaScript specific settings.
 (require 'init-js)
