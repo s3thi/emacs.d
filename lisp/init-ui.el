@@ -9,6 +9,7 @@
 (show-paren-mode)
 (set-frame-font "Fira Code 12" nil t)
 (global-hl-line-mode t)
+(setq help-window-select t)
 
 (use-package disable-mouse
   :ensure t
