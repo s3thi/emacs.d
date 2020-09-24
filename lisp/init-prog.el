@@ -32,4 +32,14 @@
   :ensure t
   :bind ("C-c d" . #'deadgrep))
 
+(use-package expand-region
+  :ensure t
+  :bind
+  ("C-=" . #'er/expand-region))
+
+(use-package smartparens
+  :ensure t
+  :config
+  (add-hook 'js-mode-hook #'smartparens-mode))
+
 (provide 'init-prog)
