@@ -1,7 +1,7 @@
 ;; Swap Ctrl and Cmd on macOS.
-;; (when *is-a-mac*
-;;   (setq mac-command-modifier 'control)
-;;   (setq mac-control-modifier 'super))
+(when *is-a-mac*
+  (setq mac-command-modifier 'control)
+  (setq mac-control-modifier 'super))
 
 ;; I don't want to use arrow keys for navigating through text.
 (global-unset-key [M-left])
