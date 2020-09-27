@@ -22,4 +22,15 @@
 (global-set-key (kbd "C-c k") #'delete-other-windows-vertically)
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
+(defun load-init-file ()
+  (interactive)
+  (find-file (expand-file-name "init.el" user-emacs-directory)))
+
+(defun load-user-emacs-directory ()
+  (interactive)
+  (find-file user-emacs-directory))
+
+(global-set-key (kbd "C-c i i") #'load-init-file)
+(global-set-key (kbd "C-c i d") #'load-user-emacs-directory)
+
 (provide 'init-keys)
