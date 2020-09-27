@@ -28,20 +28,6 @@
   :bind-keymap
   ("C-," . projectile-command-map))
 
-(use-package deadgrep
-  :ensure t
-  :bind ("C-c d" . #'deadgrep))
-
-(use-package expand-region
-  :ensure t
-  :bind
-  ("C-=" . #'er/expand-region))
-
-(use-package smartparens
-  :ensure t
-  :config
-  (add-hook 'js-mode-hook #'smartparens-mode))
-
 (use-package markdown-mode
   :ensure t
   :commands (markdown-mode gfm-mode)
@@ -49,6 +35,19 @@
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
+
+(use-package rg
+  :ensure t
+  :config
+  (rg-enable-default-bindings)
+  (add-hook 'rg-mode-hook
+            '(lambda ()
+               (switch-to-buffer-other-window "*rg*"))))
+
+(use-package hl-todo
+  :ensure t
+  :hook
+  (prog-mode . hl-todo-mode))
 
 
 (provide 'init-prog)
