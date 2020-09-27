@@ -21,4 +21,9 @@
   :config
   (load-theme 'monokai t))
 
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode 1))
+
 (provide 'init-ui)
