@@ -39,9 +39,6 @@
 ;; File related settings.
 (require 'init-files)
 
-;; Terminal settings.
-(require 'init-term)
-
 ;; Window management settings.
 (require 'init-windows)
 
