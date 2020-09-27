@@ -28,4 +28,16 @@ Source: https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginni
 
 (setq-default indent-tabs-mode nil)
 
+(use-package expand-region
+  :ensure t
+  :bind
+  ("C-=" . #'er/expand-region))
+
+(use-package smartparens
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'smartparens-mode))
+
+(setq save-interprogram-paste-before-kill t)
+
 (provide 'init-editing)
