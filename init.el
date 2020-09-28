@@ -45,5 +45,8 @@
 ;; Settings for editing text.
 (require 'init-editing)
 
+;; Magit settings.
+(require 'init-magit)
+
 ;; JavaScript specific settings.
 (require 'init-js)
