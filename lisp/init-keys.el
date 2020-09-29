@@ -20,7 +20,6 @@
 (global-unset-key (kbd "<M-down>"))
 
 (global-set-key (kbd "C-c k") #'delete-other-windows-vertically)
-(global-set-key (kbd "C-x C-b") #'ibuffer)
 
 (defun load-init-file ()
   (interactive)

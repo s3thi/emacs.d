@@ -26,4 +26,15 @@
   :config
   (beacon-mode 1))
 
+(use-package perspective
+  :ensure t
+  :config
+  (persp-mode)
+  (global-set-key (kbd "C-x C-b") #'persp-ibuffer)
+  (setq persp-state-default-file (expand-file-name "perspective.el" user-emacs-directory))
+  (add-hook 'kill-emacs-hook #'persp-state-save)
+  :bind
+  ("C-x b" . #'persp-switch-to-buffer*)
+  ("C-x k" . #'persp-kill-buffer*))
+
 (provide 'init-ui)
