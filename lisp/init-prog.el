@@ -16,8 +16,8 @@
   :init
   (add-hook 'after-init-hook #'global-flycheck-mode)
   :bind
-  ("C-c [" . #'flycheck-previous-error)
-  ("C-c ]" . #'flycheck-next-error))
+  ("s-[" . #'flycheck-previous-error)
+  ("s-]" . #'flycheck-next-error))
 
 (use-package projectile
   :ensure t
@@ -26,7 +26,9 @@
   :config
   (projectile-mode)
   :bind-keymap
-  ("C-," . projectile-command-map))
+  ("s-p" . projectile-command-map)
+  :bind
+  ("s-o" . #'projectile-find-file))
 
 (use-package markdown-mode
   :ensure t

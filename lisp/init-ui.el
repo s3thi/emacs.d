@@ -37,6 +37,6 @@
   ("C-x b" . #'persp-switch-to-buffer*)
   ("C-x k" . #'persp-kill-buffer*)
   :bind-keymap
-  ("C-c p" . perspective-map))
+  ("s-e" . perspective-map))
 
 (provide 'init-ui)

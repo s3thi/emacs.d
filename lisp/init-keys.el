@@ -19,7 +19,7 @@
 (global-unset-key (kbd "<M-up>"))
 (global-unset-key (kbd "<M-down>"))
 
-(global-set-key (kbd "C-c k") #'delete-other-windows-vertically)
+(global-set-key (kbd "s-k") #'delete-other-windows-vertically)
 
 (defun load-init-file ()
   (interactive)
@@ -29,7 +29,13 @@
   (interactive)
   (find-file user-emacs-directory))
 
-(global-set-key (kbd "C-c i i") #'load-init-file)
-(global-set-key (kbd "C-c i d") #'load-user-emacs-directory)
+(global-set-key (kbd "s-i i") #'load-init-file)
+(global-set-key (kbd "s-i d") #'load-user-emacs-directory)
+
+(global-set-key (kbd "s-l") #'goto-line)
+(global-set-key (kbd "s-a") #'windmove-left)
+(global-set-key (kbd "s-d") #'windmove-right)
+(global-set-key (kbd "s-w") #'windmove-up)
+(global-set-key (kbd "s-s") #'windmove-down)
 
 (provide 'init-keys)
