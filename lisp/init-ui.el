@@ -36,6 +36,7 @@
   :bind
   ("C-x b" . #'persp-switch-to-buffer*)
   ("C-x k" . #'persp-kill-buffer*)
+  ("s-<tab>" . #'persp-next)
   :bind-keymap
   ("s-e" . perspective-map))
 
