@@ -7,6 +7,6 @@
   :ensure t
   :after magit)
 
-(global-set-key (kbd "C-x g") 'magit-status)
+(global-set-key (kbd "s-g") 'magit-status)
 
 (provide 'init-magit)
