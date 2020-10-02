@@ -16,10 +16,10 @@
   :config
   (global-disable-mouse-mode))
 
-(use-package monokai-theme
+(use-package gruvbox-theme
   :ensure t
   :config
-  (load-theme 'monokai t))
+  (load-theme 'gruvbox t))
 
 (use-package beacon
   :ensure t
@@ -35,6 +35,8 @@
   (add-hook 'kill-emacs-hook #'persp-state-save)
   :bind
   ("C-x b" . #'persp-switch-to-buffer*)
-  ("C-x k" . #'persp-kill-buffer*))
+  ("C-x k" . #'persp-kill-buffer*)
+  :bind-keymap
+  ("C-c p" . perspective-map))
 
 (provide 'init-ui)
