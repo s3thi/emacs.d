@@ -48,5 +48,11 @@
 ;; Magit settings.
 (require 'init-magit)
 
+;; Terminal.
+(require 'init-term)
+
 ;; JavaScript specific settings.
 (require 'init-js)
+
+;; Python specific settings.
+(require 'init-python)

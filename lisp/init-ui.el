@@ -10,6 +10,7 @@
 (set-frame-font "Fira Code 12" nil t)
 (global-hl-line-mode t)
 (setq help-window-select t)
+(setq visible-bell t)
 
 (use-package disable-mouse
   :ensure t
@@ -37,7 +38,13 @@
   ("C-x b" . #'persp-switch-to-buffer*)
   ("C-x k" . #'persp-kill-buffer*)
   ("s-<tab>" . #'persp-next)
+  ("s-`" . #'persp-switch-last)
   :bind-keymap
   ("s-e" . perspective-map))
+
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
 
 (provide 'init-ui)

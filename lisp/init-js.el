@@ -19,4 +19,7 @@
   :init
   (add-hook 'js-mode-hook #'setup-tide-mode))
 
+(use-package json-mode
+  :ensure t)
+
 (provide 'init-js)

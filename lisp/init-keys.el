@@ -19,7 +19,7 @@
 (global-unset-key (kbd "<M-up>"))
 (global-unset-key (kbd "<M-down>"))
 
-(global-set-key (kbd "s-k") #'delete-other-windows-vertically)
+(global-set-key (kbd "s-v") #'delete-other-windows-vertically)
 
 (defun load-init-file ()
   (interactive)
@@ -37,5 +37,10 @@
 (global-set-key (kbd "s-d") #'windmove-right)
 (global-set-key (kbd "s-w") #'windmove-up)
 (global-set-key (kbd "s-s") #'windmove-down)
+
+(global-set-key (kbd "s-0") #'delete-window)
+(global-set-key (kbd "s-1") #'delete-other-windows)
+(global-set-key (kbd "s-2") #'split-window-below)
+(global-set-key (kbd "s-3") #'split-window-right)
 
 (provide 'init-keys)

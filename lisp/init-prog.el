@@ -40,12 +40,11 @@
 
 (use-package rg
   :ensure t
+  :init
+  (setq rg-keymap-prefix (kbd "s-r"))
   :config
-  (rg-enable-default-bindings)
-  (add-hook 'rg-mode-hook
-            '(lambda ()
-               (switch-to-buffer-other-window "*rg*"))))
-
+  (rg-enable-default-bindings))
+  
 (use-package hl-todo
   :ensure t
   :hook
