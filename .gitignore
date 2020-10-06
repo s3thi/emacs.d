@@ -9,3 +9,4 @@
 /perspective.el
 /.DS_Store
 /forge-database.sqlite
+/tramp
