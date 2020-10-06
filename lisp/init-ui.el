@@ -4,11 +4,9 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(global-display-line-numbers-mode t)
 (column-number-mode 1)
 (show-paren-mode)
 (set-frame-font "Fira Code 12" nil t)
-(global-hl-line-mode t)
 (setq help-window-select t)
 (setq visible-bell t)
 
@@ -21,11 +19,6 @@
   :ensure t
   :config
   (load-theme 'gruvbox t))
-
-(use-package beacon
-  :ensure t
-  :config
-  (beacon-mode 1))
 
 (use-package perspective
   :ensure t
