@@ -33,6 +33,8 @@
 (global-set-key (kbd "s-i d") #'load-user-emacs-directory)
 
 (global-set-key (kbd "s-l") #'goto-line)
+(global-set-key  (kbd "s-f") #'isearch-forward)
+
 (global-set-key (kbd "s-a") #'windmove-left)
 (global-set-key (kbd "s-d") #'windmove-right)
 (global-set-key (kbd "s-w") #'windmove-up)

@@ -27,6 +27,7 @@
   (add-hook 'kill-emacs-hook #'persp-state-save)
   :bind
   ("C-x b" . #'persp-switch-to-buffer*)
+  ("s-p" . #'persp-switch-to-buffer*)
   ("C-x k" . #'persp-kill-buffer*)
   ("s-<tab>" . #'persp-next)
   ("s-`" . #'persp-switch-last)

@@ -28,7 +28,7 @@
   :config
   (projectile-mode)
   :bind-keymap
-  ("s-p" . projectile-command-map)
+  ("s-j" . projectile-command-map)
   :bind
   ("s-o" . #'projectile-find-file))
 
