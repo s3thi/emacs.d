@@ -40,4 +40,12 @@
   :config
   (which-key-mode))
 
+(use-package buffer-move
+  :ensure t
+  :bind
+  ("M-s-d" . #'buf-move-right)
+  ("M-s-a" . #'buf-move-left)
+  ("M-s-w" . #'buf-move-up)
+  ("M-s-s" . #'buf-move-down))
+
 (provide 'init-ui)
