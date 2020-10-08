@@ -1,5 +1,3 @@
-(setq use-file-dialog nil)
-(setq use-dialog-box nil)
 (setq inhibit-startup-screen t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -10,10 +8,9 @@
 (setq help-window-select t)
 (setq visible-bell t)
 
-(use-package disable-mouse
-  :ensure t
-  :config
-  (global-disable-mouse-mode))
+(use-package diminish
+  :after use-package
+  :ensure t)
 
 (use-package gruvbox-theme
   :ensure t
@@ -22,6 +19,7 @@
 
 (use-package perspective
   :ensure t
+  :diminish
   :config
   (persp-mode)
   (global-set-key (kbd "C-x C-b") #'persp-ibuffer)
@@ -37,6 +35,7 @@
 
 (use-package which-key
   :ensure t
+  :diminish
   :config
   (which-key-mode))
 

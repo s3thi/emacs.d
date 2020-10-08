@@ -35,6 +35,7 @@ Source: https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginni
 
 (use-package smartparens
   :ensure t
+  :diminish
   :config
   (add-hook 'prog-mode-hook #'smartparens-mode))
 

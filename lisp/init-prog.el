@@ -13,6 +13,7 @@
 
 (use-package flycheck
   :ensure t
+  :diminish
   :init
   (add-hook 'after-init-hook #'global-flycheck-mode)
   :bind
@@ -21,6 +22,7 @@
 
 (use-package projectile
   :ensure t
+  :diminish
   :init
   (setq projectile-completion-system 'ivy)
   :config
