@@ -31,16 +31,12 @@
 ;; Settings for uniquify.
 (require 'init-uniquify)
 
-;; Ivy, Counsel, and Swiper.
+;; Ivy and Counsel.
 (require 'init-ivy)
 (require 'init-counsel)
-(require 'init-swiper)
 
 ;; File related settings.
 (require 'init-files)
-
-;; Window management settings.
-(require 'init-windows)
 
 ;; Settings for editing text.
 (require 'init-editing)
