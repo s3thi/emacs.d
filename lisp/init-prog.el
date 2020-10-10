@@ -11,6 +11,12 @@
   (setq company-tooltip-align-annotations t)
   (setq company-selection-wrap-around t))
 
+(use-package company-prescient
+  :ensure t
+  :after company
+  :config
+  (company-prescient-mode))
+
 (use-package flycheck
   :ensure t
   :diminish
