@@ -29,8 +29,10 @@
   ("C-x b" . #'persp-switch-to-buffer*)
   ("s-p" . #'persp-switch-to-buffer*)
   ("C-x k" . #'persp-kill-buffer*)
-  ("s-<tab>" . #'persp-next)
-  ("s-`" . #'persp-switch-last)
+  ("C->" . #'persp-next)
+  ("C-<" . #'persp-prev)
+  ("C-`" . #'persp-switch-last)
+  ("C-?" . #'persp-switch)
   :bind-keymap
   ("s-e" . perspective-map))
 
@@ -47,5 +49,12 @@
   ("M-s-a" . #'buf-move-left)
   ("M-s-w" . #'buf-move-up)
   ("M-s-s" . #'buf-move-down))
+
+(use-package ace-window
+  :ensure t
+  :init
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :bind
+  ("M-o" . #'ace-window))
 
 (provide 'init-ui)
