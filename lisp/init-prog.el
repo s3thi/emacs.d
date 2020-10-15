@@ -56,5 +56,12 @@
   :hook
   (prog-mode . hl-todo-mode))
 
+(use-package yasnippet
+  :ensure t
+  :diminish
+  :init
+  (setq yas-snippet-dirs '("~/.emacs.d/snippets/"))
+  :config
+  (yas-global-mode 1))
 
 (provide 'init-prog)
