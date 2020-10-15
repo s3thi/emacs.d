@@ -27,14 +27,13 @@
   (add-hook 'kill-emacs-hook #'persp-state-save)
   :bind
   ("C-x b" . #'persp-switch-to-buffer*)
-  ("s-p" . #'persp-switch-to-buffer*)
   ("C-x k" . #'persp-kill-buffer*)
-  ("C->" . #'persp-next)
-  ("C-<" . #'persp-prev)
+  ("C-}" . #'persp-next)
+  ("C-{" . #'persp-prev)
   ("C-`" . #'persp-switch-last)
   ("C-?" . #'persp-switch)
   :bind-keymap
-  ("s-e" . perspective-map))
+  ("C-c p" . perspective-map))
 
 (use-package which-key
   :ensure t

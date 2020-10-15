@@ -23,8 +23,8 @@
   :init
   (add-hook 'after-init-hook #'global-flycheck-mode)
   :bind
-  ("s-[" . #'flycheck-previous-error)
-  ("s-]" . #'flycheck-next-error))
+  ("C-<" . #'flycheck-previous-error)
+  ("C->" . #'flycheck-next-error))
 
 (use-package projectile
   :ensure t
@@ -34,9 +34,7 @@
   :config
   (projectile-mode)
   :bind-keymap
-  ("s-j" . projectile-command-map)
-  :bind
-  ("s-o" . #'projectile-find-file))
+  ("s-p" . projectile-command-map))
 
 (use-package markdown-mode
   :ensure t
