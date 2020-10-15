@@ -7,6 +7,7 @@
 (set-frame-font "Fira Code 12" nil t)
 (setq help-window-select t)
 (setq visible-bell t)
+(winner-mode 1)
 
 (use-package diminish
   :after use-package
