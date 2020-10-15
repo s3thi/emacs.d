@@ -2,6 +2,7 @@
 
 (use-package prettier-js
   :ensure t
+  :diminish
   :init
   (add-hook 'js-mode-hook #'prettier-js-mode))
 
@@ -16,6 +17,7 @@
 
 (use-package tide
   :ensure t
+  :diminish
   :init
   (add-hook 'js-mode-hook #'setup-tide-mode))
 
