@@ -16,4 +16,10 @@
 
 (setq save-interprogram-paste-before-kill t)
 
+(use-package undo-tree
+  :ensure t
+  :diminish
+  :config
+  (global-undo-tree-mode))
+
 (provide 'init-editing)

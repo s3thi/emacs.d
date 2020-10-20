@@ -42,7 +42,7 @@
 (require 'init-editing)
 
 ;; Magit settings.
-(require 'init-magit)
+(require 'init-git)
 
 ;; Terminal.
 (require 'init-term)
