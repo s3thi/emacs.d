@@ -2,6 +2,12 @@
 ;; by areas of functionality.
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
+;; Working directory should be the home directory.
+(when (string= default-directory "/")
+  (setq default-directory "~/")
+  (with-current-buffer "*Messages*"
+    (setq default-directory "~/")))
+
 (defconst *is-a-mac* (eq system-type 'darwin))
 
 ;; Store configuration created by custom in a separate file.
