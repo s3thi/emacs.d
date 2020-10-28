@@ -33,6 +33,8 @@
   (setq projectile-completion-system 'ivy)
   :config
   (projectile-mode)
+  :bind
+  ("s-o" . #'projectile-find-file)
   :bind-keymap
   ("s-p" . projectile-command-map))
 
