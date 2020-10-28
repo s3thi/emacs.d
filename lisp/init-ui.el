@@ -32,7 +32,7 @@
   ("C-}" . #'persp-next)
   ("C-{" . #'persp-prev)
   ("C-`" . #'persp-switch-last)
-  ("C-?" . #'persp-switch)
+  ("C-\"" . #'persp-switch)
   :bind-keymap
   ("C-c p" . perspective-map))
 
@@ -55,6 +55,6 @@
   :init
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind
-  ("M-o" . #'ace-window))
+  ("M-`" . #'ace-window))
 
 (provide 'init-ui)
