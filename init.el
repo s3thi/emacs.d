@@ -53,6 +53,12 @@
 ;; Terminal.
 (require 'init-term)
 
+;; Feed reader settings.
+(require 'init-elfeed)
+
+;; Email settings.
+(require 'init-mail)
+
 ;; JavaScript specific settings.
 (require 'init-js)
 

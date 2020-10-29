@@ -8,6 +8,7 @@
 (setq help-window-select t)
 (setq visible-bell t)
 (winner-mode 1)
+(setq browse-url-browser-function 'xwidget-webkit-browse-url)
 
 (use-package diminish
   :after use-package
@@ -55,6 +56,6 @@
   :init
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind
-  ("M-`" . #'ace-window))
+  ("M-o" . #'ace-window))
 
 (provide 'init-ui)
