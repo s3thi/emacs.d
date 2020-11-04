@@ -59,6 +59,9 @@
 ;; Email settings.
 (require 'init-mail)
 
+;; Org settings.
+(require 'init-org)
+
 ;; JavaScript specific settings.
 (require 'init-js)
 
