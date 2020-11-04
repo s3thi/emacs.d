@@ -23,4 +23,9 @@
   :config
   (global-undo-tree-mode))
 
+(use-package move-text
+  :ensure t
+  :config
+  (move-text-default-bindings))
+
 (provide 'init-editing)
