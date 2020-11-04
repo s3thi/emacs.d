@@ -39,4 +39,9 @@
 (global-set-key (kbd "s-2") #'split-window-below)
 (global-set-key (kbd "s-3") #'split-window-right)
 
+(global-set-key (kbd "C-<left>") #'shrink-window-horizontally)
+(global-set-key (kbd "C-<right>") #'enlarge-window-horizontally)
+(global-set-key (kbd "C-<down>") #'shrink-window)
+(global-set-key (kbd "C-<up>") #'enlarge-window)
+
 (provide 'init-keys)
