@@ -1,4 +1,5 @@
 (setq-default indent-tabs-mode nil)
+(set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
 
 (use-package expand-region
   :ensure t
