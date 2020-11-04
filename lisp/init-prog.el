@@ -17,6 +17,12 @@
   :config
   (company-prescient-mode))
 
+(use-package company-emoji
+  :ensure t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-emoji))
+
 (use-package flycheck
   :ensure t
   :diminish
