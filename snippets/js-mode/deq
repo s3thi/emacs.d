@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: destructuring-assignment
+# key: deq
+# --
+
+const \{ ${2:bindings} \} = ${1:object};$0

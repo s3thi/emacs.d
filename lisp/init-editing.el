@@ -1,3 +1,4 @@
+(server-start)
 (setq-default indent-tabs-mode nil)
 (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
 

@@ -4,38 +4,56 @@
 (scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode)
-(set-frame-font "Fira Code 14" nil t)
+(set-frame-font "Fira Code 13" nil t)
 (setq help-window-select t)
 (setq visible-bell t)
 (winner-mode 1)
-(setq browse-url-browser-function 'xwidget-webkit-browse-url)
 (fset 'yes-or-no-p 'y-or-n-p)
+
+(setq uniquify-buffer-name-style 'reverse)
+(setq uniquify-separator " • ")
+(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-ignore-buffers-re "^\\*")
 
 (use-package diminish
   :after use-package
   :ensure t)
 
-(use-package gruvbox-theme
+(use-package doom-themes
   :ensure t
   :config
-  (load-theme 'gruvbox t))
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  ;; Themes I like: challenger-deep, henna, laserwave, miramare,
+  ;; old-hope, peacock, snazzy, rouge, tomorrow-night, zenburn,
+  ;; dracula.
+  (load-theme 'doom-henna t)
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
 
-(use-package perspective
+(use-package eyebrowse
   :ensure t
-  :diminish
-  :config
-  (persp-mode)
-  (global-set-key (kbd "C-x C-b") #'persp-ibuffer)
-  (setq persp-state-default-file (expand-file-name "perspective.el" user-emacs-directory))
+  :init
+  (setq eyebrowse-wrap-around t)
+  (setq eyebrowse-switch-back-and-forth t)
+  (setq eyebrowse-new-workspace t)
   :bind
-  ("C-x b" . #'persp-switch-to-buffer*)
-  ("C-x k" . #'persp-kill-buffer*)
-  ("C-}" . #'persp-next)
-  ("C-{" . #'persp-prev)
-  ("C-`" . #'persp-switch-last)
-  ("C-M-o" . #'persp-switch)
-  :bind-keymap
-  ("C-c p" . perspective-map))
+  ("C-{" . #'eyebrowse-prev-window-config)
+  ("C-}" . #'eyebrowse-next-window-config)
+  ("C-'" . #'eyebrowse-switch-to-window-config)
+  ("C-\"" . #'eyebrowse-rename-window-config)
+  ("M-`" . #'eyebrowse-last-window-config)
+  ("M-1" . #'eyebrowse-switch-to-window-config-1)
+  ("M-2" . #'eyebrowse-switch-to-window-config-2)
+  ("M-3" . #'eyebrowse-switch-to-window-config-3)
+  ("M-4" . #'eyebrowse-switch-to-window-config-4)
+  ("M-5" . #'eyebrowse-switch-to-window-config-5)
+  ("M-6" . #'eyebrowse-switch-to-window-config-6)
+  ("M-7" . #'eyebrowse-switch-to-window-config-7)
+  ("M-8" . #'eyebrowse-switch-to-window-config-8)
+  ("M-9" . #'eyebrowse-switch-to-window-config-9)
+  :config
+  (eyebrowse-mode t))
 
 (use-package which-key
   :ensure t
@@ -44,12 +62,7 @@
   (which-key-mode))
 
 (use-package buffer-move
-  :ensure t
-  :bind
-  ("M-<right>" . #'buf-move-right)
-  ("M-<left>" . #'buf-move-left)
-  ("M-<up>" . #'buf-move-up)
-  ("M-<down>" . #'buf-move-down))
+  :ensure t)
 
 (use-package ace-window
   :ensure t
@@ -58,13 +71,11 @@
   :bind
   ("M-o" . #'ace-window))
 
-(use-package xwwp
+(use-package doom-modeline
   :ensure t
-  :config
-  (xwwp-follow-link-completion-system 'ivy)
-  :bind
-  (:map xwidget-webkit-mode-map
-        ("v" . xwwp-follow-link)))
+  :hook (after-init . doom-modeline-mode)
+  :init
+  (setq doom-modeline-buffer-encoding nil))
 
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 

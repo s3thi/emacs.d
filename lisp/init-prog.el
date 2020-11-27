@@ -17,11 +17,11 @@
   :config
   (company-prescient-mode))
 
-(use-package company-emoji
+(use-package company-box
   :ensure t
   :after company
-  :config
-  (add-to-list 'company-backends 'company-emoji))
+  :diminish
+  :hook (company-mode . company-box-mode))
 
 (use-package flycheck
   :ensure t
@@ -66,10 +66,14 @@
 
 (use-package yasnippet
   :ensure t
+  :after company
   :diminish
   :init
   (setq yas-snippet-dirs '("~/.emacs.d/snippets/"))
   :config
-  (yas-global-mode 1))
+  (yas-global-mode 1)
+  (define-key yas-minor-mode-map (kbd "<tab>") nil)
+  (define-key yas-minor-mode-map (kbd "TAB") nil)
+  (define-key yas-minor-mode-map (kbd "C-;") yas-maybe-expand))
 
 (provide 'init-prog)

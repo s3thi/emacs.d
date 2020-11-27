@@ -3,32 +3,10 @@
   (setq mac-command-modifier 'control)
   (setq mac-control-modifier 'super))
 
-;; I don't want to use arrow keys for navigating through text.
-(global-unset-key [M-left])
-(global-unset-key [M-right])
-(global-unset-key (kbd "<left>"))
-(global-unset-key (kbd "<right>"))
-(global-unset-key (kbd "<up>"))
-(global-unset-key (kbd "<down>"))
-(global-unset-key (kbd "<C-left>"))
-(global-unset-key (kbd "<C-right>"))
-(global-unset-key (kbd "<C-up>"))
-(global-unset-key (kbd "<C-down>"))
-(global-unset-key (kbd "<M-left>"))
-(global-unset-key (kbd "<M-right>"))
-(global-unset-key (kbd "<M-up>"))
-(global-unset-key (kbd "<M-down>"))
-
-(defun load-init-file ()
-  (interactive)
-  (find-file (expand-file-name "init.el" user-emacs-directory)))
-
-(defun load-user-emacs-directory ()
-  (interactive)
-  (find-file user-emacs-directory))
-
 (global-set-key (kbd "s-l") #'goto-line)
-(global-set-key (kbd "C-c 0") #'delete-other-windows-vertically)
+(global-set-key (kbd "s-f") #'flush-lines)
+(global-set-key (kbd "M-s-0") #'delete-other-windows-vertically)
+(global-set-key (kbd "C-`") #'other-window)
 
 (use-package windmove
   :config
@@ -36,12 +14,44 @@
 
 (global-set-key (kbd "s-0") #'delete-window)
 (global-set-key (kbd "s-1") #'delete-other-windows)
-(global-set-key (kbd "s-2") #'split-window-below)
-(global-set-key (kbd "s-3") #'split-window-right)
+
+(defun split-and-follow-horizontally ()
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+
+(defun split-and-follow-vertically ()
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+
+(global-set-key (kbd "s-2") #'split-and-follow-horizontally)
+(global-set-key (kbd "s-3") #'split-and-follow-vertically)
 
 (global-set-key (kbd "C-<left>") #'shrink-window-horizontally)
 (global-set-key (kbd "C-<right>") #'enlarge-window-horizontally)
 (global-set-key (kbd "C-<down>") #'shrink-window)
 (global-set-key (kbd "C-<up>") #'enlarge-window)
+
+(defun copy-file-path ()
+  "Copy the path of the file currently open in the buffer."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (if filename
+        (progn
+          (kill-new filename)
+          (message "Filename placed in kill ring"))
+      (message "Current buffer is not associated with a file"))))
+
+(defun unfill-paragraph ()
+  "The inverse of 'fill-paragraph'."
+  (interactive)
+  (let ((fill-column most-positive-fixnum))
+    (fill-paragraph nil)))
+
+(global-set-key (kbd "C-c f") #'copy-file-path)
+(global-set-key (kbd "M-Q") #'unfill-paragraph)
 
 (provide 'init-keys)

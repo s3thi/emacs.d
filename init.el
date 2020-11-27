@@ -34,9 +34,6 @@
 ;; General programming settings.
 (require 'init-prog)
 
-;; Settings for uniquify.
-(require 'init-uniquify)
-
 ;; Ivy and Counsel.
 (require 'init-ivy)
 (require 'init-counsel)
@@ -53,17 +50,17 @@
 ;; Terminal.
 (require 'init-term)
 
-;; Feed reader settings.
-(require 'init-elfeed)
-
-;; Email settings.
-(require 'init-mail)
-
-;; Org settings.
-(require 'init-org)
+;; Misc.
+(require 'init-misc)
 
 ;; JavaScript specific settings.
 (require 'init-js)
 
 ;; Python specific settings.
 (require 'init-python)
+
+;; Rust specific settings.
+(require 'init-rust)
+
+;; LSP
+(require 'init-lsp)
