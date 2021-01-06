@@ -1,5 +1,3 @@
-;; Use ~/.emacs.d/lisp/ to store custom configurations, broken down
-;; by areas of functionality.
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 ;; Working directory should be the home directory.
@@ -13,8 +11,9 @@
 ;; Store configuration created by custom in a separate file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-;; Initialize packages and elpa.
-(require 'init-elpa)
+(require 'package)
+(add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
 ;; Bootstrap use-package.
 (unless (package-installed-p 'use-package)
@@ -35,8 +34,7 @@
 (require 'init-prog)
 
 ;; Ivy and Counsel.
-(require 'init-ivy)
-(require 'init-counsel)
+(require 'init-ivy-counsel)
 
 ;; File related settings.
 (require 'init-files)
@@ -50,9 +48,6 @@
 ;; Terminal.
 (require 'init-term)
 
-;; Misc.
-(require 'init-misc)
-
 ;; JavaScript specific settings.
 (require 'init-js)
 
@@ -62,5 +57,11 @@
 ;; Rust specific settings.
 (require 'init-rust)
 
+;; Common Lisp specific settings
+(require 'init-common-lisp)
+
 ;; LSP
 (require 'init-lsp)
+
+;; Org mode
+(require 'init-org)

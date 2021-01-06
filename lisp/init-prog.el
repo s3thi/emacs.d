@@ -55,7 +55,7 @@
 (use-package rg
   :ensure t
   :init
-  (setq rg-keymap-prefix (kbd "s-r"))
+  (setq rg-keymap-prefix (kbd "C-c s"))
   :config
   (rg-enable-default-bindings))
   

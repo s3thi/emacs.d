@@ -29,4 +29,11 @@
   :config
   (move-text-default-bindings))
 
+(use-package emojify
+  :ensure t
+  :after org
+  :config
+  (setq emojify-emoji-styles '(unicode))
+  (setq emojify-display-style 'unicode))
+
 (provide 'init-editing)
