@@ -1,5 +1,4 @@
 (setq inhibit-startup-screen t)
-(menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (column-number-mode 1)
@@ -15,11 +14,6 @@
 (setq uniquify-after-kill-buffer-p t)
 (setq uniquify-ignore-buffers-re "^\\*")
 
-(defun make-frame-title ()
-    (format "Workspace %d of %s"
-            (eyebrowse--get 'current-slot)
-            (mapcar 'car (eyebrowse--get 'window-configs))))
-
 (defun set-frame-title ()
   (setq frame-title-format (make-frame-title)))
 
@@ -30,7 +24,7 @@
 (use-package gruvbox-theme
   :ensure t
   :config
-  (load-theme 'gruvbox-light-hard t))
+  (load-theme 'gruvbox-dark-soft t))
 
 (use-package modus-themes
   :ensure t)
@@ -65,9 +59,7 @@
   ("M-8" . #'eyebrowse-switch-to-window-config-8)
   ("M-9" . #'eyebrowse-switch-to-window-config-9)
   :config
-  (setq eyebrowse-mode-line-style nil)
-  (eyebrowse-mode t)
-  (add-hook 'eyebrowse-post-window-switch-hook #'set-frame-title))
+  (eyebrowse-mode t))
 
 (use-package which-key
   :ensure t
@@ -88,5 +80,28 @@
   ("M-o" . #'ace-window))
 
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
+
+(use-package treemacs
+  :ensure t
+  :config
+  (global-set-key (kbd "C-\\") #'treemacs-select-window)
+  (treemacs-resize-icons 18))
+
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t)
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config
+  (treemacs-icons-dired-mode))
+
+(use-package vc
+  :diminish)
 
 (provide 'init-ui)

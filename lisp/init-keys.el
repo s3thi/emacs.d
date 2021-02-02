@@ -160,4 +160,48 @@ there's a region, all lines that region covers will be duplicated."
 
 (global-set-key (kbd "C-c r") #'crux-rename-file-and-buffer)
 
+(defun setup-athena-workspace ()
+  (interactive)
+
+  ;; Open the main App container.
+  (find-file "~/Code/athena_web/frontend/src/containers/App.js")
+
+  ;; Open treemacs.
+  (treemacs-select-window)
+
+  ;; Focus back on the main buffer.
+  (other-window 1)
+
+  ;; Create a new eyebrowse arrangement.
+  (eyebrowse-switch-to-window-config-2)
+
+  ;; Open a terminal, switch to the project directory.
+  (vterm "docker-term")
+  (vterm-insert "cd ~/Code/athena_web/")
+  (vterm-send-return)
+
+  ;; Open another terminal in a split and switch to the project directory.
+  (split-and-follow-horizontally)
+  (vterm "npm-term")
+  (vterm-insert "cd ~/Code/athena_web/frontend/")
+  (vterm-send-return)
+
+  ;; Another terminal, this one for tests.
+  (split-and-follow-vertically)
+  (vterm "test-term")
+  (vterm-insert "cd ~/Code/athena_web/frontend/")
+  (vterm-send-return)
+
+  ;; A final terminal, this one for random tasks.
+  (other-window 1)
+  (split-and-follow-vertically)
+  (vterm "frontend-term")
+  (vterm-insert "cd ~/Code/athena_web/frontend/")
+  (vterm-send-return)
+
+  ;; Switch back to the main window config.
+  (eyebrowse-switch-to-window-config-1))
+
+(global-set-key (kbd "C-c w") #'setup-athena-workspace)
+
 (provide 'init-keys)
