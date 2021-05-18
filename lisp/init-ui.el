@@ -7,7 +7,6 @@
 (setq visible-bell t)
 (winner-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
-(setq ns-use-proxy-icon nil)
 
 (setq uniquify-buffer-name-style 'reverse)
 (setq uniquify-separator " • ")
