@@ -22,13 +22,6 @@
   :config
   (load-theme 'gruvbox-dark-soft t))
 
-(use-package modus-themes
-  :ensure t)
-
-(use-package spacemacs-theme
-  :ensure t
-  :no-require t)
-
 (use-package avy
   :ensure t
   :config
