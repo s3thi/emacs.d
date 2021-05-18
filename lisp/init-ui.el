@@ -71,12 +71,6 @@
   :after treemacs magit
   :ensure t)
 
-(use-package treemacs-icons-dired
-  :after treemacs dired
-  :ensure t
-  :config
-  (treemacs-icons-dired-mode))
-
 (use-package vc
   :diminish)
 
