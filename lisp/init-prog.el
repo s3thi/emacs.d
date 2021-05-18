@@ -76,4 +76,6 @@
   (define-key yas-minor-mode-map (kbd "TAB") nil)
   (define-key yas-minor-mode-map (kbd "C-;") yas-maybe-expand))
 
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
 (provide 'init-prog)
