@@ -1,14 +1,10 @@
 (global-set-key (kbd "C-c v") #'delete-other-windows-vertically)
 (global-set-key (kbd "C-c b") #'rename-buffer)
 (global-set-key (kbd "C-c e") #'flycheck-list-errors)
-(global-set-key (kbd "C-`") #'other-frame)
 
 (use-package windmove
   :config
   (windmove-default-keybindings))
-
-(global-set-key (kbd "s-0") #'delete-window)
-(global-set-key (kbd "s-1") #'delete-other-windows)
 
 (defun split-and-follow-horizontally ()
   (interactive)
@@ -22,11 +18,6 @@
 
 (global-set-key (kbd "C-x 2") #'split-and-follow-horizontally)
 (global-set-key (kbd "C-x 3") #'split-and-follow-vertically)
-
-(global-set-key (kbd "C-<left>") #'shrink-window-horizontally)
-(global-set-key (kbd "C-<right>") #'enlarge-window-horizontally)
-(global-set-key (kbd "C-<down>") #'shrink-window)
-(global-set-key (kbd "C-<up>") #'enlarge-window)
 
 (defun copy-file-path ()
   "Copy the path of the file currently open in the buffer."
@@ -44,7 +35,6 @@
   (let ((fill-column most-positive-fixnum))
     (fill-paragraph nil)))
 
-(global-set-key (kbd "C-c f") #'copy-file-path)
 (global-set-key (kbd "M-Q") #'unfill-paragraph)
 
 (defun quit-other-window ()
@@ -89,9 +79,6 @@ With a prefix ARG open line above the current line."
     (move-end-of-line nil)
     (newline-and-indent)))
 
-(global-set-key (kbd "<S-return>") #'crux-smart-open-line)
-(global-set-key (kbd "<C-S-return>") #'crux-smart-open-line-above)
-
 (defun crux-get-positions-of-line-or-region ()
   "Return positions (beg . end) of the current line or region."
   (let (beg end)
@@ -119,7 +106,6 @@ there's a region, all lines that region covers will be duplicated."
     (goto-char (+ origin (* (length region) arg) arg))))
 
 (global-set-key (kbd "C-c d") #'crux-duplicate-current-line-or-region)
-
 
 (defun crux-delete-file-and-buffer ()
   "Kill the current buffer and deletes the file it is visiting."
@@ -151,49 +137,5 @@ there's a region, all lines that region covers will be duplicated."
           (set-visited-file-name new-name t t)))))))
 
 (global-set-key (kbd "C-c r") #'crux-rename-file-and-buffer)
-
-(defun setup-athena-workspace ()
-  (interactive)
-
-  ;; Open the main App container.
-  (find-file "~/Code/athena_web/frontend/src/containers/App.js")
-
-  ;; Open treemacs.
-  (treemacs-select-window)
-
-  ;; Focus back on the main buffer.
-  (other-window 1)
-
-  ;; Create a new eyebrowse arrangement.
-  (eyebrowse-switch-to-window-config-2)
-
-  ;; Open a terminal, switch to the project directory.
-  (vterm "docker-term")
-  (vterm-insert "cd ~/Code/athena_web/")
-  (vterm-send-return)
-
-  ;; Open another terminal in a split and switch to the project directory.
-  (split-and-follow-horizontally)
-  (vterm "npm-term")
-  (vterm-insert "cd ~/Code/athena_web/frontend/")
-  (vterm-send-return)
-
-  ;; Another terminal, this one for tests.
-  (split-and-follow-vertically)
-  (vterm "test-term")
-  (vterm-insert "cd ~/Code/athena_web/frontend/")
-  (vterm-send-return)
-
-  ;; A final terminal, this one for random tasks.
-  (other-window 1)
-  (split-and-follow-vertically)
-  (vterm "frontend-term")
-  (vterm-insert "cd ~/Code/athena_web/frontend/")
-  (vterm-send-return)
-
-  ;; Switch back to the main window config.
-  (eyebrowse-switch-to-window-config-1))
-
-(global-set-key (kbd "C-c w") #'setup-athena-workspace)
 
 (provide 'init-keys)
