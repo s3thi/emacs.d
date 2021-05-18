@@ -30,23 +30,10 @@
 (use-package eyebrowse
   :ensure t
   :init
-  (setq eyebrowse-keymap-prefix (kbd "s-w"))
+  (setq eyebrowse-keymap-prefix (kbd "C-c w"))
   (setq eyebrowse-wrap-around t)
   (setq eyebrowse-switch-back-and-forth t)
   (setq eyebrowse-new-workspace t)
-  :bind
-  ("C-{" . #'eyebrowse-prev-window-config)
-  ("C-}" . #'eyebrowse-next-window-config)
-  ("M-`" . #'eyebrowse-last-window-config)
-  ("M-1" . #'eyebrowse-switch-to-window-config-1)
-  ("M-2" . #'eyebrowse-switch-to-window-config-2)
-  ("M-3" . #'eyebrowse-switch-to-window-config-3)
-  ("M-4" . #'eyebrowse-switch-to-window-config-4)
-  ("M-5" . #'eyebrowse-switch-to-window-config-5)
-  ("M-6" . #'eyebrowse-switch-to-window-config-6)
-  ("M-7" . #'eyebrowse-switch-to-window-config-7)
-  ("M-8" . #'eyebrowse-switch-to-window-config-8)
-  ("M-9" . #'eyebrowse-switch-to-window-config-9)
   :config
   (eyebrowse-mode t))
 
