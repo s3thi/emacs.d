@@ -13,9 +13,6 @@
 (setq uniquify-after-kill-buffer-p t)
 (setq uniquify-ignore-buffers-re "^\\*")
 
-(defun set-frame-title ()
-  (setq frame-title-format (make-frame-title)))
-
 (use-package diminish
   :after use-package
   :ensure t)
