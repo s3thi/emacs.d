@@ -40,9 +40,9 @@
   :config
   (projectile-mode)
   :bind
-  ("s-o" . #'projectile-find-file)
+  ("C-c f" . #'projectile-find-file)
   :bind-keymap
-  ("s-p" . projectile-command-map))
+  ("C-c p" . projectile-command-map))
 
 (use-package markdown-mode
   :ensure t

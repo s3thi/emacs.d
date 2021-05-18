@@ -29,6 +29,8 @@
           (message "Filename placed in kill ring"))
       (message "Current buffer is not associated with a file"))))
 
+(global-set-key (kbd "C-c c") #'copy-file-path)
+
 (defun unfill-paragraph ()
   "The inverse of 'fill-paragraph'."
   (interactive)
