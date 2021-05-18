@@ -57,8 +57,5 @@
 ;; Rust specific settings.
 (require 'init-rust)
 
-;; Lua specific settings.
-(require 'init-lua)
-
 ;; LSP
 (require 'init-lsp)
