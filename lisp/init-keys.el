@@ -1,11 +1,3 @@
-(when *is-a-mac*
-  (setq mac-command-modifier 'control)
-  (setq mac-control-modifier 'meta)
-  (setq mac-right-command-modifier 'super)
-  (setq mac-option-modifier 'super)
-  (setq mac-right-option-modifier nil)
-  (setq mac-function-modifier 'hyper))
-
 (global-set-key (kbd "C-c v") #'delete-other-windows-vertically)
 (global-set-key (kbd "C-c b") #'rename-buffer)
 (global-set-key (kbd "C-c e") #'flycheck-list-errors)
