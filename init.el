@@ -7,6 +7,7 @@
     (setq default-directory "~/")))
 
 (defconst *is-a-mac* (eq system-type 'darwin))
+(defconst *is-a-pc* (eq system-type 'windows-nt))
 
 ;; Store configuration created by custom in a separate file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
