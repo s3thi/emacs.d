@@ -1,9 +1,16 @@
 (setq inhibit-startup-screen t)
 (tool-bar-mode -1)
-(scroll-bar-mode -1)
+
+(when (boundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
+
 (column-number-mode 1)
 (show-paren-mode)
 (set-frame-font "Fira Code 13" nil t)
+
+(when (boundp 'set-fontset-font)
+  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+
 (setq visible-bell t)
 (winner-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
