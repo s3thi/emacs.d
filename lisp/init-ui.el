@@ -1,4 +1,3 @@
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
 (setq inhibit-startup-screen t)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
