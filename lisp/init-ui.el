@@ -62,7 +62,8 @@
   :ensure t
   :config
   (global-set-key (kbd "C-\\") #'treemacs-select-window)
-  (treemacs-resize-icons 18))
+  (setq treemacs-no-png-images t)
+  (treemacs-fringe-indicator-mode 'always))
 
 (use-package treemacs-projectile
   :after treemacs projectile
