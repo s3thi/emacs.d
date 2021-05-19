@@ -24,4 +24,6 @@
 (use-package json-mode
   :ensure t)
 
+(add-hook 'js-mode-hook #'js-jsx-enable)
+
 (provide 'init-js)
