@@ -34,4 +34,9 @@
   (setq emojify-emoji-styles '(unicode))
   (setq emojify-display-style 'unicode))
 
+(use-package rainbow-delimiters
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
 (provide 'init-editing)

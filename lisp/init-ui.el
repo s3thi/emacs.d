@@ -4,9 +4,12 @@
 (when (boundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
+(when (not (display-graphic-p))
+  (menu-bar-mode -1))
+
 (column-number-mode 1)
 (show-paren-mode)
-(set-frame-font "Fira Code 13" nil t)
+(set-frame-font "Iosevka 14" nil t)
 
 (when (boundp 'set-fontset-font)
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
@@ -27,7 +30,7 @@
 (use-package gruvbox-theme
   :ensure t
   :config
-  (load-theme 'gruvbox-dark-soft t))
+  (load-theme 'gruvbox-light-soft t))
 
 (use-package avy
   :ensure t
