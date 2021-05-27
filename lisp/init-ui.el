@@ -3,7 +3,13 @@
 (scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode)
-(set-frame-font "Fira Code 13" nil t)
+
+(when *is-a-mac*
+    (set-frame-font "Fira Code 13" nil t))
+
+(when *is-a-pc*
+    (set-frame-font "Fira Code 11" nil t))
+
 (setq visible-bell t)
 (winner-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)

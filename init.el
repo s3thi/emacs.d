@@ -58,5 +58,8 @@
 ;; Rust specific settings.
 (require 'init-rust)
 
+;; C# specific settings.
+(require 'init-csharp)
+
 ;; LSP
 (require 'init-lsp)
