@@ -1,14 +1,23 @@
 (setq inhibit-startup-screen t)
 (tool-bar-mode -1)
-(scroll-bar-mode -1)
+
+(when (boundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
+
+(when (not (display-graphic-p))
+  (menu-bar-mode -1))
+
 (column-number-mode 1)
 (show-paren-mode)
 
 (when *is-a-mac*
-    (set-frame-font "Fira Code 13" nil t))
+    (set-frame-font "Iosevka 13" nil t))
 
 (when *is-a-pc*
-    (set-frame-font "Fira Code 11" nil t))
+    (set-frame-font "Iosevka 11" nil t))
+
+(when (boundp 'set-fontset-font)
+  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 
 (setq visible-bell t)
 (winner-mode 1)
@@ -26,7 +35,7 @@
 (use-package gruvbox-theme
   :ensure t
   :config
-  (load-theme 'gruvbox-dark-soft t))
+  (load-theme 'gruvbox-light-soft t))
 
 (use-package avy
   :ensure t

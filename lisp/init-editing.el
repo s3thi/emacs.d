@@ -1,5 +1,4 @@
 (setq-default indent-tabs-mode nil)
-(set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
 
 (use-package expand-region
   :ensure t
@@ -34,5 +33,10 @@
   :config
   (setq emojify-emoji-styles '(unicode))
   (setq emojify-display-style 'unicode))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 (provide 'init-editing)

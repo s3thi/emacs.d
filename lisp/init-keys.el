@@ -140,4 +140,13 @@ there's a region, all lines that region covers will be duplicated."
 
 (global-set-key (kbd "C-c r") #'crux-rename-file-and-buffer)
 
+(defun goto-line-and-scroll-to-top (line)
+  "Move the cursor to LINE and move it to the top of the window."
+  (interactive "NLine number: ")
+  (with-no-warnings
+    (goto-line line))
+  (recenter-top-bottom 0))
+
+(global-set-key (kbd "C-c i") #'goto-line-and-scroll-to-top)
+
 (provide 'init-keys)

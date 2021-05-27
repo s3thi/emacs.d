@@ -79,4 +79,10 @@
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'prog-mode-hook #'hl-line-mode)
 
+(use-package docker
+  :ensure t
+  :bind ("C-c o" . docker))
+
+(global-set-key (kbd "M-;") #'comment-line)
+
 (provide 'init-prog)
