@@ -35,7 +35,7 @@
 (use-package gruvbox-theme
   :ensure t
   :config
-  (load-theme 'gruvbox-light-soft t))
+  (load-theme 'gruvbox-dark-soft t))
 
 (use-package avy
   :ensure t
