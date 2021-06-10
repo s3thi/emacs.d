@@ -11,7 +11,7 @@
 (show-paren-mode)
 
 (when *is-a-mac*
-    (set-frame-font "Iosevka 13" nil t))
+    (set-frame-font "Iosevka 14" nil t))
 
 (when *is-a-pc*
     (set-frame-font "Iosevka 11" nil t))
@@ -82,6 +82,15 @@
 (use-package treemacs-projectile
   :after treemacs projectile
   :ensure t)
+
+(use-package ibuffer-projectile
+  :ensure t
+  :config
+  (add-hook 'ibuffer-hook
+            (lambda ()
+              (ibuffer-projectile-set-filter-groups)
+              (unless (eq ibuffer-sorting-mode 'alphabetic)
+                (ibuffer-do-sort-by-alphabetic)))))
 
 (use-package treemacs-magit
   :after treemacs magit
