@@ -11,18 +11,6 @@
   (setq company-tooltip-align-annotations t)
   (setq company-selection-wrap-around t))
 
-(use-package company-prescient
-  :ensure t
-  :after company
-  :config
-  (company-prescient-mode))
-
-(use-package company-box
-  :ensure t
-  :after company
-  :diminish
-  :hook (company-mode . company-box-mode))
-
 (use-package flycheck
   :ensure t
   :diminish
@@ -78,11 +66,5 @@
 
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'prog-mode-hook #'hl-line-mode)
-
-(use-package docker
-  :ensure t
-  :bind ("C-c o" . docker))
-
-(global-set-key (kbd "M-;") #'comment-line)
 
 (provide 'init-prog)

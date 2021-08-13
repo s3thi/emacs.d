@@ -1,11 +1,7 @@
 (global-set-key (kbd "C-c v") #'delete-other-windows-vertically)
 (global-set-key (kbd "C-c b") #'rename-buffer)
 (global-set-key (kbd "C-c e") #'flycheck-list-errors)
-(global-set-key (kbd "C-x b") #'ibuffer)
-
-(use-package windmove
-  :config
-  (windmove-default-keybindings))
+(global-set-key (kbd "M-;") #'comment-line)
 
 (defun split-and-follow-horizontally ()
   (interactive)

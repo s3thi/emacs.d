@@ -11,15 +11,18 @@
 (show-paren-mode)
 
 (when *is-a-mac*
-    (set-frame-font "Iosevka 14" nil t))
+    (set-frame-font "Rec Mono Duotone 14" nil t))
 
 (when *is-a-pc*
-    (set-frame-font "Iosevka 11" nil t))
+    (set-frame-font "Rec Mono Duotone 11" nil t))
 
+;; Enable emoji on macOS.
 (when (boundp 'set-fontset-font)
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 
 (setq visible-bell t)
+
+;; Winner mode lets you undo changes in the window configuration.
 (winner-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -37,29 +40,11 @@
   :config
   (load-theme 'gruvbox-dark-soft t))
 
-(use-package avy
-  :ensure t
-  :config
-  (global-set-key (kbd "M-j") 'avy-goto-char-2))
-
-(use-package eyebrowse
-  :ensure t
-  :init
-  (setq eyebrowse-keymap-prefix (kbd "C-c w"))
-  (setq eyebrowse-wrap-around t)
-  (setq eyebrowse-switch-back-and-forth t)
-  (setq eyebrowse-new-workspace t)
-  :config
-  (eyebrowse-mode t))
-
 (use-package which-key
   :ensure t
   :diminish
   :config
   (which-key-mode))
-
-(use-package buffer-move
-  :ensure t)
 
 (use-package ace-window
   :ensure t
@@ -82,15 +67,6 @@
 (use-package treemacs-projectile
   :after treemacs projectile
   :ensure t)
-
-(use-package ibuffer-projectile
-  :ensure t
-  :config
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (ibuffer-projectile-set-filter-groups)
-              (unless (eq ibuffer-sorting-mode 'alphabetic)
-                (ibuffer-do-sort-by-alphabetic)))))
 
 (use-package treemacs-magit
   :after treemacs magit
