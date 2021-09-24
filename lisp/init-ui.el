@@ -11,10 +11,16 @@
 (show-paren-mode)
 
 (when *is-a-mac*
-    (set-frame-font "Rec Mono Duotone 14" nil t))
+  (set-frame-font "Rec Mono Duotone 14" nil t))
 
 (when *is-a-pc*
-    (set-frame-font "Rec Mono Duotone 11" nil t))
+  (set-frame-font "Rec Mono Duotone 11" nil t))
+
+(when *is-a-linux*
+  (set-frame-font "Fira Code 10" nil t))
+
+(when (or *is-a-pc* *is-a-linux*)
+  (menu-bar-mode -1))
 
 ;; Enable emoji on macOS.
 (when (boundp 'set-fontset-font)
