@@ -1,5 +1,8 @@
 ;;; init.el --- Initialization file for Emacs
 
+;;; Commentary:
+;; Initialization file for Emacs.
+
 ;;; Code:
 
 ;; I like to use different settings on different systems.
@@ -17,6 +20,9 @@
 (show-paren-mode)
 (setq visible-bell t)
 
+;; Use a built-in theme.
+(load-theme 'tango-dark t)
+
 ;; Set fonts.
 (when *is-a-mac*
     (set-frame-font "Fira Code 14" nil t))
@@ -32,9 +38,6 @@
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 
 ;; Bootstrap use-package.
-
-;;; Commentary:
-;; 
 
 (require 'package)
 (add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
