@@ -1,28 +1,51 @@
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+;;; init.el --- Initialization file for Emacs
 
-;; Working directory should be the home directory.
-(when (string= default-directory "/")
-  (setq default-directory "~/")
-  (with-current-buffer "*Messages*"
-    (setq default-directory "~/")))
+;;; Code:
 
+;; I like to use different settings on different systems.
 (defconst *is-a-mac* (eq system-type 'darwin))
 (defconst *is-a-pc* (eq system-type 'windows-nt))
+(defconst *is-a-linux* (eq system-type 'gnu/linux))
 
 ;; Store configuration created by custom in a separate file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+;; Minor UI settings.
+(setq inhibit-startup-screen t)
+(tool-bar-mode -1)
+(column-number-mode 1)
+(show-paren-mode)
+(setq visible-bell t)
+
+;; Set fonts.
+(when *is-a-mac*
+    (set-frame-font "Fira Code 14" nil t))
+
+(when *is-a-pc*
+  (set-frame-font "Fira Code 11" nil t))
+
+(when *is-a-linux*
+  (set-frame-font "Fira Code 10" nil t))
+
+;; Enable emoji on macOS.
+(when (boundp 'set-fontset-font)
+  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+
+;; Bootstrap use-package.
+
+;;; Commentary:
+;; 
 
 (require 'package)
 (add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; Bootstrap use-package.
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
 
-;; Setup auto updating.
+;; Setup auto updating for installed packages.
 (use-package auto-package-update
   :ensure t
   :config
@@ -30,44 +53,150 @@
         auto-package-update-interval 4)
   (auto-package-update-maybe))
 
-;; Configure the Emacs exec-path.
-(require 'init-exec-path)
+;; Configure exec-path.
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  (exec-path-from-shell-copy-env "WORKON_HOME"))
 
-;; UI configuration.
-(require 'init-ui)
+;; Add node_modules to the exec-path.
+(use-package add-node-modules-path
+  :ensure t
+  :hook js-mode)
 
-;; Custom keybindings.
-(require 'init-keys)
+(global-set-key (kbd "M-;") #'comment-line)
 
-;; General programming settings.
-(require 'init-prog)
+;; Don't create garbage files.
+(setq-default create-lockfiles nil)
+(setq-default make-backup-files nil)
 
-;; Ivy and Counsel.
-(require 'init-ivy-counsel)
+;; Automatically load files from disk when they change.
+(global-auto-revert-mode 1)
+(setq dired-auto-revert-buffer t)
 
-;; File related settings.
-(require 'init-files)
+;; Always use spaces for indentation.
+(setq-default indent-tabs-mode nil)
 
-;; Settings for editing text.
-(require 'init-editing)
+;; Package to mark logical regions of code.
+(use-package expand-region
+  :ensure t
+  :bind
+  ("C-=" . #'er/expand-region))
 
-;; Magit settings.
-(require 'init-git)
+;; Put the most recently killed/yanked text into the system clipboard.
+(setq save-interprogram-paste-before-kill t)
 
-;; Terminal.
-(require 'init-term)
+;; Use ivy as a completion framework.
+(use-package ivy
+  :ensure t
+  :diminish
+  :config
+  (setq ivy-re-builders-alist
+        '((t . ivy--regex-fuzzy)))
+  (ivy-mode 1))
 
-;; JavaScript specific settings.
-(require 'init-js)
+;; Use counsel to enhance emacs functions with ivy.
+(use-package counsel
+  :after ivy
+  :ensure t
+  :diminish
+  :config
+  (counsel-mode))
 
-;; Python specific settings.
-(require 'init-python)
+;; Store secrets in this file. What could possibly go wrong?
+(setq auth-sources '("~/.authinfo"))
 
-;; Rust specific settings.
-(require 'init-rust)
+;; Magit is the bomb.
+(use-package magit
+  :ensure t)
 
-;; C# specific settings.
-(require 'init-csharp)
+;; Use company for autocomplete menus.
+(use-package company
+  :ensure t
+  :hook
+  (after-init . global-company-mode)
+  :bind
+  (:map company-active-map
+        ("C-n" . company-select-next-or-abort)
+        ("C-p" . company-select-previous-or-abort))
+  :config
+  (setq company-idle-delay 0.1)
+  (setq company-tooltip-align-annotations t)
+  (setq company-selection-wrap-around t))
 
-;; LSP
-(require 'init-lsp)
+;; Display line numbers, but only when in a source code file.
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
+;; JavaScript indent level.
+(setq js-indent-level 2)
+
+;; Treat all JS as JSX.
+(add-hook 'js-mode-hook #'js-jsx-enable)
+
+;; Automatically format JS code with prettier.
+(use-package prettier-js
+  :ensure t
+  :diminish
+  :init
+  (add-hook 'js-mode-hook #'prettier-js-mode))
+
+(defun setup-tide-mode ()
+  "Run tide, eldoc, flycheck, company when entering a JS file."
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+;; Language server for JS and TS.
+(use-package tide
+  :ensure t
+  :diminish
+  :init
+  (add-hook 'js-mode-hook #'setup-tide-mode))
+
+;; It's surprising that this isn't included in Emacs by default?!
+(use-package json-mode
+  :ensure t)
+
+
+;; Syntax highlighting for Rust.
+(use-package rust-mode
+  :ensure t
+  :config
+  (setq rust-format-on-save t))
+
+;; LSP config.
+(use-package lsp-mode
+  :ensure t
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (setq lsp-rust-server "rust-analyzer")
+  :hook
+  ((rust-mode . lsp)))
+
+;; Markdown.
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+
+;; Use ripgrep for searching.
+(use-package rg
+  :ensure t
+  :init
+  (setq rg-keymap-prefix (kbd "C-c s"))
+  :config
+  (rg-enable-default-bindings))
+
+(provide 'init)
+
+;;; init.el ends here
