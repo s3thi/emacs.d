@@ -1,4 +1,4 @@
-;;; init.el --- Initialization file for Emacs
+;; init.el --- Initialization file for Emacs
 
 ;;; Commentary:
 ;; Initialization file for Emacs.
@@ -38,7 +38,6 @@
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 
 ;; Bootstrap use-package.
-
 (require 'package)
 (add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
@@ -47,6 +46,10 @@
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
+
+;; Hide certain modes from the modeline.
+(use-package diminish
+  :ensure t)
 
 ;; Setup auto updating for installed packages.
 (use-package auto-package-update
@@ -108,6 +111,12 @@
   :config
   (counsel-mode))
 
+(use-package which-key
+  :ensure t
+  :diminish
+  :config
+  (which-key-mode 1))
+
 ;; Store secrets in this file. What could possibly go wrong?
 (setq auth-sources '("~/.authinfo"))
 
@@ -118,6 +127,7 @@
 ;; Use company for autocomplete menus.
 (use-package company
   :ensure t
+  :diminish
   :hook
   (after-init . global-company-mode)
   :bind
@@ -141,7 +151,6 @@
 ;; Automatically format JS code with prettier.
 (use-package prettier-js
   :ensure t
-  :diminish
   :init
   (add-hook 'js-mode-hook #'prettier-js-mode))
 
@@ -158,7 +167,6 @@
 ;; Language server for JS and TS.
 (use-package tide
   :ensure t
-  :diminish
   :init
   (add-hook 'js-mode-hook #'setup-tide-mode))
 
