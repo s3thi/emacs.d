@@ -111,6 +111,7 @@
   :config
   (counsel-mode))
 
+;; I get by with a little help from which-key.
 (use-package which-key
   :ensure t
   :diminish
@@ -120,9 +121,23 @@
 ;; Store secrets in this file. What could possibly go wrong?
 (setq auth-sources '("~/.authinfo"))
 
-;; Magit is the bomb.
+;; Magit is dope.
 (use-package magit
   :ensure t)
+
+;; Projectile for project management, because I'm too lazy to figure
+;; out project.el.
+(use-package projectile
+  :ensure t
+  :diminish
+  :init
+  (setq projectile-completion-system 'ivy)
+  :config
+  (projectile-mode)
+  :bind
+  ("C-c f" . #'projectile-find-file)
+  :bind-keymap
+  ("C-c p" . projectile-command-map))
 
 ;; Use company for autocomplete menus.
 (use-package company
