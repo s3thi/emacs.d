@@ -37,19 +37,16 @@
 (when (boundp 'set-fontset-font)
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 
-;; Bootstrap use-package.
+;; Initialize package.
 (require 'package)
 (add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
+;; Initialize use-package.
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
-
-;; Hide certain modes from the modeline.
-(use-package diminish
-  :ensure t)
 
 ;; Setup auto updating for installed packages.
 (use-package auto-package-update
@@ -72,7 +69,9 @@
   :ensure t
   :hook js-mode)
 
-(global-set-key (kbd "M-;") #'comment-line)
+;; Hide certain modes from the modeline.
+(use-package diminish
+  :ensure t)
 
 ;; Don't create garbage files.
 (setq-default create-lockfiles nil)
@@ -163,6 +162,9 @@
 ;; Treat all JS as JSX.
 (add-hook 'js-mode-hook #'js-jsx-enable)
 
+;; Shortcut for commenting a line.
+(global-set-key (kbd "M-;") #'comment-line)
+
 ;; Automatically format JS code with prettier.
 (use-package prettier-js
   :ensure t
@@ -213,6 +215,7 @@
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
+  :hook (markdown-mode . visual-line-mode)
   :init (setq markdown-command "multimarkdown"))
 
 ;; Use ripgrep for searching.
