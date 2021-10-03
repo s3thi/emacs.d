@@ -10,3 +10,6 @@
 /.DS_Store
 /forge-database.sqlite
 /tramp
+/.cache/
+/.last-package-update-day
+/.lsp-session-v1
