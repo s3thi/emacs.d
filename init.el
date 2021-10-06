@@ -16,6 +16,7 @@
 ;; Minor UI settings.
 (setq inhibit-startup-screen t)
 (tool-bar-mode -1)
+(scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode)
 (setq visible-bell t)
