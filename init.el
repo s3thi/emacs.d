@@ -192,22 +192,27 @@
 (use-package json-mode
   :ensure t)
 
-
 ;; Syntax highlighting for Rust.
 (use-package rust-mode
   :ensure t
+  :after lsp-mode
   :config
-  (setq rust-format-on-save t))
+  (setq lsp-rust-server "rust-analyzer")
+  (setq rust-format-on-save t)
+  :hook (rust-mode . lsp))
+
+;; Support for Go.
+(use-package go-mode
+  :ensure t
+  :hook ((go-mode . lsp)
+         (go-mode . (lambda ()
+                      (add-hook 'before-save-hook #'gofmt-before-save nil t)))))
 
 ;; LSP config.
 (use-package lsp-mode
   :ensure t
   :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config
-  (setq lsp-rust-server "rust-analyzer")
-  :hook
-  ((rust-mode . lsp)))
+  (setq lsp-keymap-prefix "C-c l"))
 
 ;; Markdown.
 (use-package markdown-mode
