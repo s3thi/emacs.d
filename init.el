@@ -85,6 +85,10 @@
 ;; Always use spaces for indentation.
 (setq-default indent-tabs-mode nil)
 
+;; In modes where we are forced to use tabs (e.g go-mode), set tab
+;; width to 4.
+(setq-default tab-width 4)
+
 ;; Package to mark logical regions of code.
 (use-package expand-region
   :ensure t
