@@ -208,9 +208,33 @@
 ;; Support for Go.
 (use-package go-mode
   :ensure t
-  :hook ((go-mode . lsp)
-         (go-mode . (lambda ()
+  :hook ((go-mode . (lambda ()
                       (add-hook 'before-save-hook #'gofmt-before-save nil t)))))
+
+;; REST client.
+(use-package restclient
+  :ensure t)
+
+;; Bookmarks.
+(use-package bm
+  :ensure t
+  :init
+  (setq bm-restore-repository-on-load t)
+  :config
+  (setq bm-repository-file "~/.emacs.d/bm-repository")
+  (setq-default bm-buffer-persistence t)
+  (add-hook 'after-init-hook 'bm-repository-load)
+  (add-hook 'kill-buffer-hook #'bm-buffer-save)
+  (add-hook 'kill-emacs-hook #'(lambda nil
+                                 (bm-buffer-save-all)
+                                 (bm-repository-save)))
+  (add-hook 'after-save-hook #'bm-buffer-save)
+  (add-hook 'find-file-hooks   #'bm-buffer-restore)
+  (add-hook 'after-revert-hook #'bm-buffer-restore)
+  (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+  :bind (("C-<f2>" . #'bm-toggle)
+         ("<f2>" . #'bm-next)
+         ("M-<f2>" . #'bm-previous)))
 
 ;; LSP config.
 (use-package lsp-mode
@@ -235,6 +259,9 @@
   (setq rg-keymap-prefix (kbd "C-c s"))
   :config
   (rg-enable-default-bindings))
+
+;; Start a server so other clients can connect to this.
+(server-start)
 
 (provide 'init)
 
