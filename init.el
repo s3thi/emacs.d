@@ -21,8 +21,10 @@
 (show-paren-mode)
 (setq visible-bell t)
 
-;; Use a built-in theme.
-(load-theme 'tango-dark t)
+;; Clicking a file in dired should open it in the same window.
+(eval-after-load "dired"
+  `(progn
+     (define-key dired-mode-map (kbd "<mouse-2>") 'dired-mouse-find-file)))
 
 ;; Set fonts.
 (when *is-a-mac*
@@ -89,6 +91,9 @@
 ;; width to 4.
 (setq-default tab-width 4)
 
+;; Fill paragraphs so the lines are 80 characters wide.
+(setq-default fill-column 80)
+
 ;; Package to mark logical regions of code.
 (use-package expand-region
   :ensure t
@@ -98,22 +103,10 @@
 ;; Put the most recently killed/yanked text into the system clipboard.
 (setq save-interprogram-paste-before-kill t)
 
-;; Use ivy as a completion framework.
-(use-package ivy
-  :ensure t
-  :diminish
-  :config
-  (setq ivy-re-builders-alist
-        '((t . ivy--regex-fuzzy)))
-  (ivy-mode 1))
-
-;; Use counsel to enhance emacs functions with ivy.
-(use-package counsel
-  :after ivy
-  :ensure t
-  :diminish
-  :config
-  (counsel-mode))
+;; Configure ido-mode for completions.
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
 
 ;; I get by with a little help from which-key.
 (use-package which-key
@@ -135,11 +128,8 @@
   :ensure t
   :diminish
   :init
-  (setq projectile-completion-system 'ivy)
   :config
   (projectile-mode)
-  :bind
-  ("C-c f" . #'projectile-find-file)
   :bind-keymap
   ("C-c p" . projectile-command-map))
 
@@ -179,12 +169,14 @@
 (defun setup-tide-mode ()
   "Run tide, eldoc, flycheck, company when entering a JS file."
   (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (company-mode +1))
+  (if buffer-file-name
+      (progn
+        (tide-setup)
+        (flycheck-mode +1)
+        (setq flycheck-check-syntax-automatically '(save mode-enabled))
+        (eldoc-mode +1)
+        (tide-hl-identifier-mode +1)
+        (company-mode +1))))
 
 ;; Language server for JS and TS.
 (use-package tide
