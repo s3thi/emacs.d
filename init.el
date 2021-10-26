@@ -94,12 +94,6 @@
 ;; Fill paragraphs so the lines are 80 characters wide.
 (setq-default fill-column 80)
 
-;; Package to mark logical regions of code.
-(use-package expand-region
-  :ensure t
-  :bind
-  ("C-=" . #'er/expand-region))
-
 ;; Put the most recently killed/yanked text into the system clipboard.
 (setq save-interprogram-paste-before-kill t)
 
@@ -148,8 +142,8 @@
   (setq company-tooltip-align-annotations t)
   (setq company-selection-wrap-around t))
 
-;; Display line numbers, but only when in a source code file.
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+;; Display line numbers.
+(global-display-line-numbers-mode t)
 
 ;; JavaScript indent level.
 (setq js-indent-level 2)
@@ -244,13 +238,18 @@
   :hook (markdown-mode . visual-line-mode)
   :init (setq markdown-command "multimarkdown"))
 
-;; Use ripgrep for searching.
-(use-package rg
-  :ensure t
-  :init
-  (setq rg-keymap-prefix (kbd "C-c s"))
-  :config
-  (rg-enable-default-bindings))
+;; Ignored files/directories when grepping.
+(eval-after-load "grep"
+  `(progn
+     (setq-default grep-find-ignored-directories
+                   (cons
+                    "node_modules"
+                    (default-value 'grep-find-ignored-directories)))
+     (setq-default grep-find-ignored-files
+                   (cons
+                    "package-lock.json"
+                    (default-value 'grep-find-ignored-directories)))))
+
 
 ;; Start a server so other clients can connect to this.
 (server-start)
