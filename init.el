@@ -145,6 +145,10 @@
 ;; Display line numbers.
 (global-display-line-numbers-mode t)
 
+;; Turn off soft wrapping for source code only.
+(add-hook 'prog-mode-hook
+          (lambda () (setq truncate-lines t)))
+
 ;; JavaScript indent level.
 (setq js-indent-level 2)
 
