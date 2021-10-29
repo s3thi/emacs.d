@@ -183,13 +183,8 @@
   :ensure t)
 
 ;; Syntax highlighting for Rust.
-(use-package rust-mode
-  :ensure t
-  :after lsp-mode
-  :config
-  (setq lsp-rust-server "rust-analyzer")
-  (setq rust-format-on-save t)
-  :hook (rust-mode . lsp))
+(use-package rustic
+  :ensure t)
 
 ;; Support for Go.
 (use-package go-mode
