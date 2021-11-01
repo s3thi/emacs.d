@@ -21,6 +21,10 @@
 (show-paren-mode)
 (setq visible-bell t)
 
+;; Enable some commands that are disabled by default.
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
 ;; Clicking a file in dired should open it in the same window.
 (eval-after-load "dired"
   `(progn
