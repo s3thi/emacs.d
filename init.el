@@ -32,7 +32,7 @@
 
 ;; Set fonts.
 (when *is-a-mac*
-    (set-frame-font "Fira Code 14" nil t))
+    (set-frame-font "DM Mono 14" nil t))
 
 (when *is-a-pc*
   (set-frame-font "Fira Code 11" nil t))
