@@ -39,7 +39,6 @@
 
 (when *is-a-linux*
   (set-frame-font "DM Mono 10" nil t))
-
 ;; Enable emoji on macOS.
 (when (boundp 'set-fontset-font)
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
@@ -101,10 +100,27 @@
 ;; Put the most recently killed/yanked text into the system clipboard.
 (setq save-interprogram-paste-before-kill t)
 
-;; Configure ido-mode for completions.
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(ido-mode 1)
+;; Use Vertico for minibuffer completions.
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
+
+;; Add annotations in the minibuffer using Marginalia.
+(use-package marginalia
+  :ensure t
+  :bind (:map minibuffer-local-map
+              ("M-A" . marginalia-cycle))
+  :init
+  (marginalia-mode))
+
+;; Use Orderless for searching through completions in the minibuffer.
+(use-package orderless
+  :ensure t
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 
 ;; I get by with a little help from which-key.
 (use-package which-key
