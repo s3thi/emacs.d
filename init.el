@@ -21,6 +21,10 @@
 (show-paren-mode)
 (setq visible-bell t)
 
+;; Disable C-z to suspend in GUI Emacs.
+(when window-system
+  (global-unset-key (kbd "C-z")))
+
 ;; Enable some commands that are disabled by default.
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
