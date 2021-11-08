@@ -212,7 +212,8 @@
 
 ;; Syntax highlighting for Rust.
 (use-package rustic
-  :ensure t)
+  :ensure t
+  :diminish)
 
 ;; Support for Go.
 (use-package go-mode
@@ -261,18 +262,15 @@
   :hook (markdown-mode . visual-line-mode)
   :init (setq markdown-command "multimarkdown"))
 
-;; Ignored files/directories when grepping.
-(eval-after-load "grep"
-  `(progn
-     (setq-default grep-find-ignored-directories
-                   (cons
-                    "node_modules"
-                    (default-value 'grep-find-ignored-directories)))
-     (setq-default grep-find-ignored-files
-                   (cons
-                    "package-lock.json"
-                    (default-value 'grep-find-ignored-directories)))))
+(use-package rg
+  :ensure t
+  :config
+  (rg-enable-default-bindings))
 
+(use-package evil
+  :ensure t
+  :config
+  (evil-mode))
 
 ;; Start a server so other clients can connect to this.
 (server-start)
