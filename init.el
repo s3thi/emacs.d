@@ -42,7 +42,8 @@
   (set-frame-font "Fira Code 11" nil t))
 
 (when *is-a-linux*
-  (set-frame-font "DM Mono 10" nil t))
+  (set-frame-font "DM Mono 11" nil t))
+
 ;; Enable emoji on macOS.
 (when (boundp 'set-fontset-font)
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
