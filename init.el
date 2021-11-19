@@ -271,9 +271,15 @@
 (use-package evil
   :ensure t
   :init
-  (setq evil-want-C-u-scroll t)
+  (setq evil-want-keybinding nil)
   :config
-  (evil-mode))
+  (evil-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
 
 ;; Start a server so other clients can connect to this.
 (server-start)
