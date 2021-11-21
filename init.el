@@ -9,8 +9,6 @@
 (defconst *is-a-mac* (eq system-type 'darwin))
 (defconst *is-a-pc* (eq system-type 'windows-nt))
 (defconst *is-a-linux* (eq system-type 'gnu/linux))
-(defconst *is-office-pc* (string= system-name "alison"))
-(defconst *is-thinkpad-x1-carbon* (string= system-name "harrowhark"))
 
 ;; Store configuration created by custom in a separate file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -43,11 +41,8 @@
 (when *is-a-pc*
   (set-frame-font "Fira Code 11" nil t))
 
-(when *is-office-pc*
+(when *is-a-linux*
   (set-frame-font "DM Mono 11" nil t))
-
-(when *is-thinkpad-x1-carbon*
-  (set-frame-font "DM Mono 13" nil t))
 
 ;; Enable emoji on macOS.
 (when (boundp 'set-fontset-font)
