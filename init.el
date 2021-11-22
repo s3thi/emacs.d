@@ -290,6 +290,9 @@
   :config
   (evil-collection-init))
 
+(use-package eldoc
+  :diminish)
+
 ;; Start a server so other clients can connect to this.
 (server-start)
 
