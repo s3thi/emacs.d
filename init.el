@@ -105,6 +105,15 @@
 ;; Put the most recently killed/yanked text into the system clipboard.
 (setq save-interprogram-paste-before-kill t)
 
+;; Modus themes.
+(use-package modus-themes
+  :ensure
+  :init
+  (modus-themes-load-themes)
+  :config
+  (modus-themes-load-operandi)
+  :bind ("<f5>" . modus-themes-toggle))
+
 ;; Use Vertico for minibuffer completions.
 (use-package vertico
   :ensure t
