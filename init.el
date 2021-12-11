@@ -15,7 +15,8 @@
 
 ;; Store configuration created by custom in a separate file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load-file custom-file)
+(when (file-exists-p custom-file)
+  (load-file custom-file))
 
 ;; UI settings.
 (setq inhibit-startup-screen t)
