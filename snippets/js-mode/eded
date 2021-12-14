@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Disable eslint rule for exhaustive dependencies
+# key: eded
+# --
+// eslint-disable-line react-hooks/exhaustive-deps $0
