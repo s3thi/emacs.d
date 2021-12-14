@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(setq user-full-name "Ankur Sethi"
+      user-mail-address "contact@ankursethi.in")
+
 ;; Add ~/.emacs.d/lisp/ to the load path.
 (add-to-list 'load-path
              (expand-file-name "lisp/" user-emacs-directory))
@@ -18,21 +21,40 @@
 (when (file-exists-p custom-file)
   (load-file custom-file))
 
-;; UI settings.
+;; General settings.
 (setq inhibit-startup-screen t)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode)
-(hl-line-mode 1)
+(global-hl-line-mode 1)
 (set-frame-font "DM Mono 11" nil t)
+(fset 'yes-or-no-p 'y-or-n-p)
+(setq ring-bell-function 'ignore)
 (global-display-line-numbers-mode t)
+
+;; Don't make the screen jump when scroll off the top/bottom of the buffer.
+(setq scroll-conservatively 100)
+
+;; Really, really, REALLY use UTF-8 everywhere.
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
 
 ;; Some general keybindings.
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "M-;") #'comment-line)
 (global-set-key (kbd "M-o") #'other-window)
+(global-set-key (kbd "C-c I") (lambda ()
+                                (interactive)
+                                (find-file user-init-file)))
+(global-set-key (kbd "C-0") #'delete-window)
+(global-set-key (kbd "C-1") #'delete-other-windows)
+(global-set-key (kbd "C-2") #'split-window-below)
+(global-set-key (kbd "C-3") #'split-window-right)
 
 ;; Disable C-z to suspend in GUI Emacs.
 (when window-system
@@ -101,7 +123,9 @@
 
 ;; Hide certain modes from the modeline.
 (use-package diminish
-  :ensure t)
+  :ensure t
+  :config
+  (diminish 'subword-mode))
 
 ;; Color themes.
 (use-package gruvbox-theme
@@ -160,10 +184,9 @@
 (add-hook 'prog-mode-hook
           (lambda ()
             ;; Turn off soft wrapping for source code only.
-            (setq truncate-lines t)
+            (setq truncate-lines t)))
 
-            ;; Enable subword mode in code buffers.
-            (subword-mode 1)))
+(global-subword-mode 1)
 
 ;; JavaScript indent level.
 (setq js-indent-level 2)
@@ -171,8 +194,12 @@
 ;; Treat all JS as JSX.
 (add-hook 'js-mode-hook #'js-jsx-enable)
 
+(use-package flycheck
+  :ensure t)
+
 ;; Automatically format JS code with prettier.
 (use-package prettier-js
+  :diminish
   :ensure t
   :hook ((js-mode . prettier-js-mode)))
 
@@ -272,13 +299,13 @@ filling inside YAML frontmatter (if it exists)."
 
 (use-package yasnippet
   :ensure t
+  :diminish yas-minor-mode
   :config
   (yas-global-mode 1)
   (define-key yas-minor-mode-map (kbd "<tab>") nil)
   (define-key yas-minor-mode-map (kbd "TAB") nil)
   (global-set-key (kbd "C-c y") #'yas-insert-snippet)
-  (global-set-key (kbd "C-;") #'yas-expand)
-  (diminish 'yas-minor-mode))
+  (global-set-key (kbd "C-;") #'yas-expand))
 
 (use-package crux
   :ensure t
@@ -289,29 +316,33 @@ filling inside YAML frontmatter (if it exists)."
          ("C-c D" . #'crux-delete-file-and-buffer)
          ("C-c r" . #'crux-rename-file-and-buffer)
          ("C-c k" . #'crux-kill-other-buffers)
-         ("C-c I" . #'crux-find-user-init-file)
          ("C-c S" . #'crux-find-shell-init-file)))
 
 (use-package org
   :bind (("C-c a" . org-agenda)
-         ("C-c c" . org-capture))
+         ("C-c c" . org-capture)
+
+         ;; Open the default org directory in dired.
+         ("<f12>" . (lambda ()
+                      (interactive)
+                      (dired org-directory))))
   :hook ((org-mode . auto-fill-mode))
   :config
   (setq org-directory "~/Dropbox/Org/")
-  (add-to-list 'auto-mode-alist `("\\.org-archive$" . org-mode))
   (setq org-default-notes-file "~/Dropbox/Org/gtd/inbox.org")
+  (add-to-list 'auto-mode-alist `("\\.org-archive$" . org-mode))
   (setq org-agenda-files `("~/Dropbox/Org/gtd/inbox.org"
                            "~/Dropbox/Org/gtd/inbox-mobile.org"
-                           "~/Dropbox/Org/gtd/personal.org"
+                           "~/Dropbox/Org/gtd/tasks.org"
                            "~/Dropbox/Org/gtd/projects.org"
-                           "~/Dropbox/Org/gtd/work.org"))
+                           "~/Dropbox/Org/gtd/gluttony.org"))
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(p)" "WAITING(w)"
                     "SOMEDAY(s)" "|" "DONE(d)" "CANCELLED(c)")))
   (setq org-todo-keyword-faces
         '(("TODO" . org-warning)
           ("NEXT" . "purple")
-          ("IN-PROGRESS" . (:foreground "green" :weight bold))
+          ("IN-PROGRESS" . (:foreground "OliveDrab4" :weight bold))
           ("WAITING" . org-warning)
           ("SOMEDAY" . "gray")
           ("DONE" . org-done)
@@ -329,18 +360,43 @@ filling inside YAML frontmatter (if it exists)."
         '(("t" "todo" entry (file "~/Dropbox/Org/gtd/inbox.org")
            "* TODO %?")
           ("p" "project todo" entry (file+headline "~/Dropbox/Org/gtd/projects.org" "Refile")
-           "* TODO %?"))))
+           "* TODO %?")
+          ("g" "gluttony" entry (file+headline "~/Dropbox/Org/gtd/gluttony.org" "Refile")
+           "* TODO %?")))
+  (setq org-agenda-custom-commands
+        '(("y" "My agenda view"
+           ((agenda "")
+            (todo "IN-PROGRESS" ((org-agenda-overriding-header "\nDoing now:")
+                                 (org-agenda-files
+                                  '("~/Dropbox/Org/gtd/tasks.org"
+                                    "~/Dropbox/Org/gtd/gluttony.org"))))
+            (todo "WAITING" ((org-agenda-overriding-header "\nWaiting on:")))
+            (alltodo "" ((org-agenda-overriding-header "\nInboxes:")
+                         (org-agenda-files
+                          '("~/Dropbox/Org/gtd/inbox.org"
+                            "~/Dropbox/Org/gtd/inbox-mobile.org"))))
+            (alltodo "" ((org-agenda-overriding-header "\nUnscheduled:")
+                         (org-agenda-skip-function
+                          '(org-agenda-skip-entry-if 'timestamp))
+                         (org-agenda-files '("~/Dropbox/Org/gtd/tasks.org")))))
+           ((org-agenda-block-separator nil)))
+          ("o" "Things to do someday"
+           ((todo "SOMEDAY"))
+           ((org-agenda-overriding-header "Things to do someday:")
+            (org-agenda-files
+             (remove "~/Dropbox/Org/gtd/projects.org" org-agenda-files)))))))
 
-(use-package org-super-agenda
-  :after org
+(use-package undo-tree
   :ensure t
+  :diminish undo-tree-mode
   :config
-  (org-super-agenda-mode))
+  (global-undo-tree-mode)
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t))
 
-(use-package org-bullets
-  :after org
+(use-package avy
   :ensure t
-  :hook ((org-mode . org-bullets-mode)))
+  :bind (("C-:" . #'avy-goto-char-2)))
 
 ;; Start a server so other clients can connect to this.
 (server-start)
