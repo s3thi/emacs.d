@@ -48,13 +48,39 @@
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "M-;") #'comment-line)
 (global-set-key (kbd "M-o") #'other-window)
-(global-set-key (kbd "C-c I") (lambda ()
-                                (interactive)
-                                (find-file user-init-file)))
+
+(defun s3thi/split-window-right-and-follow ()
+  "Split window right and move cursor into the new window."
+  (interactive)
+  (split-window-right)
+  (other-window 1))
+
+(defun s3thi/split-window-below-and-follow ()
+  "Split window below and move cursor into the new window."
+  (interactive)
+  (split-window-below)
+  (other-window 1))
+
+(defun s3thi/quit-other-window ()
+  "Switch focus to the next window and quits it.
+
+This is the equivalent of switching to the next window and
+hitting \"q\" in it."
+  (interactive)
+  (other-window 1)
+  (quit-window))
+
+(defun s3thi/find-user-init-file ()
+  "Open user's initialization file in the current window."
+  (interactive)
+  (find-file user-init-file))
+
 (global-set-key (kbd "C-0") #'delete-window)
 (global-set-key (kbd "C-1") #'delete-other-windows)
-(global-set-key (kbd "C-2") #'split-window-below)
-(global-set-key (kbd "C-3") #'split-window-right)
+(global-set-key (kbd "C-2") #'s3thi/split-window-below-and-follow)
+(global-set-key (kbd "C-3") #'s3thi/split-window-right-and-follow)
+(global-set-key (kbd "C-c q") #'s3thi/quit-other-window)
+(global-set-key (kbd "C-c I") #'s3thi/find-user-init-file)
 
 ;; Disable C-z to suspend in GUI Emacs.
 (when window-system
