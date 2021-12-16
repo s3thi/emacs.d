@@ -311,6 +311,13 @@ filling inside YAML frontmatter (if it exists)."
   :ensure t
   :bind (("C-=" . #'er/expand-region)))
 
+(use-package move-dup
+  :ensure t
+  :bind (("M-<up>"   . move-dup-move-lines-up)
+         ("C-M-<up>" . move-dup-duplicate-up)
+         ("M-<down>"   . move-dup-move-lines-down)
+         ("C-M-<down>" . move-dup-duplicate-down)))
+
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
