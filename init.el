@@ -166,6 +166,16 @@
 (use-package magit
   :ensure t)
 
+;; Highlight modified lines on the fly.
+(use-package diff-hl
+  :ensure t
+  :after magit
+  :config
+  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  (diff-hl-flydiff-mode)
+  (global-diff-hl-mode))
+
 ;; Use company for autocomplete menus.
 (use-package company
   :ensure t
@@ -195,7 +205,11 @@
 (add-hook 'js-mode-hook #'js-jsx-enable)
 
 (use-package flycheck
-  :ensure t)
+  :ensure t
+  :init
+  (setq flycheck-indication-mode nil)
+  :config
+  (global-flycheck-mode))
 
 ;; Automatically format JS code with prettier.
 (use-package prettier-js
