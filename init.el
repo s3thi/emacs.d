@@ -394,6 +394,7 @@ filling inside YAML frontmatter (if it exists)."
           ("SOMEDAY" . "gray")
           ("DONE" . org-done)
           ("CANCELLED" .  org-done)))
+  (setq org-hide-leading-stars t)
   (setq org-refile-targets '((nil :maxlevel . 3)
                              (org-agenda-files :maxlevel . 3)))
   (setq org-refile-use-outline-path t)
