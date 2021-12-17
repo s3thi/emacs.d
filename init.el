@@ -30,9 +30,9 @@
 (show-paren-mode)
 (global-hl-line-mode 1)
 (set-frame-font "DM Mono 11" nil t)
-(fset 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
 (global-display-line-numbers-mode t)
+(setq confirm-kill-emacs #'yes-or-no-p)
 
 ;; Don't make the screen jump when scroll off the top/bottom of the buffer.
 (setq scroll-conservatively 100)
@@ -61,15 +61,6 @@
   (split-window-below)
   (other-window 1))
 
-(defun s3thi/quit-other-window ()
-  "Switch focus to the next window and quits it.
-
-This is the equivalent of switching to the next window and
-hitting \"q\" in it."
-  (interactive)
-  (other-window 1)
-  (quit-window))
-
 (defun s3thi/find-user-init-file ()
   "Open user's initialization file in the current window."
   (interactive)
@@ -79,7 +70,6 @@ hitting \"q\" in it."
 (global-set-key (kbd "C-1") #'delete-other-windows)
 (global-set-key (kbd "C-2") #'s3thi/split-window-below-and-follow)
 (global-set-key (kbd "C-3") #'s3thi/split-window-right-and-follow)
-(global-set-key (kbd "C-c q") #'s3thi/quit-other-window)
 (global-set-key (kbd "C-c I") #'s3thi/find-user-init-file)
 
 ;; Disable C-z to suspend in GUI Emacs.
@@ -153,11 +143,18 @@ hitting \"q\" in it."
   :config
   (diminish 'subword-mode))
 
-;; Color themes.
+;; Gruvbox is timeless.
 (use-package gruvbox-theme
+  :ensure t)
+
+;; The Spacemacs theme is polished af.
+(use-package spacemacs-theme
   :ensure t
+  :defer t
+  :init
+  (setq spacemacs-theme-org-height nil)
   :config
-  (load-theme 'gruvbox-light-hard t))
+  (load-theme 'spacemacs-light t))
 
 ;; Use Vertico for minibuffer completions.
 (use-package vertico
@@ -293,8 +290,10 @@ frontmatter section"
     (let ((current-position (point))
           (begin (point-min))
           (end (progn (beginning-of-buffer)
-                      (search-forward-regexp "^---$")
-                      (search-forward-regexp "^---$")
+                      ;; TODO immediately return nil if either of these searches
+                      ;; fail.
+                      (search-forward-regexp "^---$" nil t)
+                      (search-forward-regexp "^---$" nil t)
                       (point))))
       (and (> current-position begin)
            (< current-position end)))))
@@ -384,12 +383,13 @@ filling inside YAML frontmatter (if it exists)."
                            "~/Dropbox/Org/gtd/projects.org"
                            "~/Dropbox/Org/gtd/gluttony.org"))
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(p)" "WAITING(w)"
-                    "SOMEDAY(s)" "|" "DONE(d)" "CANCELLED(c)")))
+        '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i)" "ONGOING(o)"
+                    "WAITING(w)" "SOMEDAY(s)" "|" "DONE(d)" "CANCELLED(c)")))
   (setq org-todo-keyword-faces
         '(("TODO" . org-warning)
           ("NEXT" . "purple")
           ("IN-PROGRESS" . (:foreground "OliveDrab4" :weight bold))
+          ("ONGOING" . (:foreground "DarkCyan" :weight bold))
           ("WAITING" . org-warning)
           ("SOMEDAY" . "gray")
           ("DONE" . org-done)
