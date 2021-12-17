@@ -32,7 +32,7 @@
 
 ;;; Code:
 
-(setq aaw/post-template
+(defvar aaw/post-template
 "\
 ---
 title: \"%s\"
@@ -49,7 +49,7 @@ Write your post here.
 
 ")
 
-(setq aaw/page-template
+(defvar aaw/page-template
 "\
 ---
 title: \"%s\"
@@ -65,48 +65,137 @@ Write your page content here.
 
 ")
 
-(setq aaw/blog-directory (expand-file-name "~/Code/ankursethi.in/"))
-
-(setq aaw/clean-punct-regexp "[[:punct:]]")
-(setq aaw/slugify-regexp "[[:space:]]")
+(defvar aaw/blog-directory (expand-file-name "~/Code/ankursethi.in/"))
 
 (defun aaw/slugify (title)
+  "Convert TITLE into a URL-save slug."
   (let* ((downcased (downcase title))
          (without-punctuation
-          (replace-regexp-in-string aaw/clean-punct-regexp "" downcased))
+          (replace-regexp-in-string "[[:punct:]]" "" downcased))
          (slugified
-          (replace-regexp-in-string aaw/slugify-regexp "-" without-punctuation)))
+          (replace-regexp-in-string "[[:space:]]" "-" without-punctuation)))
     slugified))
-  
-(defun aaw/new-post ()
-  (interactive)
-  (let* ((title (read-from-minibuffer "Enter post title: "))
-         (slugified-title (aaw/slugify title))
-         (time (current-time))
+
+(defun aaw/current-date-list ()
+  "Return current date as a three-elment list.
+
+The shape of the list is (year month day)."
+  (let* ((time (current-time))
          (year (format-time-string "%Y" time))
          (month (format-time-string "%m" time))
-         (day (format-time-string "%d" time))
-         (date-string (format "%s-%s-%s" year month day))
-         (post-file-path
-          (concat
-           aaw/blog-directory
-           "posts/"
-           (format "%s-%s.md" date-string slugified-title)))
-         (permalink (format "/%s/%s/%s/%s/" year month day slugified-title))
+         (day (format-time-string "%d" time)))
+    `(,year ,month ,day)))
+
+(defun aaw/date-list-to-string (date-list)
+  "Convert DATE-LIST to a string with format \"year-month-day\"."
+  (format "%s-%s-%s"
+          (nth 0 date-list)
+          (nth 1 date-list)
+          (nth 2 date-list)))
+
+(defun aaw/make-file-path (date-list slug)
+  "Create a file path for a post using DATE-LIST and SLUG."
+  (concat
+   aaw/blog-directory
+   "posts/"
+   (format "%s-%s.md" (aaw/date-list-to-string date-list) slug)))
+
+(defun aaw/make-permalink (date-list slug)
+  "Create a permalink for a post using DATE-LIST and SLUG."
+  (format "/%s/%s/%s/%s/"
+          (nth 0 date-list)
+          (nth 1 date-list)
+          (nth 2 date-list)
+          slug))
+
+(defun aaw/new-post ()
+  "Create a new post in the blog directory."
+  (interactive)
+  (let* ((title (read-from-minibuffer "Enter post title: "))
+         (slug (aaw/slugify title))
+         (date-list (aaw/current-date-list))
+         (date-string (aaw/date-list-to-string date-list))
+         (post-path (aaw/make-file-path date-list slug))
+         (permalink (aaw/make-permalink date-list slug))
          (post-content (format aaw/post-template title date-string permalink)))
-    (find-file post-file-path)
+    (find-file post-path)
     (insert post-content)
     (save-buffer)))
 
-;; Get current date and grab all components separately.
-;; Use date to create a permalink path.
-;; Get buffer content by formatting string template.
-;; Create new file in the correct location.
-;; Insert the template into the file and save it.
-;; Switch user to the new buffer.
+(defun aaw/file-in-blog-directory-p (file)
+  "Return t if FILE is inside the blog directory, nil otherwise."
+  (let ((file-full-path (expand-file-name file)))
+    (string-prefix-p aaw/blog-directory file-full-path)))
 
-(defun aaw/new-page ()
-  (message "Creating new page ..."))
+(defun aaw/get-frontmatter-single-key-value (key)
+  "Return value for KEY in the YAML frontmatter of buffer.
+
+Return nil if no value is found."
+    (save-excursion
+      (goto-char (point-min))
+      (when (and
+             (search-forward (format "%s: " key) nil t)
+             (s3thi/is-inside-frontmatter))
+        (string-trim
+         (buffer-substring-no-properties (point) (line-end-position))
+         "\""
+         "\""))))
+
+(defun aaw/set-frontmatter-single-key-value (key value)
+  "Set value of KEY to VALUE in the YAML frontmatter of buffer."
+    (save-excursion
+      (goto-char (point-min))
+      (when (and
+             (search-forward (format "%s: " key) nil t)
+             (s3thi/is-inside-frontmatter))
+        (kill-line)
+        (insert (format "\"%s\"" value)))))
+
+(defun aaw/post-title ()
+  "Return current post's title from YAML frontmatter."
+  (aaw/get-frontmatter-single-key-value "title"))
+
+(defun aaw/post-date-list ()
+  "Return current post's date as a date list."
+  (split-string (aaw/get-frontmatter-single-key-value "date") "-"))
+
+(defun aaw/post-permalink ()
+  "Return current post's permalink from YAML frontmatter."
+  (aaw/get-frontmatter-single-key-value "permalink"))
+
+(defun aaw/update-metadata-on-save ()
+  (when (aaw/file-in-blog-directory-p buffer-file-name)
+    (let* ((title (aaw/post-title))
+           (slug (aaw/slugify title))
+           (date-list (aaw/post-date-list))
+           (post-permalink (aaw/post-permalink))
+           (post-path buffer-file-name)
+           (new-post-path (aaw/make-file-path date-list slug))
+           (new-post-permalink (aaw/make-permalink date-list slug))
+           (post-path-changed-p (not (string= post-path new-post-path)))
+           (post-permalink-changed-p
+            (not (string= post-permalink new-post-permalink))))
+      (when post-path-changed-p
+        (rename-file post-path new-post-path)
+        (set-visited-file-name new-post-path t t))
+      (when post-permalink-changed-p
+        (aaw/set-frontmatter-single-key-value "permalink" new-post-permalink))
+      (when (or post-path-changed-p post-permalink-changed-p)
+        (save-buffer)))))
+
+;; Get slug from title and date.
+;; Generate file path from this info.
+;; Generate permalink from this info.
+;; Update permalink from this info.
+;; Rename file to this new file path.
+
+(defun aaw/initialize ()
+  (add-hook 'markdown-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook
+                        #'aaw/update-metadata-on-save
+                        nil
+                        'make-it-local))))
 
 (provide 'alive-and-well)
 
