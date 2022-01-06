@@ -8,6 +8,9 @@
 (setq user-full-name "Ankur Sethi"
       user-mail-address "contact@ankursethi.in")
 
+(setq *is-a-linux* (eq system-type 'linux))
+(setq *is-a-mac* (eq system-type 'darwin))
+
 ;; Add ~/.emacs.d/lisp/ to the load path.
 (add-to-list 'load-path
              (expand-file-name "lisp/" user-emacs-directory))
@@ -30,10 +33,15 @@
 (column-number-mode 1)
 (show-paren-mode)
 (global-hl-line-mode 1)
-(set-frame-font "Cascadia Code Light 11" nil t)
 (setq ring-bell-function 'ignore)
 (setq confirm-kill-emacs #'yes-or-no-p)
 (winner-mode 1)
+
+(when *is-a-linux*
+  (set-frame-font "Cascadia Code Light 11" nil t))
+
+(when *is-a-mac*
+  (set-frame-font "Cascadia Code Light 14" nil t))
 
 ;; Don't make the screen jump when scroll off the top/bottom of the buffer.
 ;; TODO figure out why/how this setting works.
