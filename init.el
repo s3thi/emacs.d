@@ -8,8 +8,8 @@
 (setq user-full-name "Ankur Sethi"
       user-mail-address "contact@ankursethi.in")
 
-(setq *is-a-linux* (eq system-type 'linux))
-(setq *is-a-mac* (eq system-type 'darwin))
+(defvar s3thi/is-a-linux (eq system-type 'gnu/linux))
+(defvar s3thi/is-a-mac (eq system-type 'darwin))
 
 ;; Add ~/.emacs.d/lisp/ to the load path.
 (add-to-list 'load-path
@@ -37,10 +37,10 @@
 (setq confirm-kill-emacs #'yes-or-no-p)
 (winner-mode 1)
 
-(when *is-a-linux*
+(when s3thi/is-a-linux
   (set-frame-font "Cascadia Code Light 11" nil t))
 
-(when *is-a-mac*
+(when s3thi/is-a-mac
   (set-frame-font "Cascadia Code Light 14" nil t))
 
 ;; Don't make the screen jump when scroll off the top/bottom of the buffer.
@@ -353,7 +353,8 @@
 (use-package org
   :bind (("C-c a" . org-agenda)
          ("C-c c" . org-capture))
-  :hook ((org-mode . auto-fill-mode))
+  :hook ((org-mode . auto-fill-mode)
+         (org-mode . flyspell-mode))
   :config
   (setq org-directory "~/Dropbox/Org/")
   (setq org-default-notes-file "~/Dropbox/Org/agenda/inbox.org")
