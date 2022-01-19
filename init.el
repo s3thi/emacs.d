@@ -47,6 +47,9 @@
 ;; TODO figure out why/how this setting works.
 (setq scroll-conservatively 100)
 
+;; Don't need the initial scratch buffer message.
+(setq initial-scratch-message "")
+
 ;; Really, really, REALLY use UTF-8 everywhere.
 (setq locale-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)
