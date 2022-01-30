@@ -8,7 +8,6 @@
 (setq user-full-name "Ankur Sethi"
       user-mail-address "contact@ankursethi.in")
 
-(defvar s3thi/is-a-linux (eq system-type 'gnu/linux))
 (defvar s3thi/is-a-mac (eq system-type 'darwin))
 
 ;; Add ~/.emacs.d/lisp/ to the load path.
@@ -28,7 +27,6 @@
 ;; General settings.
 (setq inhibit-startup-screen t)
 (tool-bar-mode -1)
-(menu-bar-mode -1)
 (scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode)
@@ -37,11 +35,8 @@
 (setq confirm-kill-emacs #'yes-or-no-p)
 (winner-mode 1)
 
-(when s3thi/is-a-linux
-  (set-frame-font "Cascadia Code Light 11" nil t))
-
 (when s3thi/is-a-mac
-  (set-frame-font "Cascadia Code Light 14" nil t))
+  (set-frame-font "Cascadia Code 14" nil t))
 
 ;; Don't make the screen jump when scroll off the top/bottom of the buffer.
 ;; TODO figure out why/how this setting works.
@@ -78,9 +73,6 @@
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'scroll-left 'disabled nil)
-
-;; Slightly better directory listing in dired.
-(setq dired-listing-switches "-lAhX --group-directories-first")
 
 ;; Sentences end with a single space, not double space.
 (setq sentence-end-double-space nil)
@@ -149,14 +141,14 @@
 
 ;; Gruvbox is timeless.
 (use-package gruvbox-theme
-  :ensure t)
+  :ensure t
+  :config
+  (load-theme 'gruvbox-dark-soft t))
 
 ;; Modus Operandi is a great light theme, but Modus Vivendi is a bit too harsh
 ;; for my eyes.
 (use-package modus-themes
-  :ensure t
-  :config
-  (load-theme 'modus-operandi t))
+  :ensure t)
 
 ;; Use Vertico for minibuffer completions.
 (use-package vertico
@@ -238,6 +230,7 @@
 
 (use-package flycheck
   :ensure t
+  :diminish
   :init
   (setq flycheck-indication-mode nil)
   :config
@@ -248,24 +241,6 @@
   :diminish
   :ensure t
   :hook ((js-mode . prettier-js-mode)))
-
-(defun setup-tide-mode ()
-  "Run tide, eldoc, flycheck, company when entering a JS file."
-  (interactive)
-  (if buffer-file-name
-      (progn
-        (tide-setup)
-        (flycheck-mode +1)
-        (setq flycheck-check-syntax-automatically '(save mode-enabled))
-        (eldoc-mode +1)
-        (tide-hl-identifier-mode +1)
-        (company-mode +1))))
-
-;; Language server for JS and TS.
-(use-package tide
-  :ensure t
-  :init
-  (add-hook 'js-mode-hook #'setup-tide-mode))
 
 ;; Syntax highlighting for JSON.
 (use-package json-mode
@@ -293,7 +268,8 @@
   :ensure t
   :init
   (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-rust-analyzer-cargo-watch-command "clippy"))
+  (setq lsp-rust-analyzer-cargo-watch-command "clippy")
+  :hook ((js-mode . lsp)))
 
 ;; Markdown.
 (use-package markdown-mode
@@ -352,102 +328,6 @@
          ("C-c r" . #'crux-rename-file-and-buffer)
          ("C-c k" . #'crux-kill-other-buffers)
          ("C-c S" . #'crux-find-shell-init-file)))
-
-(use-package org
-  :bind (("C-c a" . org-agenda)
-         ("C-c c" . org-capture))
-  :hook ((org-mode . auto-fill-mode)
-         (org-mode . flyspell-mode))
-  :config
-  (setq org-directory "~/Dropbox/Org/")
-  (setq org-default-notes-file "~/Dropbox/Org/agenda/inbox.org")
-  (add-to-list 'auto-mode-alist `("\\.org-archive$" . org-mode))
-  (setq org-agenda-files `("~/Dropbox/Org/agenda/inbox.org"
-                           "~/Dropbox/Org/agenda/inbox-mobile.org"
-                           "~/Dropbox/Org/agenda/tasks.org"
-                           "~/Dropbox/Org/agenda/projects.org"
-                           "~/Dropbox/Org/agenda/gluttony.org"))
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i)" "WAITING(w)"
-                    "SOMEDAY(s)" "|"
-                    "DONE(d)" "CANCELLED(c)")))
-  (setq org-todo-keyword-faces
-        '(("TODO" . org-warning)
-          ("NEXT" . "purple")
-          ("IN-PROGRESS" . (:foreground "OliveDrab4" :weight bold))
-          ("WAITING" . org-warning)
-          ("SOMEDAY" . "gray")
-          ("DONE" . org-done)
-          ("CANCELLED" .  org-done)))
-  (setq org-hide-leading-stars t)
-  (setq org-hide-emphasis-markers t)
-  (setq org-refile-targets '((nil :maxlevel . 3)
-                             (org-agenda-files :maxlevel . 3)))
-  (setq org-refile-use-outline-path t)
-  (setq org-outline-path-complete-in-steps nil)
-  (setq org-refile-allow-creating-parent-nodes '(confirm))
-  (setq org-log-into-drawer t)
-  (setq org-archive-location "%s-archive::")
-  (setq org-log-done t)
-  (setq org-log-reschedule t)
-  (setq org-capture-templates
-        '(("t" "todo" entry
-           (file "~/Dropbox/Org/agenda/inbox.org")
-           "* TODO %?")
-          ("p" "project todo" entry
-           (file+headline "~/Dropbox/Org/agenda/projects.org" "Inbox")
-           "* TODO %?")
-          ("g" "gluttony" entry
-           (file+headline "~/Dropbox/Org/agenda/gluttony.org" "Inbox")
-           "* SOMEDAY %?")
-          ("i" "idea" entry
-           (file+headline "~/Dropbox/Org/notes/ideas.org" "Inbox")
-           "* SOMEDAY %?")))
-  (setq org-agenda-custom-commands
-        '(("y" "My agenda view"
-           ((agenda "" ((org-agenda-span 'day)))
-            (todo "IN-PROGRESS" ((org-agenda-overriding-header "\nDoing now:")
-                                 (org-agenda-files
-                                  '("~/Dropbox/Org/agenda/tasks.org"
-                                    "~/Dropbox/Org/agenda/gluttony.org"))))
-            (todo "WAITING" ((org-agenda-overriding-header "\nWaiting on:")))
-            (alltodo "" ((org-agenda-overriding-header "\nInboxes:")
-                         (org-agenda-files
-                          '("~/Dropbox/Org/agenda/inbox.org"
-                            "~/Dropbox/Org/agenda/inbox-mobile.org"))))
-            (alltodo "" ((org-agenda-overriding-header "\nUnscheduled:")
-                         (org-agenda-skip-function
-                          '(org-agenda-skip-entry-if 'timestamp))
-                         (org-agenda-files '("~/Dropbox/Org/agenda/tasks.org")))))
-           ((org-agenda-block-separator nil)))
-          ("o" "Things to do someday"
-           ((todo "SOMEDAY"))
-           ((org-agenda-overriding-header "Things to do someday:")
-            (org-agenda-files
-             (remove "~/Dropbox/Org/agenda/projects.org" org-agenda-files))))))
-  (setq org-agenda-prefix-format
-        '((agenda . " %i %-16:c%?-12t% s")
-          (todo . " %i %-16:c")
-          (tags . " %i %-16:c")
-          (search . " %i %-16:c"))))
-
-(use-package org-journal
-  :ensure t
-  :init
-  (setq org-journal-prefix-key "C-c j")
-  (setq org-journal-file-type 'monthly)
-  (setq org-journal-file-format "journal-%Y-%m.org")
-  (setq org-journal-date-format "%A, %d %B %Y")
-  :config
-  (setq org-journal-dir "~/Dropbox/Org/journal/"))
-
-(use-package deft
-  :ensure t
-  :bind (("C-c l" . #'deft))
-  :init
-  (setq deft-extensions '("org"))
-  (setq deft-recursive t)
-  (setq deft-directory "~/Dropbox/Org/"))
 
 (use-package undo-tree
   :ensure t
