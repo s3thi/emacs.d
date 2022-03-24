@@ -36,7 +36,7 @@
 (winner-mode 1)
 
 (when s3thi/is-a-mac
-  (set-frame-font "Cascadia Code 14" nil t))
+  (set-frame-font "Fira Code 14" nil t))
 
 ;; Don't make the screen jump when scroll off the top/bottom of the buffer.
 ;; TODO figure out why/how this setting works.
@@ -145,11 +145,6 @@
   :config
   (load-theme 'gruvbox-dark-soft t))
 
-;; Modus Operandi is a great light theme, but Modus Vivendi is a bit too harsh
-;; for my eyes.
-(use-package modus-themes
-  :ensure t)
-
 ;; Use Vertico for minibuffer completions.
 (use-package vertico
   :ensure t
@@ -182,10 +177,6 @@
 ;; Magit is dope.
 (use-package magit
   :ensure t)
-
-(use-package forge
-  :ensure t
-  :after magit)
 
 ;; Highlight modified lines on the fly.
 (use-package diff-hl
@@ -220,6 +211,7 @@
 
 (add-hook 'prog-mode-hook #'s3thi/prog-mode-hook)
 
+;; Make word movement commands take CamelCase words into account.
 (global-subword-mode 1)
 
 ;; JavaScript indent level.
@@ -228,6 +220,7 @@
 ;; Treat all JS as JSX.
 (add-hook 'js-mode-hook #'js-jsx-enable)
 
+;; Lint using flycheck.
 (use-package flycheck
   :ensure t
   :diminish
@@ -257,7 +250,9 @@
 (use-package go-mode
   :ensure t
   :hook ((go-mode . (lambda ()
-                      (add-hook 'before-save-hook #'gofmt-before-save nil t)))))
+                      (add-hook
+                       'before-save-hook
+                       #'gofmt-before-save nil t)))))
 
 ;; REST client.
 (use-package restclient
@@ -280,27 +275,29 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
+;; Ripgrep for searching.
 (use-package rg
   :ensure t
   :config
   (rg-enable-default-bindings))
 
-(use-package eldoc
-  :diminish)
-
+;; Highlight TODO, HACK, etc. keywords.
 (use-package hl-todo
   :ensure t
   :diminish
   :hook ((prog-mode . hl-todo-mode)))
 
+;; Easily select text surrounded by certain delimiters.
 (use-package expand-region
   :ensure t
   :bind (("C-=" . #'er/expand-region)))
 
+;; Cycle through CamelCase, lowerCamelCase, snake_case, etc.
 (use-package string-inflection
   :ensure t
   :bind (("C-c C-u" . #'string-inflection-all-cycle)))
 
+;; Move and duplicate entire lines.
 (use-package move-dup
   :ensure t
   :bind (("M-<up>"   . move-dup-move-lines-up)
@@ -308,6 +305,7 @@
          ("M-<down>"   . move-dup-move-lines-down)
          ("C-M-<down>" . move-dup-duplicate-down)))
 
+;; Snippets.
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
@@ -318,6 +316,7 @@
   (global-set-key (kbd "C-c y") #'yas-insert-snippet)
   (global-set-key (kbd "C-;") #'yas-expand))
 
+;; A ton of useful functions.
 (use-package crux
   :ensure t
   :bind (("C-c o" . #'crux-open-with)
@@ -329,6 +328,7 @@
          ("C-c k" . #'crux-kill-other-buffers)
          ("C-c S" . #'crux-find-shell-init-file)))
 
+;; A visual undo tree.
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode
@@ -337,9 +337,11 @@
   (setq undo-tree-visualizer-timestamps t)
   (setq undo-tree-visualizer-diff t))
 
+;; Move buffers between windows.
 (use-package buffer-move
   :ensure t)
 
+;; Browse kill ring.
 (use-package browse-kill-ring
   :ensure t)
 
