@@ -63,8 +63,6 @@ Don't create garbage files.
   (setq-default make-backup-files nil)
 #+END_SRC
 
-** Package Installation
-
 ** Programming
 
 *** General Programming
@@ -113,19 +111,6 @@ Don't create garbage files.
 
   ;; Put the most recently killed/yanked text into the system clipboard.
   (setq save-interprogram-paste-before-kill t)
-
-  ;; Initialize package.
-  (require 'package)
-  (add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
-  (package-initialize)
-  (unless package-archive-contents
-    (package-refresh-contents))
-
-  ;; Initialize use-package.
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-  (require 'use-package)
 
   ;; Setup auto updating for installed packages.
   (use-package auto-package-update
