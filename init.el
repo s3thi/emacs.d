@@ -14,11 +14,6 @@
 (add-to-list 'load-path
              (expand-file-name "lisp/" user-emacs-directory))
 
-;; Load my personal blog helpers.
-(require 'alive-and-well)
-(aaw-initialize)
-(global-set-key (kbd "C-c w") #'aaw-new-post)
-
 ;; Store configuration created by custom in a separate file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
@@ -30,7 +25,6 @@
 (scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode)
-(global-hl-line-mode 1)
 (setq ring-bell-function 'ignore)
 (setq confirm-kill-emacs #'yes-or-no-p)
 (winner-mode 1)
@@ -45,13 +39,6 @@
 ;; Don't need the initial scratch buffer message.
 (setq initial-scratch-message "")
 
-;; Really, really, REALLY use UTF-8 everywhere.
-(setq locale-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-
 (defun s3thi/find-init-file ()
   "Find init file."
   (interactive)
@@ -63,7 +50,6 @@
 (global-set-key (kbd "M-o") #'other-window)
 (global-set-key (kbd "<f12>") #'bookmark-bmenu-list)
 (global-set-key (kbd "C-<f12>") #'bookmark-set)
-(global-set-key (kbd "C-c i") #'s3thi/find-init-file)
 
 ;; Disable C-z to suspend in GUI Emacs.
 (when window-system
@@ -220,6 +206,28 @@
 ;; Treat all JS as JSX.
 (add-hook 'js-mode-hook #'js-jsx-enable)
 
+;; Syntax highlighting for TypeScript.
+(use-package typescript-mode
+  :ensure t)
+
+;; Autocompletion for JavaScript and TypeScript. LSP doesn't work well for these
+;; yet.
+(defun setup-tide-mode ()
+  "Set up Tide."
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)))
+
 ;; Lint using flycheck.
 (use-package flycheck
   :ensure t
@@ -239,21 +247,6 @@
 (use-package json-mode
   :ensure t)
 
-;; Syntax highlighting for Rust.
-(use-package rustic
-  :ensure t
-  :diminish
-  :init
-  (setq rustic-format-on-save t))
-
-;; Support for Go.
-(use-package go-mode
-  :ensure t
-  :hook ((go-mode . (lambda ()
-                      (add-hook
-                       'before-save-hook
-                       #'gofmt-before-save nil t)))))
-
 ;; REST client.
 (use-package restclient
   :ensure t)
@@ -262,9 +255,7 @@
 (use-package lsp-mode
   :ensure t
   :init
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-rust-analyzer-cargo-watch-command "clippy")
-  :hook ((js-mode . lsp)))
+  (setq lsp-keymap-prefix "C-c l"))
 
 ;; Markdown.
 (use-package markdown-mode
@@ -319,14 +310,9 @@
 ;; A ton of useful functions.
 (use-package crux
   :ensure t
-  :bind (("C-c o" . #'crux-open-with)
-         ("C-c u" . #'crux-view-url)
-         ("C-c e" . #'crux-eval-and-replace)
-         ("C-c d" . #'crux-duplicate-current-line-or-region)
+  :bind (("C-c d" . #'crux-duplicate-current-line-or-region)
          ("C-c D" . #'crux-delete-file-and-buffer)
-         ("C-c r" . #'crux-rename-file-and-buffer)
-         ("C-c k" . #'crux-kill-other-buffers)
-         ("C-c S" . #'crux-find-shell-init-file)))
+         ("C-c r" . #'crux-rename-file-and-buffer)))
 
 ;; A visual undo tree.
 (use-package undo-tree
@@ -335,7 +321,9 @@
   :config
   (global-undo-tree-mode)
   (setq undo-tree-visualizer-timestamps t)
-  (setq undo-tree-visualizer-diff t))
+  (setq undo-tree-visualizer-diff t)
+  (setq undo-tree-history-directory-alist
+        `(("." . ,(concat user-emacs-directory "undo-tree/")))))
 
 ;; Move buffers between windows.
 (use-package buffer-move
