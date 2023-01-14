@@ -1,18 +1,7 @@
-;; init.el --- Initialization file for Emacs -*- lexical-binding: t -*-
-
-;;; Commentary:
-;; Initialization file for Emacs.
-
-;;; Code:
-
 (setq user-full-name "Ankur Sethi"
       user-mail-address "contact@ankursethi.in")
 
 (defvar s3thi/is-a-mac (eq system-type 'darwin))
-
-;; Add ~/.emacs.d/lisp/ to the load path.
-(add-to-list 'load-path
-             (expand-file-name "lisp/" user-emacs-directory))
 
 ;; Store configuration created by custom in a separate file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -38,11 +27,6 @@
 
 ;; Don't need the initial scratch buffer message.
 (setq initial-scratch-message "")
-
-(defun s3thi/find-init-file ()
-  "Find init file."
-  (interactive)
-  (find-file user-init-file))
 
 ;; Some general keybindings.
 (global-set-key (kbd "C-x C-b") #'ibuffer)
@@ -336,7 +320,3 @@
 ;; Start the Emacs server.
 (unless (server-running-p)
   (server-start))
-
-(provide 'init)
-
-;;; init.el ends here
