@@ -39,14 +39,14 @@ And add UI elements that are nice to have.
 #+END_SRC
 
 Set a nice font. The font size will have to be different across platforms, so we
-check the platform before setting this here.
+check the OS we're runniong on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
     (set-frame-font "Fira Code 14" nil t))
 #+END_SRC
 
-** Files and Editing
+** Files and Directories
 
 Store configuration created by custom in a separate file.
 
@@ -63,11 +63,99 @@ Don't create garbage files.
   (setq-default make-backup-files nil)
 #+END_SRC
 
+Turn on auto-revert-mode for all files. This will automatically reload files
+from disk every time they're changed by another from from outside Emacs.
+
+Also ensure that Dired buffers are reloaded on each visit, and that version
+control information is checked periodically to ensure that we're showing the
+correct VCS information in our modeline.
+
+#+BEGIN_SRC emacs-lisp
+  (setq dired-auto-revert-buffer t)
+  (setq auto-revert-check-vc-info t)
+  (global-auto-revert-mode 1)
+#+END_SRC
+
+
+** Text Editing
+
+Enable useful text editing commands that are disabled by default.
+
+#+BEGIN_SRC emacs-lisp
+  (put 'upcase-region 'disabled nil)
+  (put 'downcase-region 'disabled nil)
+  (put 'scroll-left 'disabled nil)
+#+END_SRC
+
+Make sure sentences end with single spaces, not double spaces. This makes
+functions that operate on prose behave better (such as those in org-mode and
+markdown-mode).
+
+#+BEGIN_SRC emacs-lisp
+  (setq sentence-end-double-space nil)
+#+END_SRC
+
+Fill paragraphs so the lines are 80 characters wide. Affects all modes.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default fill-column 80)
+#+END_SRC
+
+Always use spaces for indentation. Affects all modes, unless we override it
+later. The only programming language I've used that mandates the use of tabs
+rather than spaces is Go, so it's safe to set this here and override it for Go
+if I ever write it again.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+END_SRC
+
+In modes where we are forced to use tabs, set the tab width to 4.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default tab-width 4)
+#+END_SRC
+
+If there is some text already present in the system clipboard when we run an
+Emacs command that kills text, make sure that is preserved by pushing it into
+the kill ring.
+
+Since we've configured Emacs to put text into the system clipboard -- in
+addition to the kill ring -- when we kill it, this setting ensures that we never
+lose whatever might have already been in the clipboard when we perform a kill
+operation. Not always useful, but a nice to have.
+
+#+BEGIN_SRC emacs-lisp
+  (setq save-interprogram-paste-before-kill t)
+#+END_SRC
+
+Make word movement commands take CamelCase words into account. Also make sure we
+diminish this, otherwise it shows up as an irritating little comma in the
+modeline.
+
+#+BEGIN_SRC emacs-lisp
+  (with-eval-after-load 'subword
+    (diminish 'subword-mode))
+  (global-subword-mode 1)
+#+END_SRC
+
 ** Programming
 
 *** General Programming
 
 *** JavaScript
+
+** Key Bindings
+
+Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI Emacs will
+minimize the editor, which is very annoying. This disables that behavior. On
+terminal Emacs, this will still allow us to suspend the editor and go back to
+our shell.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (global-unset-key (kbd "C-z")))
+#+END_SRC
 
 ** Everything Else
 
@@ -82,35 +170,6 @@ Don't create garbage files.
   (global-set-key (kbd "M-o") #'other-window)
   (global-set-key (kbd "<f12>") #'bookmark-bmenu-list)
   (global-set-key (kbd "C-<f12>") #'bookmark-set)
-
-  ;; Disable C-z to suspend in GUI Emacs.
-  (when window-system
-    (global-unset-key (kbd "C-z")))
-
-  ;; Enable some commands that are disabled by default.
-  (put 'upcase-region 'disabled nil)
-  (put 'downcase-region 'disabled nil)
-  (put 'scroll-left 'disabled nil)
-
-  ;; Sentences end with a single space, not double space.
-  (setq sentence-end-double-space nil)
-
-  ;; Automatically load files from disk when they change.
-  (global-auto-revert-mode 1)
-  (setq dired-auto-revert-buffer t)
-
-  ;; Always use spaces for indentation.
-  (setq-default indent-tabs-mode nil)
-
-  ;; In modes where we are forced to use tabs (e.g go-mode), set tab
-  ;; width to 4.
-  (setq-default tab-width 4)
-
-  ;; Fill paragraphs so the lines are 80 characters wide.
-  (setq-default fill-column 80)
-
-  ;; Put the most recently killed/yanked text into the system clipboard.
-  (setq save-interprogram-paste-before-kill t)
 
   ;; Configure exec-path.
   (use-package exec-path-from-shell
@@ -204,9 +263,6 @@ Don't create garbage files.
     (display-line-numbers-mode))
 
   (add-hook 'prog-mode-hook #'s3thi/prog-mode-hook)
-
-  ;; Make word movement commands take CamelCase words into account.
-  (global-subword-mode 1)
 
   ;; JavaScript indent level.
   (setq js-indent-level 2)
