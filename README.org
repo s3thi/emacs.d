@@ -46,6 +46,32 @@ check the OS we're runniong on before setting it.
     (set-frame-font "Fira Code 14" nil t))
 #+END_SRC
 
+=scroll-conservatively= specifies the number of lines to scroll the buffer in
+order to bring the cursor back on the screen when it moves off-screen. If moving
+that much doesn't bring the cursor back, Emacs will scroll the buffer by as many
+lines as it takes to bring the cursor to the exact center of the screen.
+
+This behavior is irritating and jarring, causing huge jumps as you move around a
+file. Luckily, setting this variable to a number larger than 100 tells Emacs to
+/never/ scroll by large amounts, and instead scroll the screen /just enough/ to
+keep the cursor visible.
+
+In summary, setting =scroll-conservatively= to 101 will make Emacs behave like
+every other text editor on the planet.
+
+
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-conservatively 101)
+#+END_SRC
+
+=scroll-margin= specifies the number of lines of margin at the top or bottom of
+the window. As soon as the cursor gets closer than this to the top of or bottom
+of a window, Emacs will start scrolling.
+
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-margin 10)
+#+END_SRC
+
 *** General UI Enhancements
 
 *** Minibuffer Completion
@@ -106,7 +132,6 @@ enabled for a single buffer. This conveniently integrates with use-package.
     (load-theme 'monokai t))
 #+END_SRC
 
-
 ** Files and Directories
 
 Store configuration created by custom in a separate file.
@@ -136,7 +161,6 @@ correct VCS information in our modeline.
   (setq auto-revert-check-vc-info t)
   (global-auto-revert-mode 1)
 #+END_SRC
-
 
 ** Text Editing
 
@@ -200,11 +224,89 @@ modeline.
   (global-subword-mode 1)
 #+END_SRC
 
+Select text surrounded by certain delimiters using a single key combination.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind (("C-=" . #'er/expand-region)))
+#+END_SRC
+
+Snippets using =yasnippet=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :diminish yas-minor-mode
+    :config
+    (yas-global-mode 1)
+    (define-key yas-minor-mode-map (kbd "<tab>") nil)
+    (define-key yas-minor-mode-map (kbd "TAB") nil)
+    (global-set-key (kbd "C-c y") #'yas-insert-snippet)
+    (global-set-key (kbd "C-;") #'yas-expand))
+#+END_SRC
+
+** Version Control
+
+Install Magit. Also install diff-hl to highlight changed lines within a buffer.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t)
+
+  (use-package diff-hl
+    :ensure t
+    :after magit
+    :config
+    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    (diff-hl-flydiff-mode)
+    (global-diff-hl-mode))
+#+END_SRC
+
 ** Programming
 
-*** Version Control
-
 *** General Programming
+
+Use company for autocomplete menus.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :diminish
+    :hook
+    (after-init . global-company-mode)
+    :bind
+    (:map company-active-map
+          ("C-n" . company-select-next-or-abort)
+          ("C-p" . company-select-previous-or-abort))
+    :config
+    (setq company-idle-delay 0.1)
+    (setq company-tooltip-align-annotations t)
+    (setq company-selection-wrap-around t)
+    (setq company-dabbrev-downcase nil))
+#+END_SRC
+
+Use Flycheck for linting.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :diminish
+    :init
+    (setq flycheck-indication-mode nil)
+    :config
+    (global-flycheck-mode))
+#+END_SRC
+
+Highlight keywords like TODO, HACK, etc. in source code.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hl-todo
+    :ensure t
+    :diminish
+    :hook ((prog-mode . hl-todo-mode)))
+#+END_SRC
 
 *** JavaScript
 
@@ -223,10 +325,6 @@ our shell.
 ** Everything Else
 
 #+BEGIN_SRC emacs-lisp
-  ;; Don't make the screen jump when scroll off the top/bottom of the buffer.
-  ;; TODO figure out why/how this setting works.
-  (setq scroll-conservatively 100)
-
   ;; Some general keybindings.
   (global-set-key (kbd "C-x C-b") #'ibuffer)
   (global-set-key (kbd "M-;") #'comment-line)
@@ -246,36 +344,6 @@ our shell.
   (use-package add-node-modules-path
     :ensure t
     :hook js-mode)
-
-  ;; Magit is dope.
-  (use-package magit
-    :ensure t)
-
-  ;; Highlight modified lines on the fly.
-  (use-package diff-hl
-    :ensure t
-    :after magit
-    :config
-    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (diff-hl-flydiff-mode)
-    (global-diff-hl-mode))
-
-  ;; Use company for autocomplete menus.
-  (use-package company
-    :ensure t
-    :diminish
-    :hook
-    (after-init . global-company-mode)
-    :bind
-    (:map company-active-map
-          ("C-n" . company-select-next-or-abort)
-          ("C-p" . company-select-previous-or-abort))
-    :config
-    (setq company-idle-delay 0.1)
-    (setq company-tooltip-align-annotations t)
-    (setq company-selection-wrap-around t)
-    (setq company-dabbrev-downcase nil))
 
   (defun s3thi/prog-mode-hook ()
     "Customizations for 'prog-mode' only."
@@ -312,15 +380,6 @@ our shell.
     :hook ((typescript-mode . tide-setup)
            (typescript-mode . tide-hl-identifier-mode)))
 
-  ;; Lint using flycheck.
-  (use-package flycheck
-    :ensure t
-    :diminish
-    :init
-    (setq flycheck-indication-mode nil)
-    :config
-    (global-flycheck-mode))
-
   ;; Automatically format JS code with prettier.
   (use-package prettier-js
     :diminish
@@ -355,28 +414,6 @@ our shell.
     :ensure t
     :config
     (rg-enable-default-bindings))
-
-  ;; Highlight TODO, HACK, etc. keywords.
-  (use-package hl-todo
-    :ensure t
-    :diminish
-    :hook ((prog-mode . hl-todo-mode)))
-
-  ;; Easily select text surrounded by certain delimiters.
-  (use-package expand-region
-    :ensure t
-    :bind (("C-=" . #'er/expand-region)))
-
-  ;; Snippets.
-  (use-package yasnippet
-    :ensure t
-    :diminish yas-minor-mode
-    :config
-    (yas-global-mode 1)
-    (define-key yas-minor-mode-map (kbd "<tab>") nil)
-    (define-key yas-minor-mode-map (kbd "TAB") nil)
-    (global-set-key (kbd "C-c y") #'yas-insert-snippet)
-    (global-set-key (kbd "C-;") #'yas-expand))
 
   ;; A ton of useful functions.
   (use-package crux
