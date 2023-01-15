@@ -112,14 +112,6 @@ Don't create garbage files.
   ;; Put the most recently killed/yanked text into the system clipboard.
   (setq save-interprogram-paste-before-kill t)
 
-  ;; Setup auto updating for installed packages.
-  (use-package auto-package-update
-    :ensure t
-    :config
-    (setq auto-package-update-delete-old-versions t
-          auto-package-update-interval 4)
-    (auto-package-update-maybe))
-
   ;; Configure exec-path.
   (use-package exec-path-from-shell
     :ensure t
@@ -139,9 +131,13 @@ Don't create garbage files.
 
   ;; Gruvbox is timeless.
   (use-package gruvbox-theme
+    :ensure t)
+
+  ;; And so is Monokai.
+  (use-package monokai-theme
     :ensure t
     :config
-    (load-theme 'gruvbox-dark-soft t))
+    (load-theme 'monokai t))
 
   ;; Use Vertico for minibuffer completions.
   (use-package vertico
@@ -335,5 +331,4 @@ Don't create garbage files.
   ;; Start the Emacs server.
   (unless (server-running-p)
     (server-start))
-
 #+END_SRC
