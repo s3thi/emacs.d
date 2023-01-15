@@ -46,6 +46,67 @@ check the OS we're runniong on before setting it.
     (set-frame-font "Fira Code 14" nil t))
 #+END_SRC
 
+*** General UI Enhancements
+
+*** Minibuffer Completion
+
+We use Vertico for minibuffer completions, Marginalia to add helpful annotations
+and documentation next to completions, and Orderless to impose and order on
+completions.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vertico
+    :ensure t
+    :init
+    (vertico-mode))
+
+  (use-package marginalia
+    :ensure t
+    :bind (:map minibuffer-local-map
+                ("M-A" . marginalia-cycle))
+    :init
+    (marginalia-mode))
+
+  (use-package orderless
+    :ensure t
+    :init
+    (setq completion-styles '(orderless)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles partial-completion)))))
+#+END_SRC
+
+which-key displays helpful suggestions in the minibuffer when you hit the first
+part of a long keychord.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :diminish
+    :config
+    (which-key-mode 1))
+#+END_SRC
+
+Diminish prevents the modeline from getting polluted when too many modes are
+enabled for a single buffer. This conveniently integrates with use-package.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t)
+#+END_SRC
+
+*** Themes
+
+#+BEGIN_SRC emacs-lisp
+  (use-package gruvbox-theme
+    :ensure t)
+
+  (use-package monokai-theme
+    :ensure t
+    :config
+    (load-theme 'monokai t))
+#+END_SRC
+
+
 ** Files and Directories
 
 Store configuration created by custom in a separate file.
@@ -141,6 +202,8 @@ modeline.
 
 ** Programming
 
+*** Version Control
+
 *** General Programming
 
 *** JavaScript
@@ -183,49 +246,6 @@ our shell.
   (use-package add-node-modules-path
     :ensure t
     :hook js-mode)
-
-  ;; Hide certain modes from the modeline.
-  (use-package diminish
-    :ensure t)
-
-  ;; Gruvbox is timeless.
-  (use-package gruvbox-theme
-    :ensure t)
-
-  ;; And so is Monokai.
-  (use-package monokai-theme
-    :ensure t
-    :config
-    (load-theme 'monokai t))
-
-  ;; Use Vertico for minibuffer completions.
-  (use-package vertico
-    :ensure t
-    :init
-    (vertico-mode))
-
-  ;; Add annotations in the minibuffer using Marginalia.
-  (use-package marginalia
-    :ensure t
-    :bind (:map minibuffer-local-map
-                ("M-A" . marginalia-cycle))
-    :init
-    (marginalia-mode))
-
-  ;; Use Orderless for searching through completions in the minibuffer.
-  (use-package orderless
-    :ensure t
-    :init
-    (setq completion-styles '(orderless)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles partial-completion)))))
-
-  ;; I get by with a little help from which-key.
-  (use-package which-key
-    :ensure t
-    :diminish
-    :config
-    (which-key-mode 1))
 
   ;; Magit is dope.
   (use-package magit
