@@ -173,8 +173,8 @@ Enable useful text editing commands that are disabled by default.
 #+END_SRC
 
 Make sure sentences end with single spaces, not double spaces. This makes
-functions that operate on prose behave better (such as those in org-mode and
-markdown-mode).
+functions that operate on prose behave better (such as those in =org-mode= and
+=markdown-mode=).
 
 #+BEGIN_SRC emacs-lisp
   (setq sentence-end-double-space nil)
@@ -248,7 +248,8 @@ Snippets using =yasnippet=.
 
 ** Version Control
 
-Install Magit. Also install diff-hl to highlight changed lines within a buffer.
+Install =magit=. Also install =diff-hl= to highlight changed lines within a
+buffer.
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -268,7 +269,7 @@ Install Magit. Also install diff-hl to highlight changed lines within a buffer.
 
 *** General Programming
 
-Use company for autocomplete menus.
+Use =company= for autocomplete menus.
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -308,7 +309,7 @@ Highlight keywords like TODO, HACK, etc. in source code.
     :hook ((prog-mode . hl-todo-mode)))
 #+END_SRC
 
-*** JavaScript
+*** JavaScript and TypeScript
 
 ** Key Bindings
 
