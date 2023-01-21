@@ -11,6 +11,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (defvar s3thi/is-a-mac (eq system-type 'darwin))
+  (defvar s3thi/is-a-linux (eq system-type 'gnu/linux))
 #+END_SRC
 
 ** User Interface
@@ -39,11 +40,14 @@ And add UI elements that are nice to have.
 #+END_SRC
 
 Set a nice font. The font size will have to be different across platforms, so we
-check the OS we're runniong on before setting it.
+check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
     (set-frame-font "Fira Code 14" nil t))
+
+  (when s3thi/is-a-linux
+    (set-frame-font "Fira Code 11" nil t))
 #+END_SRC
 
 =scroll-conservatively= specifies the number of lines to scroll the buffer in
