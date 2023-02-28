@@ -1,5 +1,9 @@
 * Emacs Configuration
 
+#+BEGIN_SRC emacs-lisp
+  ;;; README.el --- Literate initialization file for Emacs -*- lexical-binding: t -*-
+#+END_SRC
+
 ** Personal Information
 
 #+BEGIN_SRC emacs-lisp
@@ -44,10 +48,17 @@ check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
-    (set-frame-font "Fira Code 14" nil t))
+    (set-frame-font "Input Mono Narrow 14" nil t))
+#+END_SRC
 
-  (when s3thi/is-a-linux
-    (set-frame-font "Fira Code 11" nil t))
+Maximize the Emacs frame on startup. To start every new frame maximized instead
+of just the first frame, you can add the following options to
+=default-frame-alist= instead of =initial-frame-alist=. Additionally, it's
+possible to toggle the maximized status of an Emacs frame by calling
+=toggle-frame-maximized=, which is bound to =M-<f10>= by default.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
 =scroll-conservatively= specifies the number of lines to scroll the buffer in
@@ -63,9 +74,8 @@ keep the cursor visible.
 In summary, setting =scroll-conservatively= to 101 will make Emacs behave like
 every other text editor on the planet.
 
-
 #+BEGIN_SRC emacs-lisp
-  (setq scroll-conservatively 101)
+    (setq scroll-conservatively 101)
 #+END_SRC
 
 =scroll-margin= specifies the number of lines of margin at the top or bottom of
@@ -73,7 +83,7 @@ the window. As soon as the cursor gets closer than this to the top of or bottom
 of a window, Emacs will start scrolling.
 
 #+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 10)
+  (setq scroll-margin 5)
 #+END_SRC
 
 *** General UI Enhancements
@@ -131,9 +141,9 @@ enabled for a single buffer. This conveniently integrates with use-package.
     :ensure t)
 
   (use-package monokai-theme
-    :ensure t
-    :config
-    (load-theme 'monokai t))
+    :ensure t)
+
+  (load-theme 'gruvbox-light-hard t)
 #+END_SRC
 
 ** Files and Directories
@@ -445,8 +455,4 @@ our shell.
   ;; Browse kill ring.
   (use-package browse-kill-ring
     :ensure t)
-
-  ;; Start the Emacs server.
-  (unless (server-running-p)
-    (server-start))
 #+END_SRC
