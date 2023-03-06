@@ -291,7 +291,10 @@ Use =vterm= as a shell.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vterm
-    :ensure t)
+    :ensure t
+    :init
+    (setq vterm-buffer-name-string "vterm %s")
+    :bind (("C-c t" . vterm)))
 #+END_SRC
 
 ** Programming
