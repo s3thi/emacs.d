@@ -452,11 +452,6 @@ our shell.
   (global-set-key (kbd "C-x C-b") #'ibuffer)
   (global-set-key (kbd "M-;") #'comment-line)
 
-  ;; Add node_modules to the exec-path.
-  (use-package add-node-modules-path
-    :ensure t
-    :hook js-mode)
-
   ;; Syntax highlighting for JSON.
   (use-package json-mode
     :ensure t)
