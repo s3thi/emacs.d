@@ -2,26 +2,26 @@
 
 ** Paperwork
 
-Enable lexical binding:
+Enable lexical binding.
 
 #+BEGIN_SRC emacs-lisp
   ;;; README.el --- Literate configuration for Emacs -*- lexical-binding: t -*-
 #+END_SRC
 
-Set encoding to UTF-8:
+Set encoding to UTF-8.
 
 #+BEGIN_SRC emacs-lisp
   (prefer-coding-system 'utf-8)
 #+END_SRC
 
-** Personal Information
+Personal information.
 
 #+BEGIN_SRC emacs-lisp
   (setq user-full-name "Ankur Sethi"
         user-mail-address "contact@ankursethi.in")
 #+END_SRC
 
-** Platform Specific Variables
+Platform specific variables.
 
 #+BEGIN_SRC emacs-lisp
   (defvar s3thi/is-a-mac (eq system-type 'darwin))
@@ -102,29 +102,8 @@ Show total number of matches while searching:
 
 *** Minibuffer Completion
 
-We use =vertico= for minibuffer completions, =marginalia= to add helpful
-annotations and documentation next to completions, and =orderless= to impose an
-order on completions.
-
 #+BEGIN_SRC emacs-lisp
-  (use-package vertico
-    :ensure t
-    :init
-    (vertico-mode))
-
-  (use-package marginalia
-    :ensure t
-    :bind (:map minibuffer-local-map
-                ("M-A" . marginalia-cycle))
-    :init
-    (marginalia-mode))
-
-  (use-package orderless
-    :ensure t
-    :init
-    (setq completion-styles '(orderless)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles partial-completion)))))
+  ;; What will we put here???
 #+END_SRC
 
 =which-key= displays helpful suggestions in the minibuffer when you hit the
@@ -149,12 +128,6 @@ enabled for a single buffer. This conveniently integrates with use-package.
 *** Themes
 
 #+BEGIN_SRC emacs-lisp
-  (use-package gruvbox-theme
-    :ensure t)
-
-  (use-package monokai-theme
-    :ensure t)
-
   (use-package modus-themes
     :ensure t
     :init
@@ -255,14 +228,6 @@ modeline.
   (global-subword-mode 1)
 #+END_SRC
 
-Select text surrounded by certain delimiters using a single key combination.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package expand-region
-    :ensure t
-    :bind (("C-=" . #'er/expand-region)))
-#+END_SRC
-
 Snippets using =yasnippet=.
 
 #+BEGIN_SRC emacs-lisp
@@ -277,23 +242,39 @@ Snippets using =yasnippet=.
     (global-set-key (kbd "C-;") #'yas-expand))
 #+END_SRC
 
-** Version Control
+Use =olivetti= to make sure all prose is aligned to the center of the screen.
+Useful for writing long-form prose in Markdown, org-mode, etc.
 
-Install =magit=. Also install =diff-hl= to highlight changed lines within a
-buffer.
+#+BEGIN_SRC emacs-lisp
+  (use-package olivetti
+    :ensure t
+    :bind (("C-c o" . olivetti-mode))
+    :hook ((text-mode . olivetti-mode)))
+#+END_SRC
+
+Enable =auto-fill-mode= for all modes deriving from =text-mode=.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'text-mode-hook #'auto-fill-mode)
+#+END_SRC
+
+** Org Mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :config
+    (setq org-directory "~/Org/")
+    (set-face-attribute 'org-level-1 nil :height 2.0)
+    (set-face-attribute 'org-level-2 nil :height 1.7143)
+    (set-face-attribute 'org-level-3 nil :height 1.4286)
+    (set-face-attribute 'org-level-4 nil :height 1.1429))
+#+END_SRC
+
+** Version Control
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t)
-
-  (use-package diff-hl
-    :ensure t
-    :after magit
-    :config
-    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (diff-hl-flydiff-mode)
-    (global-diff-hl-mode))
 #+END_SRC
 
 ** Shell
@@ -341,15 +322,6 @@ Use Flycheck for linting.
     (setq flycheck-indication-mode nil)
     :config
     (global-flycheck-mode))
-#+END_SRC
-
-Highlight keywords like TODO, HACK, etc. in source code.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package hl-todo
-    :ensure t
-    :diminish
-    :hook ((prog-mode . hl-todo-mode)))
 #+END_SRC
 
 Hook for general programming settings. Modes that are derived from =prog-mode=
@@ -470,15 +442,6 @@ Syntax highlighting for JSON.
     :ensure t)
 #+END_SRC
 
-** Writing
-
-#+BEGIN_SRC emacs-lisp
-  (use-package olivetti
-    :ensure t
-    :bind (("C-c o" . olivetti-mode)))
-#+END_SRC
-
-
 ** Key Bindings
 
 Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI Emacs will
@@ -496,7 +459,6 @@ our shell.
 #+BEGIN_SRC emacs-lisp
   ;; Some general keybindings.
   (global-set-key (kbd "C-x C-b") #'ibuffer)
-  (global-set-key (kbd "M-;") #'comment-line)
 
   ;; REST client.
   (use-package restclient
@@ -535,10 +497,6 @@ our shell.
     (setq undo-tree-history-directory-alist
           `(("." . ,(concat user-emacs-directory "undo-tree/")))))
 
-  ;; Move buffers between windows.
-  (use-package buffer-move
-    :ensure t)
-
   ;; Browse kill ring.
   (use-package browse-kill-ring
     :ensure t)
@@ -550,7 +508,6 @@ our shell.
     :config
     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
     (setq aw-background nil)
-    (setq aw-dispatch-always t)
     (setq aw-scope 'frame))
 
   ;; Start server.
