@@ -30,6 +30,8 @@ Set encoding to UTF-8:
 
 ** User Interface
 
+*** General UI Enhancements
+
 Remove UI elements we don't like.
 
 #+BEGIN_SRC emacs-lisp
@@ -54,7 +56,7 @@ check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
-    (set-frame-font "Input Mono Narrow 14" nil t))
+    (set-frame-font "Berkeley Mono 14" nil t))
 #+END_SRC
 
 Maximize the Emacs frame on startup. To start every new frame maximized instead
@@ -92,13 +94,17 @@ of a window, Emacs will start scrolling.
   (setq scroll-margin 5)
 #+END_SRC
 
-*** General UI Enhancements
+Show total number of matches while searching:
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default isearch-lazy-count t)
+#+END_SRC
 
 *** Minibuffer Completion
 
-We use Vertico for minibuffer completions, Marginalia to add helpful annotations
-and documentation next to completions, and Orderless to impose and order on
-completions.
+We use =vertico= for minibuffer completions, =marginalia= to add helpful
+annotations and documentation next to completions, and =orderless= to impose an
+order on completions.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vertico
@@ -121,8 +127,8 @@ completions.
           completion-category-overrides '((file (styles partial-completion)))))
 #+END_SRC
 
-which-key displays helpful suggestions in the minibuffer when you hit the first
-part of a long keychord.
+=which-key= displays helpful suggestions in the minibuffer when you hit the
+first part of a long keychord.
 
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -132,7 +138,7 @@ part of a long keychord.
     (which-key-mode 1))
 #+END_SRC
 
-Diminish prevents the modeline from getting polluted when too many modes are
+=diminish= prevents the modeline from getting polluted when too many modes are
 enabled for a single buffer. This conveniently integrates with use-package.
 
 #+BEGIN_SRC emacs-lisp
@@ -149,7 +155,12 @@ enabled for a single buffer. This conveniently integrates with use-package.
   (use-package monokai-theme
     :ensure t)
 
-  (load-theme 'gruvbox-light-hard t)
+  (use-package modus-themes
+    :ensure t
+    :init
+    (setq modus-themes-org-blocks 'gray-background))
+
+  (load-theme 'modus-operandi t)
 #+END_SRC
 
 ** Files and Directories
@@ -356,21 +367,14 @@ will automatically inherit these settings.
 
 *** JavaScript and TypeScript
 
-Start by defining a function to detect if our file is supported by =web-mode= or
-not.
-
-#+BEGIN_SRC emacs-lisp
-  (setq s3thi/js-ts-extensions-list '("js" "jsx" "ts" "tsx"))
-
-  (defun s3thi/buffer-is-js-or-ts ()
-      (member (file-name-extension buffer-file-name) s3thi/js-ts-extensions-list))
-#+END_SRC
-
 Add =.bin= directories that exist inside =node_modules= directories in frontend
 projects to the Emacs =exec-path=. This will let Emacs find project-specific
 versions of ESLint, Prettier, etc.
 
 #+BEGIN_SRC emacs-lisp
+  (setq s3thi/wants-node-modules-paths-extensions-list
+        '("js" "jsx" "ts" "tsx" "json" "css" "scss" "md"))
+
   (defun s3thi/recursively-find-node-modules-bin-dirs ()
     "Starting with the current directory and recursing up to the file system root, find all .bin directories that exist inside a node_modules directory."
     (let ((dir (file-name-directory (or buffer-file-name default-directory)))
@@ -391,53 +395,89 @@ versions of ESLint, Prettier, etc.
     (make-local-variable 'exec-path)
     (dolist (dir (s3thi/recursively-find-node-modules-bin-dirs))
       (add-to-list 'exec-path dir)))
+
+  (defun s3thi/maybe-add-node-modules-paths ()
+    (when (member (file-name-extension buffer-file-name)
+                  s3thi/wants-node-modules-paths-extensions-list)
+      (s3thi/add-node-modules-paths)))
+
+  (add-hook 'find-file-hook #'s3thi/maybe-add-node-modules-paths)
 #+END_SRC
 
 Set up syntax highlighting for JavaScript, TypeScript, and their JSX variants.
 
 #+BEGIN_SRC emacs-lisp
+  (setq s3thi/wants-web-mode-extensions-list
+        '("js" "jsx" "ts" "tsx" "html" "css"))
+
   (use-package web-mode
     :ensure t
-    :hook ((web-mode . (lambda ()
-                         (when (s3thi/buffer-is-js-or-ts)
-                           (s3thi/add-node-modules-paths)))))
     :init
     (setq web-mode-code-indent-offset 2)
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-css-indent-offset 2)
     :config
-    (dolist (file-ext s3thi/js-ts-extensions-list)
+    (dolist (file-ext s3thi/wants-web-mode-extensions-list)
       (add-to-list 'auto-mode-alist (cons (format "\\.%s\\'" file-ext) #'web-mode))))
 #+END_SRC
 
 Add some smarts using Tide.
 
 #+BEGIN_SRC emacs-lisp
+  (setq s3thi/wants-tide-mode-extensions-list
+        '("js" "jsx" "ts" "tsx"))
+
+  (defun s3thi/maybe-setup-tide ()
+    (when (member (file-name-extension buffer-file-name)
+                  s3thi/wants-tide-mode-extensions-list)
+      (tide-setup)
+      (tide-hl-identifier-mode)))
+
   (use-package tide
     :ensure t
     :after (web-mode company flycheck)
-    :hook ((web-mode . (lambda ()
-                         (when (s3thi/buffer-is-js-or-ts)
-                           (tide-setup)
-                           (tide-hl-identifier-mode)))))
     :config
     (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
     (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
     (flycheck-add-next-checker 'typescript-tslint 'typescript-tide 'append)
     (flycheck-add-next-checker 'typescript-tslint 'tsx-tide 'append)
     (flycheck-add-mode 'javascript-eslint 'web-mode)
-    (flycheck-add-mode 'typescript-tslint 'web-mode))
+    (flycheck-add-mode 'typescript-tslint 'web-mode)
+    (add-hook 'find-file-hook #'s3thi/maybe-setup-tide))
 #+END_SRC
 
 Add formatting via Prettier.
 
 #+BEGIN_SRC emacs-lisp
+  (setq s3thi/wants-prettier-js-mode-extensions-list
+        '("js" "jsx" "ts" "tsx" "css" "html" "json"))
+
+  (defun s3thi/maybe-enable-prettier ()
+    (when (member (file-name-extension buffer-file-name)
+                  s3thi/wants-prettier-js-mode-extensions-list)
+      (prettier-js-mode)))
+
   (use-package prettier
     :ensure t
-    :hook ((web-mode . (lambda ()
-                         (when (s3thi/buffer-is-js-or-ts)
-                           (prettier-js-mode))))))
+    :config
+    (add-hook 'find-file-hook #'s3thi/maybe-enable-prettier))
 #+END_SRC
+
+Syntax highlighting for JSON.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package json-mode
+    :ensure t)
+#+END_SRC
+
+** Writing
+
+#+BEGIN_SRC emacs-lisp
+  (use-package olivetti
+    :ensure t
+    :bind (("C-c o" . olivetti-mode)))
+#+END_SRC
+
 
 ** Key Bindings
 
@@ -458,19 +498,9 @@ our shell.
   (global-set-key (kbd "C-x C-b") #'ibuffer)
   (global-set-key (kbd "M-;") #'comment-line)
 
-  ;; Syntax highlighting for JSON.
-  (use-package json-mode
-    :ensure t)
-
   ;; REST client.
   (use-package restclient
     :ensure t)
-
-  ;; LSP config.
-  (use-package lsp-mode
-    :ensure t
-    :init
-    (setq lsp-keymap-prefix "C-c l"))
 
   ;; Markdown.
   (use-package markdown-mode
@@ -512,4 +542,17 @@ our shell.
   ;; Browse kill ring.
   (use-package browse-kill-ring
     :ensure t)
+
+  ;; ace-window
+  (use-package ace-window
+    :ensure t
+    :bind (("M-o" . 'ace-window))
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    (setq aw-background nil)
+    (setq aw-dispatch-always t)
+    (setq aw-scope 'frame))
+
+  ;; Start server.
+  (server-start)
 #+END_SRC
