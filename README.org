@@ -30,7 +30,8 @@ Platform specific variables.
 
 #+BEGIN_SRC emacs-lisp
   (defvar s3thi/is-a-mac (eq system-type 'darwin))
-  (defvar s3thi/is-a-linux (eq system-type 'gnu/linux))
+  (defvar s3thi/is-a-pc (eq system-type 'windows-nt))
+  (defvar s3thi/is-a-penguin (eq system-type 'gnu/linux))
 #+END_SRC
 
 ** User Interface
@@ -133,11 +134,7 @@ enabled for a single buffer. This conveniently integrates with use-package.
 *** Themes
 
 #+BEGIN_SRC emacs-lisp
-  (use-package modus-themes
-    :ensure t
-    :init
-    (setq modus-themes-org-blocks 'gray-background))
-
+  (setq modus-themes-org-blocks 'gray-background)
   (load-theme 'modus-operandi t)
 #+END_SRC
 
@@ -189,12 +186,6 @@ functions that operate on prose behave better (such as those in =org-mode= and
   (setq sentence-end-double-space nil)
 #+END_SRC
 
-Fill paragraphs so the lines are 80 characters wide. Affects all modes.
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default fill-column 80)
-#+END_SRC
-
 Always use spaces for indentation. Affects all modes, unless we override it
 later. The only programming language I've used that mandates the use of tabs
 rather than spaces is Go, so it's safe to set this here and override it for Go
@@ -233,6 +224,28 @@ modeline.
   (global-subword-mode 1)
 #+END_SRC
 
+Use =visual-fill-column= to give us the same word-wrapping experience as a
+regular text editor inside Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (defun s3thi/center-and-fill ()
+    (interactive)
+    (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
+        (visual-fill-column-mode 0)
+      (progn
+        (setq visual-fill-column-center-text t)
+        (visual-fill-column-mode))))
+
+  (use-package visual-fill-column
+    :ensure t
+    :bind (("C-c f" . #'visual-fill-column-mode)
+           ("C-c c" . #'s3thi/center-and-fill))
+    :init
+    (setq visual-fill-column-enable-sensible-window-split t)
+    :config
+    (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
+#+END_SRC
+
 Snippets using =yasnippet=.
 
 #+BEGIN_SRC emacs-lisp
@@ -243,45 +256,46 @@ Snippets using =yasnippet=.
     (yas-global-mode 1)
     (define-key yas-minor-mode-map (kbd "<tab>") nil)
     (define-key yas-minor-mode-map (kbd "TAB") nil)
-    (global-set-key (kbd "C-c y") #'yas-insert-snippet)
-    (global-set-key (kbd "C-;") #'yas-expand))
+    (global-set-key (kbd "C-c y") #'yas-expand))
 #+END_SRC
 
-Use =olivetti= to make sure all prose is aligned to the center of the screen.
-Useful for writing long-form prose in Markdown, org-mode, etc.
+Define a type scale that we'll use later.
 
 #+BEGIN_SRC emacs-lisp
-  (defun s3thi/toggle-writing-environment ()
-    (interactive)
-    (if (equal olivetti-mode nil)
-        (progn
-          (olivetti-mode t)
-          (text-scale-increase 1))
-      (progn
-        (olivetti-mode 0)
-        (text-scale-decrease 1))))
+  (defvar s3thi/type-scale-level-1 1.802)
+  (defvar s3thi/type-scale-level-2 1.602)
+  (defvar s3thi/type-scale-level-3 1.424)
+  (defvar s3thi/type-scale-level-4 1.266)
+  (defvar s3thi/type-scale-level-5 1.125)
+  (defvar s3thi/type-scale-level-6 1)
+#+END_SRC
 
-  (use-package olivetti
-    :ensure t
-    :init
-    (setq olivetti-body-width 64)
-    :bind (("C-c o" . #'s3thi/toggle-writing-environment)))
+Define line spacing that we'll use later, and a function we can use
+for hooks.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar s3thi/prose-line-spacing 0.125)
+
+  (defun s3thi/set-prose-line-spacing ()
+    (setq line-spacing s3thi/prose-line-spacing))
 #+END_SRC
 
 ** Org Mode
 
-TODO: use these sizes for Markdown headings.
-
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :hook ((org-mode . visual-line-mode)
-           (org-mode . flyspell-mode))
+           (org-mode . flyspell-mode)
+           (org-mode . s3thi/set-prose-line-spacing))
+    :init
+    (setq org-startup-indented t)
     :config
-    (set-face-attribute 'org-level-1 nil :height 2.0)
-    (set-face-attribute 'org-level-2 nil :height 1.7143)
-    (set-face-attribute 'org-level-3 nil :height 1.4286)
-    (set-face-attribute 'org-level-4 nil :height 1.1429)
-    (setq org-startup-indented t))
+    (set-face-attribute 'org-level-1 nil :height s3thi/type-scale-level-1)
+    (set-face-attribute 'org-level-2 nil :height s3thi/type-scale-level-2)
+    (set-face-attribute 'org-level-3 nil :height s3thi/type-scale-level-3)
+    (set-face-attribute 'org-level-4 nil :height s3thi/type-scale-level-4)
+    (set-face-attribute 'org-level-5 nil :height s3thi/type-scale-level-5)
+    (set-face-attribute 'org-level-6 nil :height s3thi/type-scale-level-6))
 #+END_SRC
 
 ** Version Control
@@ -315,13 +329,18 @@ Good ol' ==ibuffer==.
   ;; Markdown.
   (use-package markdown-mode
     :ensure t
-    :commands (markdown-mode gfm-mode)
-    :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'" . markdown-mode)
+    :mode (("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
     :hook ((markdown-mode . visual-line-mode)
-           (markdown-mode . flyspell-mode))
-    :init (setq markdown-command "multimarkdown"))
+           (markdown-mode . flyspell-mode)
+           (markdown-mode . s3thi/set-prose-line-spacing))
+    :config
+    (set-face-attribute 'markdown-header-face-1 nil :height s3thi/type-scale-level-1)
+    (set-face-attribute 'markdown-header-face-2 nil :height s3thi/type-scale-level-2)
+    (set-face-attribute 'markdown-header-face-3 nil :height s3thi/type-scale-level-3)
+    (set-face-attribute 'markdown-header-face-4 nil :height s3thi/type-scale-level-4)
+    (set-face-attribute 'markdown-header-face-5 nil :height s3thi/type-scale-level-5)
+    (set-face-attribute 'markdown-header-face-6 nil :height s3thi/type-scale-level-6))
 
   ;; Ripgrep for searching.
   (use-package rg
@@ -350,15 +369,6 @@ Good ol' ==ibuffer==.
   ;; Browse kill ring.
   (use-package browse-kill-ring
     :ensure t)
-
-  ;; ace-window
-  (use-package ace-window
-    :ensure t
-    :bind (("M-o" . 'ace-window))
-    :config
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-    (setq aw-background nil)
-    (setq aw-scope 'frame))
 
   ;; Start server.
   (server-start)
