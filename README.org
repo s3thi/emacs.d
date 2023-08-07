@@ -1,5 +1,11 @@
 * Emacs Configuration
 
+** Things to do
+
+- Fix indentation of lists in Markdown mode.
+- Is it possible to make Markdown mode behave like org-mode in terms
+  of indenting text nested under headings?
+
 ** Paperwork
 
 File header.
@@ -108,8 +114,73 @@ Show total number of matches while searching:
 
 *** Minibuffer Completion
 
+Use =vertico= as the completion UI. Also add some recommended configuration from
+the =vertico= documentation.
+
 #+BEGIN_SRC emacs-lisp
-  ;; What will we put here???
+  (use-package vertico
+    :ensure t
+    :init
+    (vertico-mode))
+
+  (use-package emacs
+    :init
+    ;; Add prompt indicator to `completing-read-multiple'.
+    ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+    (defun crm-indicator (args)
+      (cons (format "[CRM%s] %s"
+                    (replace-regexp-in-string
+                     "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                     crm-separator)
+                    (car args))
+            (cdr args)))
+    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+    ;; Do not allow the cursor in the minibuffer prompt
+    (setq minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+    ;; Vertico commands are hidden in normal buffers.
+    (setq read-extended-command-predicate
+          #'command-completion-default-include-p)
+
+    ;; Enable recursive minibuffers
+    (setq enable-recursive-minibuffers t))
+#+END_SRC
+
+Use =savehist= to save minibuffer history.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package savehist
+    :ensure t
+    :init
+    (savehist-mode))
+#+END_SRC
+
+Use =orderless= to filter completions.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package orderless
+    :ensure t
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles basic partial-completion)))))
+#+END_SRC
+
+Enable annotations in the minibuffer using =marginalia=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package marginalia
+    :ensure t
+    ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+    ;; available in the *Completions* buffer, add it to the
+    ;; `completion-list-mode-map'.
+    :bind (:map minibuffer-local-map
+                ("M-A" . marginalia-cycle))
+    :init
+    (marginalia-mode))
 #+END_SRC
 
 =which-key= displays helpful suggestions in the minibuffer when you hit the
@@ -201,6 +272,12 @@ In modes where we are forced to use tabs, set the tab width to 4.
   (setq-default tab-width 4)
 #+END_SRC
 
+Increase =fill-column= to a more reasonable value.
+
+#+BEGIN_SRC emacs-lisp
+  (setq fill-column 80)
+#+END_SRC
+
 If there is some text already present in the system clipboard when we run an
 Emacs command that kills text, make sure that is preserved by pushing it into
 the kill ring.
@@ -262,6 +339,7 @@ Snippets using =yasnippet=.
 Define a type scale that we'll use later.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar s3thi/type-scale-document-title 2.02725)
   (defvar s3thi/type-scale-level-1 1.802)
   (defvar s3thi/type-scale-level-2 1.602)
   (defvar s3thi/type-scale-level-3 1.424)
@@ -290,6 +368,7 @@ for hooks.
     :init
     (setq org-startup-indented t)
     :config
+    (set-face-attribute 'org-document-title nil :height s3thi/type-scale-document-title)
     (set-face-attribute 'org-level-1 nil :height s3thi/type-scale-level-1)
     (set-face-attribute 'org-level-2 nil :height s3thi/type-scale-level-2)
     (set-face-attribute 'org-level-3 nil :height s3thi/type-scale-level-3)
