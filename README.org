@@ -65,44 +65,46 @@ And add UI elements that are nice to have.
   (winner-mode 1)
 #+END_SRC
 
-Set a nice font. The font size will have to be different across platforms, so we
-check the OS we're running on before setting it.
+Set a nice font. The font size will have to be different across
+platforms, so we check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
     (set-frame-font "Berkeley Mono 15" nil t))
 #+END_SRC
 
-Maximize the Emacs frame on startup. To start every new frame maximized instead
-of just the first frame, you can add the following options to
-=default-frame-alist= instead of =initial-frame-alist=. Additionally, it's
-possible to toggle the maximized status of an Emacs frame by calling
-=toggle-frame-maximized=, which is bound to =M-<f10>= by default.
+Maximize the Emacs frame on startup. To start every new frame maximized
+instead of just the first frame, you can add the following options to
+=default-frame-alist= instead of =initial-frame-alist=. Additionally,
+it's possible to toggle the maximized status of an Emacs frame by
+calling =toggle-frame-maximized=, which is bound to =M-<f10>= by
+default.
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
-=scroll-conservatively= specifies the number of lines to scroll the buffer in
-order to bring the cursor back on the screen when it moves off-screen. If moving
-that much doesn't bring the cursor back, Emacs will scroll the buffer by as many
-lines as it takes to bring the cursor to the exact center of the screen.
+=scroll-conservatively= specifies the number of lines to scroll the
+buffer in order to bring the cursor back on the screen when it moves
+off-screen. If moving that much doesn't bring the cursor back, Emacs
+will scroll the buffer by as many lines as it takes to bring the cursor
+to the exact center of the screen.
 
-This behavior is irritating and jarring, causing huge jumps as you move around a
-file. Luckily, setting this variable to a number larger than 100 tells Emacs to
-/never/ scroll by large amounts, and instead scroll the screen /just enough/ to
-keep the cursor visible.
+This behavior is irritating and jarring, causing huge jumps as you move
+around a file. Luckily, setting this variable to a number larger than
+100 tells Emacs to /never/ scroll by large amounts, and instead scroll
+the screen /just enough/ to keep the cursor visible.
 
-In summary, setting =scroll-conservatively= to 101 will make Emacs behave like
-every other text editor on the planet.
+In summary, setting =scroll-conservatively= to 101 will make Emacs
+behave like every other text editor on the planet.
 
 #+BEGIN_SRC emacs-lisp
     (setq scroll-conservatively 101)
 #+END_SRC
 
-=scroll-margin= specifies the number of lines of margin at the top or bottom of
-the window. As soon as the cursor gets closer than this to the top of or bottom
-of a window, Emacs will start scrolling.
+=scroll-margin= specifies the number of lines of margin at the top or
+bottom of the window. As soon as the cursor gets closer than this to the
+top of or bottom of a window, Emacs will start scrolling.
 
 #+BEGIN_SRC emacs-lisp
   (setq scroll-margin 5)
@@ -116,8 +118,8 @@ Show total number of matches while searching:
 
 *** Minibuffer Completion
 
-Use =vertico= as the completion UI. Also add some recommended configuration from
-the =vertico= documentation.
+Use =vertico= as the completion UI. Also add some recommended
+configuration from the =vertico= documentation.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vertico
@@ -185,8 +187,8 @@ Enable annotations in the minibuffer using =marginalia=.
     (marginalia-mode))
 #+END_SRC
 
-=which-key= displays helpful suggestions in the minibuffer when you hit the
-first part of a long keychord.
+=which-key= displays helpful suggestions in the minibuffer when you hit
+the first part of a long keychord.
 
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -196,8 +198,9 @@ first part of a long keychord.
     (which-key-mode 1))
 #+END_SRC
 
-=diminish= prevents the modeline from getting polluted when too many modes are
-enabled for a single buffer. This conveniently integrates with use-package.
+=diminish= prevents the modeline from getting polluted when too many
+modes are enabled for a single buffer. This conveniently integrates with
+use-package.
 
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
@@ -228,12 +231,13 @@ Don't create garbage files.
   (setq-default make-backup-files nil)
 #+END_SRC
 
-Turn on =auto-revert-mode= for all files. This will automatically reload files
-from disk every time they're changed by another from outside Emacs.
+Turn on =auto-revert-mode= for all files. This will automatically reload
+files from disk every time they're changed by another from outside
+Emacs.
 
-Also ensure that Dired buffers are reloaded on each visit, and that version
-control information is checked periodically to ensure that we're showing the
-correct VCS information in our modeline.
+Also ensure that Dired buffers are reloaded on each visit, and that
+version control information is checked periodically to ensure that we're
+showing the correct VCS information in our modeline.
 
 #+BEGIN_SRC emacs-lisp
   (setq dired-auto-revert-buffer t)
@@ -247,8 +251,8 @@ Save place in files.
   (save-place-mode 1)
 #+END_SRC
 
-If a read-only file is opened, use =view-mode= instead of the regular mode. This
-ensures you can't accidentally change or overwrite the file.
+If a read-only file is opened, use =view-mode= instead of the regular
+mode. This ensures you can't accidentally change or overwrite the file.
 
 #+BEGIN_SRC emacs-lisp
   (setq view-read-only t)
@@ -264,18 +268,18 @@ Enable useful text editing commands that are disabled by default.
   (put 'scroll-left 'disabled nil)
 #+END_SRC
 
-Make sure sentences end with single spaces, not double spaces. This makes
-functions that operate on prose behave better (such as those in =org-mode= and
-=markdown-mode=).
+Make sure sentences end with single spaces, not double spaces. This
+makes functions that operate on prose behave better (such as those in
+=org-mode= and =markdown-mode=).
 
 #+BEGIN_SRC emacs-lisp
   (setq sentence-end-double-space nil)
 #+END_SRC
 
-Always use spaces for indentation. Affects all modes, unless we override it
-later. The only programming language I've used that mandates the use of tabs
-rather than spaces is Go, so it's safe to set this here and override it for Go
-if I ever write it again.
+Always use spaces for indentation. Affects all modes, unless we override
+it later. The only programming language I've used that mandates the use
+of tabs rather than spaces is Go, so it's safe to set this here and
+override it for Go if I ever write it again.
 
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -306,9 +310,9 @@ perform a kill operation. Not always useful, but a nice to have.
   (setq save-interprogram-paste-before-kill t)
 #+END_SRC
 
-Make word movement commands take CamelCase words into account. Also make sure we
-diminish this, otherwise it shows up as an irritating little comma in the
-modeline.
+Make word movement commands take CamelCase words into account. Also make
+sure we diminish this, otherwise it shows up as an irritating little
+comma in the modeline.
 
 #+BEGIN_SRC emacs-lisp
   (with-eval-after-load 'subword
@@ -316,8 +320,8 @@ modeline.
   (global-subword-mode 1)
 #+END_SRC
 
-Use =visual-fill-column= to give us the same word-wrapping experience as a
-regular text editor inside Emacs.
+Use =visual-fill-column= to give us the same word-wrapping experience as
+a regular text editor inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
     (defun s3thi/center-and-fill ()
@@ -368,8 +372,8 @@ Define a type scale that we'll use later.
   (defvar s3thi/type-scale-level-6 1)
 #+END_SRC
 
-Define line spacing that we'll use later, and a function we can use
-for hooks.
+Define line spacing that we'll use later, and a function we can use for
+hooks.
 
 #+BEGIN_SRC emacs-lisp
   (defvar s3thi/prose-line-spacing 0.125)
@@ -390,15 +394,7 @@ for hooks.
     (setq org-special-ctrl-a/e t)
     (setq org-special-ctrl-k t)
     (setq org-yank-adjusted-subtrees t)
-    (setq org-catch-invisible-edits 'error)
-    :config
-    (set-face-attribute 'org-document-title nil :height s3thi/type-scale-document-title)
-    (set-face-attribute 'org-level-1 nil :height s3thi/type-scale-level-1)
-    (set-face-attribute 'org-level-2 nil :height s3thi/type-scale-level-2)
-    (set-face-attribute 'org-level-3 nil :height s3thi/type-scale-level-3)
-    (set-face-attribute 'org-level-4 nil :height s3thi/type-scale-level-4)
-    (set-face-attribute 'org-level-5 nil :height s3thi/type-scale-level-5)
-    (set-face-attribute 'org-level-6 nil :height s3thi/type-scale-level-6))
+    (setq org-catch-invisible-edits 'error))
 #+END_SRC
 
 * Version Control
@@ -410,10 +406,10 @@ for hooks.
 
 * Key Bindings
 
-Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI Emacs will
-minimize the editor, which is very annoying. This disables that behavior. On
-terminal Emacs, this will still allow us to suspend the editor and go back to
-our shell.
+Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI
+Emacs will minimize the editor, which is very annoying. This disables
+that behavior. On terminal Emacs, this will still allow us to suspend
+the editor and go back to our shell.
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
