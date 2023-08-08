@@ -1,12 +1,14 @@
-* Emacs Configuration
+#+TITLE: Emacs Configuration
+#+AUTHOR: Ankur Sethi <contact@ankursethi.in>
 
-** Things to do
+* Things to do
 
 - Fix indentation of lists in Markdown mode.
-- Is it possible to make Markdown mode behave like org-mode in terms
-  of indenting text nested under headings?
+- Is it possible to make Markdown mode behave like org-mode in terms of
+  indenting text nested under headings?
+- Use =yankpad= instead of =yasnippet=.
 
-** Paperwork
+* Paperwork
 
 File header.
 
@@ -40,7 +42,7 @@ Platform specific variables.
   (defvar s3thi/is-a-penguin (eq system-type 'gnu/linux))
 #+END_SRC
 
-** User Interface
+* User Interface
 
 *** General UI Enhancements
 
@@ -209,7 +211,7 @@ enabled for a single buffer. This conveniently integrates with use-package.
   (load-theme 'modus-operandi t)
 #+END_SRC
 
-** Files and Directories
+* Files and Directories
 
 Store configuration created by custom in a separate file.
 
@@ -227,7 +229,7 @@ Don't create garbage files.
 #+END_SRC
 
 Turn on =auto-revert-mode= for all files. This will automatically reload files
-from disk every time they're changed by another from from outside Emacs.
+from disk every time they're changed by another from outside Emacs.
 
 Also ensure that Dired buffers are reloaded on each visit, and that version
 control information is checked periodically to ensure that we're showing the
@@ -239,7 +241,20 @@ correct VCS information in our modeline.
   (global-auto-revert-mode 1)
 #+END_SRC
 
-** Text Editing
+Save place in files.
+
+#+BEGIN_SRC emacs-lisp
+  (save-place-mode 1)
+#+END_SRC
+
+If a read-only file is opened, use =view-mode= instead of the regular mode. This
+ensures you can't accidentally change or overwrite the file.
+
+#+BEGIN_SRC emacs-lisp
+  (setq view-read-only t)
+#+END_SRC
+
+* Text Editing
 
 Enable useful text editing commands that are disabled by default.
 
@@ -272,20 +287,20 @@ In modes where we are forced to use tabs, set the tab width to 4.
   (setq-default tab-width 4)
 #+END_SRC
 
-Increase =fill-column= to a more reasonable value.
+Set =fill-column=.
 
 #+BEGIN_SRC emacs-lisp
-  (setq fill-column 80)
+  (setq-default fill-column 72)
 #+END_SRC
 
-If there is some text already present in the system clipboard when we run an
-Emacs command that kills text, make sure that is preserved by pushing it into
-the kill ring.
+If there is some text already present in the system clipboard when we
+run an Emacs command that kills text, make sure that is preserved by
+pushing it into the kill ring.
 
 Since we've configured Emacs to put text into the system clipboard -- in
-addition to the kill ring -- when we kill it, this setting ensures that we never
-lose whatever might have already been in the clipboard when we perform a kill
-operation. Not always useful, but a nice to have.
+addition to the kill ring -- when we kill it, this setting ensures that
+we never lose whatever might have already been in the clipboard when we
+perform a kill operation. Not always useful, but a nice to have.
 
 #+BEGIN_SRC emacs-lisp
   (setq save-interprogram-paste-before-kill t)
@@ -305,22 +320,27 @@ Use =visual-fill-column= to give us the same word-wrapping experience as a
 regular text editor inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (defun s3thi/center-and-fill ()
-    (interactive)
-    (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
-        (visual-fill-column-mode 0)
-      (progn
-        (setq visual-fill-column-center-text t)
-        (visual-fill-column-mode))))
+    (defun s3thi/center-and-fill ()
+      (interactive)
+      (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
+          (progn
+            (setq visual-fill-column-center-text nil)
+            (visual-fill-column-mode 0))
+        (progn
+          (setq visual-fill-column-center-text t)
+          (visual-fill-column-mode))))
 
-  (use-package visual-fill-column
-    :ensure t
-    :bind (("C-c f" . #'visual-fill-column-mode)
-           ("C-c c" . #'s3thi/center-and-fill))
-    :init
-    (setq visual-fill-column-enable-sensible-window-split t)
-    :config
-    (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
+    (use-package visual-fill-column
+      :ensure t
+      :bind (("C-c f" . #'visual-fill-column-mode)
+             ("C-c c" . #'s3thi/center-and-fill))
+      :init
+      ;; Let the column width be a bit more than fill-column. Otherwise things
+      ;; look odd.
+      (setq visual-fill-column-width (+ fill-column 4))
+      (setq visual-fill-column-enable-sensible-window-split t)
+      :config
+      (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
 #+END_SRC
 
 Snippets using =yasnippet=.
@@ -358,7 +378,7 @@ for hooks.
     (setq line-spacing s3thi/prose-line-spacing))
 #+END_SRC
 
-** Org Mode
+* Org Mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -367,6 +387,10 @@ for hooks.
            (org-mode . s3thi/set-prose-line-spacing))
     :init
     (setq org-startup-indented t)
+    (setq org-special-ctrl-a/e t)
+    (setq org-special-ctrl-k t)
+    (setq org-yank-adjusted-subtrees t)
+    (setq org-catch-invisible-edits 'error)
     :config
     (set-face-attribute 'org-document-title nil :height s3thi/type-scale-document-title)
     (set-face-attribute 'org-level-1 nil :height s3thi/type-scale-level-1)
@@ -377,14 +401,14 @@ for hooks.
     (set-face-attribute 'org-level-6 nil :height s3thi/type-scale-level-6))
 #+END_SRC
 
-** Version Control
+* Version Control
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t)
 #+END_SRC
 
-** Key Bindings
+* Key Bindings
 
 Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI Emacs will
 minimize the editor, which is very annoying. This disables that behavior. On
@@ -402,7 +426,13 @@ Good ol' ==ibuffer==.
   (global-set-key (kbd "C-x C-b") #'ibuffer)
 #+END_SRC
 
-** Everything Else
+Make it slightly easier to quickly switch between windows.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-o") #'other-window)
+#+END_SRC
+
+* Everything Else
 
 #+BEGIN_SRC emacs-lisp
   ;; Markdown.
