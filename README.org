@@ -2,7 +2,8 @@
 #+AUTHOR: Ankur Sethi <contact@ankursethi.in>
 
 * Things to do
-** TODO: Configure spellcheck
+** TODO Configure spellcheck
+** TODO Fill out the Command key map for macOS
 
 * Paperwork
 
@@ -59,6 +60,12 @@ And add UI elements that are nice to have.
   (show-paren-mode)
   (setq confirm-kill-emacs #'yes-or-no-p)
   (winner-mode 1)
+#+END_SRC
+
+Enable smooth scrolling.
+
+#+BEGIN_SRC emacs-lisp
+  (pixel-scroll-precision-mode 1)
 #+END_SRC
 
 Set a nice font. The font size will have to be different across
@@ -362,27 +369,25 @@ Use =visual-fill-column= to give us the same word-wrapping experience as
 a regular text editor inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
-    (defun s3thi/center-and-fill ()
-      (interactive)
-      (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
-          (progn
-            (setq visual-fill-column-center-text nil)
-            (visual-fill-column-mode 0))
+  (defun s3thi/center-and-fill ()
+    (interactive)
+    (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
         (progn
-          (setq visual-fill-column-center-text t)
-          (visual-fill-column-mode))))
+          (setq visual-fill-column-center-text nil)
+          (visual-fill-column-mode 0))
+      (progn
+        (setq visual-fill-column-center-text t)
+        (visual-fill-column-mode))))
 
-    (use-package visual-fill-column
-      :ensure t
-      :bind (("C-c f" . #'visual-fill-column-mode)
-             ("C-c c" . #'s3thi/center-and-fill))
-      :init
-      ;; Let the column width be a bit more than fill-column. Otherwise things
-      ;; look odd.
-      (setq visual-fill-column-width (+ fill-column 4))
-      (setq visual-fill-column-enable-sensible-window-split t)
-      :config
-      (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
+  (use-package visual-fill-column
+    :ensure t
+    :init
+    ;; Let the column width be a bit more than fill-column. Otherwise
+    ;; things look odd.
+    (setq visual-fill-column-width (+ fill-column 4))
+    (setq visual-fill-column-enable-sensible-window-split t)
+    :config
+    (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
 #+END_SRC
 
 Snippets using =yasnippet=.
@@ -394,8 +399,7 @@ Snippets using =yasnippet=.
     :config
     (yas-global-mode 1)
     (define-key yas-minor-mode-map (kbd "<tab>") nil)
-    (define-key yas-minor-mode-map (kbd "TAB") nil)
-    (global-set-key (kbd "s-y") #'yas-expand))
+    (define-key yas-minor-mode-map (kbd "TAB") nil))
 #+END_SRC
 
 Define a type scale that we'll use later.
@@ -425,7 +429,8 @@ hooks.
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :hook ((org-mode . flyspell-mode)
-           (org-mode . s3thi/set-prose-line-spacing))
+           (org-mode . s3thi/set-prose-line-spacing)
+           (org-mode . auto-fill-mode))
     :init
     (setq org-directory "~/org/")
     (setq org-startup-indented t)
@@ -484,7 +489,7 @@ the editor and go back to our shell.
     (global-unset-key (kbd "C-z")))
 #+END_SRC
 
-Good ol' =ibuffer=.
+Good old =ibuffer=. I don't always need it, but it comes in handy sometimes.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") #'ibuffer)
@@ -501,19 +506,30 @@ there, so might as well use it.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "s-l") #'goto-line)
-  (global-set-key (kbd "s-k") #'kill-buffer)
-  (global-set-key (kbd "s-b") #'switch-to-buffer)
+  (global-set-key (kbd "s-w") #'kill-buffer)
+  (global-set-key (kbd "s-k") #'switch-to-buffer)
   (global-set-key (kbd "s-g") #'magit-status)
   (global-set-key (kbd "s-p") #'project-find-file)
   (global-set-key (kbd "s-P") #'project-switch-project)
   (global-set-key (kbd "s-,") (lambda ()
                                 (interactive)
                                 (find-file "~/.emacs.d/README.org")))
+  (global-set-key (kbd "s-s") #'save-buffer)
+
+  (global-set-key (kbd "s-y") #'yas-expand)
+
+  (global-set-key (kbd "s-d") #'crux-duplicate-current-line-or-region)
+  (global-set-key (kbd "s-<backspace>") #'crux-kill-whole-line)
 
   (global-set-key (kbd "s-0") #'delete-window)
   (global-set-key (kbd "s-1") #'delete-other-windows)
   (global-set-key (kbd "s-2") #'split-window-below)
   (global-set-key (kbd "s-3") #'split-window-right)
+
+  (global-set-key (kbd "s-<up>") #'beginning-of-buffer)
+  (global-set-key (kbd "s-<down>") #'end-of-buffer)
+  (global-set-key (kbd "s-<up>") #'beginning-of-buffer)
+  (global-set-key (kbd "s-<up>") #'beginning-of-buffer)
 #+END_SRC
 
 * Miscellaneous
@@ -523,11 +539,7 @@ write myself otherwise.
 
 #+BEGIN_SRC emacs-lisp
   (use-package crux
-    :ensure t
-    :bind (("s-d" . #'crux-duplicate-current-line-or-region)
-           ("s-D" . #'crux-delete-file-and-buffer)
-           ("s-r" . #'crux-rename-file-and-buffer)
-           ("s-<backspace>" . #'crux-kill-whole-line)))
+    :ensure t)
 #+END_SRC
 
 Start the Emacs server.
