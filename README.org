@@ -2,11 +2,7 @@
 #+AUTHOR: Ankur Sethi <contact@ankursethi.in>
 
 * Things to do
-
-- Fix indentation of lists in Markdown mode.
-- Is it possible to make Markdown mode behave like org-mode in terms of
-  indenting text nested under headings?
-- Use =yankpad= instead of =yasnippet=.
+** TODO: Configure spellcheck
 
 * Paperwork
 
@@ -44,7 +40,7 @@ Platform specific variables.
 
 * User Interface
 
-*** General UI Enhancements
+** General UI Enhancements
 
 Remove UI elements we don't like.
 
@@ -116,7 +112,49 @@ Show total number of matches while searching:
   (setq-default isearch-lazy-count t)
 #+END_SRC
 
-*** Minibuffer Completion
+=undo-tree= lets me browse the Emacs undo history visually.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package undo-tree
+    :ensure t
+    :diminish undo-tree-mode
+    :config
+    (global-undo-tree-mode)
+    (setq undo-tree-visualizer-timestamps t)
+    (setq undo-tree-visualizer-diff t)
+    (setq undo-tree-history-directory-alist
+          `(("." . ,(concat user-emacs-directory "undo-tree/")))))
+#+END_SRC
+
+=browse-kill-ring= lets me browse the kill ring visually.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package browse-kill-ring
+    :ensure t)
+#+END_SRC
+
+=which-key= displays helpful suggestions in the minibuffer when you hit
+the first part of a long keychord.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :diminish
+    :config
+    (which-key-mode 1))
+#+END_SRC
+
+=diminish= prevents the modeline from getting polluted when too many
+modes are enabled for a single buffer. This conveniently integrates with
+use-package.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t)
+#+END_SRC
+
+** Minibuffer Completion
 
 Use =vertico= as the completion UI. Also add some recommended
 configuration from the =vertico= documentation.
@@ -187,31 +225,21 @@ Enable annotations in the minibuffer using =marginalia=.
     (marginalia-mode))
 #+END_SRC
 
-=which-key= displays helpful suggestions in the minibuffer when you hit
-the first part of a long keychord.
+** Themes
+
+Install the =gruvbox= set of themes.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key
+  (use-package gruvbox-theme
     :ensure t
-    :diminish
-    :config
-    (which-key-mode 1))
+    :init
+    (load-theme 'gruvbox-dark-soft t))
 #+END_SRC
 
-=diminish= prevents the modeline from getting polluted when too many
-modes are enabled for a single buffer. This conveniently integrates with
-use-package.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t)
-#+END_SRC
-
-*** Themes
+Settings for the included =modus= themes.
 
 #+BEGIN_SRC emacs-lisp
   (setq modus-themes-org-blocks 'gray-background)
-  (load-theme 'modus-operandi t)
 #+END_SRC
 
 * Files and Directories
@@ -258,6 +286,15 @@ mode. This ensures you can't accidentally change or overwrite the file.
   (setq view-read-only t)
 #+END_SRC
 
+Use =ripgrep= for searching.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rg
+    :ensure t
+    :config
+    (rg-enable-default-bindings))
+#+END_SRC
+
 * Text Editing
 
 Enable useful text editing commands that are disabled by default.
@@ -291,10 +328,11 @@ In modes where we are forced to use tabs, set the tab width to 4.
   (setq-default tab-width 4)
 #+END_SRC
 
-Set =fill-column=.
+Set =fill-column= manually, to make sure it's always what I expect. The
+default of 70 is good enough for me.
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default fill-column 72)
+  (setq-default fill-column 70)
 #+END_SRC
 
 If there is some text already present in the system clipboard when we
@@ -357,18 +395,18 @@ Snippets using =yasnippet=.
     (yas-global-mode 1)
     (define-key yas-minor-mode-map (kbd "<tab>") nil)
     (define-key yas-minor-mode-map (kbd "TAB") nil)
-    (global-set-key (kbd "C-c y") #'yas-expand))
+    (global-set-key (kbd "s-y") #'yas-expand))
 #+END_SRC
 
 Define a type scale that we'll use later.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar s3thi/type-scale-document-title 2.02725)
-  (defvar s3thi/type-scale-level-1 1.802)
-  (defvar s3thi/type-scale-level-2 1.602)
-  (defvar s3thi/type-scale-level-3 1.424)
-  (defvar s3thi/type-scale-level-4 1.266)
-  (defvar s3thi/type-scale-level-5 1.125)
+  (defvar s3thi/type-scale-document-title 1.276)
+  (defvar s3thi/type-scale-level-1 1.216)
+  (defvar s3thi/type-scale-level-2 1.296)
+  (defvar s3thi/type-scale-level-3 1.157)
+  (defvar s3thi/type-scale-level-4 1.1025)
+  (defvar s3thi/type-scale-level-5 1.05)
   (defvar s3thi/type-scale-level-6 1)
 #+END_SRC
 
@@ -386,15 +424,45 @@ hooks.
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
-    :hook ((org-mode . visual-line-mode)
-           (org-mode . flyspell-mode)
+    :hook ((org-mode . flyspell-mode)
            (org-mode . s3thi/set-prose-line-spacing))
     :init
+    (setq org-directory "~/org/")
     (setq org-startup-indented t)
     (setq org-special-ctrl-a/e t)
     (setq org-special-ctrl-k t)
     (setq org-yank-adjusted-subtrees t)
     (setq org-catch-invisible-edits 'error))
+#+END_SRC
+
+Optional type scale settings, for future reference. Not used
+currently.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (set-face-attribute 'org-document-title nil :height s3thi/type-scale-document-title)
+  (set-face-attribute 'org-level-1 nil :height s3thi/type-scale-level-1)
+  (set-face-attribute 'org-level-2 nil :height s3thi/type-scale-level-2)
+  (set-face-attribute 'org-level-3 nil :height s3thi/type-scale-level-3)
+  (set-face-attribute 'org-level-4 nil :height s3thi/type-scale-level-4)
+  (set-face-attribute 'org-level-5 nil :height s3thi/type-scale-level-5)
+  (set-face-attribute 'org-level-6 nil :height s3thi/type-scale-level-6)
+#+END_SRC
+
+* Markdown
+
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :mode (("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :hook ((markdown-mode . s3thi/set-prose-line-spacing))
+    :config
+    (set-face-attribute 'markdown-header-face-1 nil :height s3thi/type-scale-level-1)
+    (set-face-attribute 'markdown-header-face-2 nil :height s3thi/type-scale-level-2)
+    (set-face-attribute 'markdown-header-face-3 nil :height s3thi/type-scale-level-3)
+    (set-face-attribute 'markdown-header-face-4 nil :height s3thi/type-scale-level-4)
+    (set-face-attribute 'markdown-header-face-5 nil :height s3thi/type-scale-level-5)
+    (set-face-attribute 'markdown-header-face-6 nil :height s3thi/type-scale-level-6))
 #+END_SRC
 
 * Version Control
@@ -416,7 +484,7 @@ the editor and go back to our shell.
     (global-unset-key (kbd "C-z")))
 #+END_SRC
 
-Good ol' ==ibuffer==.
+Good ol' =ibuffer=.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") #'ibuffer)
@@ -428,56 +496,47 @@ Make it slightly easier to quickly switch between windows.
   (global-set-key (kbd "M-o") #'other-window)
 #+END_SRC
 
-* Everything Else
+Add a bunch of useful keybindings for the Command key on macOS. It's
+there, so might as well use it.
 
 #+BEGIN_SRC emacs-lisp
-  ;; Markdown.
-  (use-package markdown-mode
-    :ensure t
-    :mode (("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode))
-    :hook ((markdown-mode . visual-line-mode)
-           (markdown-mode . flyspell-mode)
-           (markdown-mode . s3thi/set-prose-line-spacing))
-    :config
-    (set-face-attribute 'markdown-header-face-1 nil :height s3thi/type-scale-level-1)
-    (set-face-attribute 'markdown-header-face-2 nil :height s3thi/type-scale-level-2)
-    (set-face-attribute 'markdown-header-face-3 nil :height s3thi/type-scale-level-3)
-    (set-face-attribute 'markdown-header-face-4 nil :height s3thi/type-scale-level-4)
-    (set-face-attribute 'markdown-header-face-5 nil :height s3thi/type-scale-level-5)
-    (set-face-attribute 'markdown-header-face-6 nil :height s3thi/type-scale-level-6))
+  (global-set-key (kbd "s-l") #'goto-line)
+  (global-set-key (kbd "s-k") #'kill-buffer)
+  (global-set-key (kbd "s-b") #'switch-to-buffer)
+  (global-set-key (kbd "s-g") #'magit-status)
+  (global-set-key (kbd "s-p") #'project-find-file)
+  (global-set-key (kbd "s-P") #'project-switch-project)
+  (global-set-key (kbd "s-,") (lambda ()
+                                (interactive)
+                                (find-file "~/.emacs.d/README.org")))
 
-  ;; Ripgrep for searching.
-  (use-package rg
-    :ensure t
-    :config
-    (rg-enable-default-bindings))
+  (global-set-key (kbd "s-0") #'delete-window)
+  (global-set-key (kbd "s-1") #'delete-other-windows)
+  (global-set-key (kbd "s-2") #'split-window-below)
+  (global-set-key (kbd "s-3") #'split-window-right)
+#+END_SRC
 
-  ;; A ton of useful functions.
+* Miscellaneous
+
+=crux= contains a ton of useful Emacs Lisp functions that I'd have to
+write myself otherwise.
+
+#+BEGIN_SRC emacs-lisp
   (use-package crux
     :ensure t
-    :bind (("C-c d" . #'crux-duplicate-current-line-or-region)
-           ("C-c D" . #'crux-delete-file-and-buffer)
-           ("C-c r" . #'crux-rename-file-and-buffer)))
+    :bind (("s-d" . #'crux-duplicate-current-line-or-region)
+           ("s-D" . #'crux-delete-file-and-buffer)
+           ("s-r" . #'crux-rename-file-and-buffer)
+           ("s-<backspace>" . #'crux-kill-whole-line)))
+#+END_SRC
 
-  ;; A visual undo tree.
-  (use-package undo-tree
-    :ensure t
-    :diminish undo-tree-mode
-    :config
-    (global-undo-tree-mode)
-    (setq undo-tree-visualizer-timestamps t)
-    (setq undo-tree-visualizer-diff t)
-    (setq undo-tree-history-directory-alist
-          `(("." . ,(concat user-emacs-directory "undo-tree/")))))
+Start the Emacs server.
 
-  ;; Browse kill ring.
-  (use-package browse-kill-ring
-    :ensure t)
-
-  ;; Start server.
+#+BEGIN_SRC emacs-lisp
   (server-start)
 #+END_SRC
+
+* That's All, Folks
 
 #+BEGIN_SRC emacs-lisp
   ;;; README.el ends here.
