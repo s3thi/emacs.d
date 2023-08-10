@@ -1,10 +1,6 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Ankur Sethi <contact@ankursethi.in>
 
-* Things to do
-** TODO Configure spellcheck
-** TODO Fill out the Command key map for macOS
-
 * Paperwork
 
 File header.
@@ -34,9 +30,9 @@ Personal information.
 Platform specific variables.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar s3thi/is-a-mac (eq system-type 'darwin))
-  (defvar s3thi/is-a-pc (eq system-type 'windows-nt))
-  (defvar s3thi/is-a-penguin (eq system-type 'gnu/linux))
+  (defvar s3thi--is-a-mac (eq system-type 'darwin))
+  (defvar s3thi--is-a-pc (eq system-type 'windows-nt))
+  (defvar s3thi--is-a-penguin (eq system-type 'gnu/linux))
 #+END_SRC
 
 * User Interface
@@ -72,7 +68,7 @@ Set a nice font. The font size will have to be different across
 platforms, so we check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
-  (when s3thi/is-a-mac
+  (when s3thi--is-a-mac
     (set-frame-font "Berkeley Mono 15" nil t))
 #+END_SRC
 
@@ -238,9 +234,35 @@ Install the =gruvbox= set of themes.
 
 #+BEGIN_SRC emacs-lisp
   (use-package gruvbox-theme
-    :ensure t
-    :init
-    (load-theme 'gruvbox-dark-soft t))
+    :ensure t)
+#+END_SRC
+
+Add the ability to toggle between light and dark themes.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar s3thi--favorite-themes
+    '(gruvbox-light-soft gruvbox-dark-soft))
+
+  (defun s3thi--current-theme ()
+      (car custom-enabled-themes))
+
+  (defun s3thi--next-theme-index ()
+    (let ((current (cl-position
+                    (s3thi--current-theme)
+                    s3thi--favorite-themes)))
+      (if (eq nil current)
+          0
+        (% (+ current 1) (length s3thi--favorite-themes)))))
+
+  (defun s3thi--cycle-theme ()
+    (interactive)
+    (let ((next (nth
+                 (s3thi--next-theme-index)
+                 s3thi--favorite-themes)))
+      (disable-theme (s3thi--current-theme))
+      (load-theme next t)))
+
+  (s3thi--cycle-theme)
 #+END_SRC
 
 Settings for the included =modus= themes.
@@ -369,7 +391,7 @@ Use =visual-fill-column= to give us the same word-wrapping experience as
 a regular text editor inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (defun s3thi/center-and-fill ()
+  (defun s3thi--center-and-fill ()
     (interactive)
     (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
         (progn
@@ -405,23 +427,23 @@ Snippets using =yasnippet=.
 Define a type scale that we'll use later.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar s3thi/type-scale-document-title 1.276)
-  (defvar s3thi/type-scale-level-1 1.216)
-  (defvar s3thi/type-scale-level-2 1.296)
-  (defvar s3thi/type-scale-level-3 1.157)
-  (defvar s3thi/type-scale-level-4 1.1025)
-  (defvar s3thi/type-scale-level-5 1.05)
-  (defvar s3thi/type-scale-level-6 1)
+  (defvar s3thi--type-scale-document-title 1.276)
+  (defvar s3thi--type-scale-level-1 1.216)
+  (defvar s3thi--type-scale-level-2 1.296)
+  (defvar s3thi--type-scale-level-3 1.157)
+  (defvar s3thi--type-scale-level-4 1.1025)
+  (defvar s3thi--type-scale-level-5 1.05)
+  (defvar s3thi--type-scale-level-6 1)
 #+END_SRC
 
 Define line spacing that we'll use later, and a function we can use for
 hooks.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar s3thi/prose-line-spacing 0.125)
+  (defvar s3thi--prose-line-spacing 0.125)
 
-  (defun s3thi/set-prose-line-spacing ()
-    (setq line-spacing s3thi/prose-line-spacing))
+  (defun s3thi--set-prose-line-spacing ()
+    (setq line-spacing s3thi--prose-line-spacing))
 #+END_SRC
 
 * Org Mode
@@ -429,7 +451,7 @@ hooks.
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :hook ((org-mode . flyspell-mode)
-           (org-mode . s3thi/set-prose-line-spacing)
+           (org-mode . s3thi--set-prose-line-spacing)
            (org-mode . auto-fill-mode))
     :init
     (setq org-directory "~/org/")
@@ -444,13 +466,13 @@ Optional type scale settings, for future reference. Not used
 currently.
 
 #+BEGIN_SRC emacs-lisp :tangle no
-  (set-face-attribute 'org-document-title nil :height s3thi/type-scale-document-title)
-  (set-face-attribute 'org-level-1 nil :height s3thi/type-scale-level-1)
-  (set-face-attribute 'org-level-2 nil :height s3thi/type-scale-level-2)
-  (set-face-attribute 'org-level-3 nil :height s3thi/type-scale-level-3)
-  (set-face-attribute 'org-level-4 nil :height s3thi/type-scale-level-4)
-  (set-face-attribute 'org-level-5 nil :height s3thi/type-scale-level-5)
-  (set-face-attribute 'org-level-6 nil :height s3thi/type-scale-level-6)
+  (set-face-attribute 'org-document-title nil :height s3thi--type-scale-document-title)
+  (set-face-attribute 'org-level-1 nil :height s3thi--type-scale-level-1)
+  (set-face-attribute 'org-level-2 nil :height s3thi--type-scale-level-2)
+  (set-face-attribute 'org-level-3 nil :height s3thi--type-scale-level-3)
+  (set-face-attribute 'org-level-4 nil :height s3thi--type-scale-level-4)
+  (set-face-attribute 'org-level-5 nil :height s3thi--type-scale-level-5)
+  (set-face-attribute 'org-level-6 nil :height s3thi--type-scale-level-6)
 #+END_SRC
 
 * Markdown
@@ -460,14 +482,14 @@ currently.
     :ensure t
     :mode (("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
-    :hook ((markdown-mode . s3thi/set-prose-line-spacing))
+    :hook ((markdown-mode . s3thi--set-prose-line-spacing))
     :config
-    (set-face-attribute 'markdown-header-face-1 nil :height s3thi/type-scale-level-1)
-    (set-face-attribute 'markdown-header-face-2 nil :height s3thi/type-scale-level-2)
-    (set-face-attribute 'markdown-header-face-3 nil :height s3thi/type-scale-level-3)
-    (set-face-attribute 'markdown-header-face-4 nil :height s3thi/type-scale-level-4)
-    (set-face-attribute 'markdown-header-face-5 nil :height s3thi/type-scale-level-5)
-    (set-face-attribute 'markdown-header-face-6 nil :height s3thi/type-scale-level-6))
+    (set-face-attribute 'markdown-header-face-1 nil :height s3thi--type-scale-level-1)
+    (set-face-attribute 'markdown-header-face-2 nil :height s3thi--type-scale-level-2)
+    (set-face-attribute 'markdown-header-face-3 nil :height s3thi--type-scale-level-3)
+    (set-face-attribute 'markdown-header-face-4 nil :height s3thi--type-scale-level-4)
+    (set-face-attribute 'markdown-header-face-5 nil :height s3thi--type-scale-level-5)
+    (set-face-attribute 'markdown-header-face-6 nil :height s3thi--type-scale-level-6))
 #+END_SRC
 
 * Version Control
@@ -501,25 +523,33 @@ Make it slightly easier to quickly switch between windows.
   (global-set-key (kbd "M-o") #'other-window)
 #+END_SRC
 
+** Command Key Bindings
+
 Add a bunch of useful keybindings for the Command key on macOS. It's
 there, so might as well use it.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "s-l") #'goto-line)
-  (global-set-key (kbd "s-w") #'kill-buffer)
-  (global-set-key (kbd "s-k") #'switch-to-buffer)
+  (global-set-key (kbd "s-w") #'kill-this-buffer)
+  (global-set-key (kbd "s-p") #'switch-to-buffer)
   (global-set-key (kbd "s-g") #'magit-status)
-  (global-set-key (kbd "s-p") #'project-find-file)
-  (global-set-key (kbd "s-P") #'project-switch-project)
+  (global-set-key (kbd "s-P") #'project-find-file)
+  (global-set-key (kbd "M-s-p") #'project-switch-project)
   (global-set-key (kbd "s-,") (lambda ()
                                 (interactive)
                                 (find-file "~/.emacs.d/README.org")))
   (global-set-key (kbd "s-s") #'save-buffer)
+  (global-set-key (kbd "s-z") #'undo-tree-undo)
+  (global-set-key (kbd "s-Z") #'undo-tree-redo)
+  (global-set-key (kbd "s-t") #'s3thi--cycle-theme)
 
   (global-set-key (kbd "s-y") #'yas-expand)
 
   (global-set-key (kbd "s-d") #'crux-duplicate-current-line-or-region)
-  (global-set-key (kbd "s-<backspace>") #'crux-kill-whole-line)
+  (global-set-key (kbd "s-<backspace>") (lambda ()
+                                          (interactive)
+                                          (kill-line 0)))
+  (global-set-key (kbd "S-s-<backspace>") #'crux-kill-whole-line)
 
   (global-set-key (kbd "s-0") #'delete-window)
   (global-set-key (kbd "s-1") #'delete-other-windows)
