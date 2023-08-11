@@ -79,7 +79,10 @@ it's possible to toggle the maximized status of an Emacs frame by
 calling =toggle-frame-maximized=, which is bound to =M-<f10>= by
 default.
 
-#+BEGIN_SRC emacs-lisp
+Currently disabled because I prefer to resize my Emacs manually, like
+some kind of a Neanderthal.
+
+#+BEGIN_SRC emacs-lisp :tangle no
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
@@ -106,7 +109,7 @@ bottom of the window. As soon as the cursor gets closer than this to the
 top of or bottom of a window, Emacs will start scrolling.
 
 #+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 5)
+  (setq scroll-margin 3)
 #+END_SRC
 
 Show total number of matches while searching:
@@ -159,40 +162,13 @@ use-package.
 
 ** Minibuffer Completion
 
-Use =vertico= as the completion UI. Also add some recommended
-configuration from the =vertico= documentation.
+Use =vertico= as the completion UI.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vertico
     :ensure t
     :init
     (vertico-mode))
-
-  (use-package emacs
-    :init
-    ;; Add prompt indicator to `completing-read-multiple'.
-    ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-    (defun crm-indicator (args)
-      (cons (format "[CRM%s] %s"
-                    (replace-regexp-in-string
-                     "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                     crm-separator)
-                    (car args))
-            (cdr args)))
-    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-    ;; Do not allow the cursor in the minibuffer prompt
-    (setq minibuffer-prompt-properties
-          '(read-only t cursor-intangible t face minibuffer-prompt))
-    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-    ;; Vertico commands are hidden in normal buffers.
-    (setq read-extended-command-predicate
-          #'command-completion-default-include-p)
-
-    ;; Enable recursive minibuffers
-    (setq enable-recursive-minibuffers t))
 #+END_SRC
 
 Use =savehist= to save minibuffer history.
@@ -237,7 +213,9 @@ Install the =gruvbox= set of themes.
     :ensure t)
 #+END_SRC
 
-Add the ability to toggle between light and dark themes.
+Add the ability to toggle between light and dark themes. Instead of
+setting the theme on Emacs startup, just call the cycle theme function
+to pick up the first theme from this list.
 
 #+BEGIN_SRC emacs-lisp
   (defvar s3thi--favorite-themes
@@ -261,6 +239,8 @@ Add the ability to toggle between light and dark themes.
                  s3thi--favorite-themes)))
       (disable-theme (s3thi--current-theme))
       (load-theme next t)))
+
+  (global-set-key (kbd "C-c t") #'s3thi--cycle-theme)
 
   (s3thi--cycle-theme)
 #+END_SRC
@@ -382,25 +362,16 @@ sure we diminish this, otherwise it shows up as an irritating little
 comma in the modeline.
 
 #+BEGIN_SRC emacs-lisp
-  (with-eval-after-load 'subword
-    (diminish 'subword-mode))
-  (global-subword-mode 1)
+  (use-package subword
+    :diminish
+    :config
+    (global-subword-mode 1))
 #+END_SRC
 
 Use =visual-fill-column= to give us the same word-wrapping experience as
 a regular text editor inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (defun s3thi--center-and-fill ()
-    (interactive)
-    (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
-        (progn
-          (setq visual-fill-column-center-text nil)
-          (visual-fill-column-mode 0))
-      (progn
-        (setq visual-fill-column-center-text t)
-        (visual-fill-column-mode))))
-
   (use-package visual-fill-column
     :ensure t
     :init
@@ -412,6 +383,22 @@ a regular text editor inside Emacs.
     (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
 #+END_SRC
 
+Define a function to enable =visual-fill-column= and center the text
+on the screen. This is mostly useful for editing Markdown files that
+don't have hard newlines.
+
+#+BEGIN_SRC emacs-lisp
+  (defun s3thi--center-and-fill ()
+    (interactive)
+    (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
+        (progn
+          (setq visual-fill-column-center-text nil)
+          (visual-fill-column-mode 0))
+      (progn
+        (setq visual-fill-column-center-text t)
+        (visual-fill-column-mode))))
+#+END_SRC
+
 Snippets using =yasnippet=.
 
 #+BEGIN_SRC emacs-lisp
@@ -421,10 +408,14 @@ Snippets using =yasnippet=.
     :config
     (yas-global-mode 1)
     (define-key yas-minor-mode-map (kbd "<tab>") nil)
-    (define-key yas-minor-mode-map (kbd "TAB") nil))
+    (define-key yas-minor-mode-map (kbd "TAB") nil)
+    (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand))
 #+END_SRC
 
-Define a type scale that we'll use later.
+Define a type scale. This is useful for making =org-mode= and Markdown
+files pretty, but it really only works out for Markdown. I don't want
+differently sized headlines in =org-mode= because sometimes they are
+tasks or database entries, not just plain text.
 
 #+BEGIN_SRC emacs-lisp
   (defvar s3thi--type-scale-document-title 1.276)
@@ -446,6 +437,17 @@ hooks.
     (setq line-spacing s3thi--prose-line-spacing))
 #+END_SRC
 
+** Spell checking
+
+Use =aspell= instead of the default =ispell=. It's better, faster,
+supports enabling multiple dictionaries at once, and ships with a
+bunch of dictionaries by default (unlike =hunspell=).
+
+#+BEGIN_SRC emacs-lisp
+  (setq ispell-program-name "aspell")
+  (setq ispell-dictionary "en_US")
+#+END_SRC
+
 * Org Mode
 
 #+BEGIN_SRC emacs-lisp
@@ -462,8 +464,7 @@ hooks.
     (setq org-catch-invisible-edits 'error))
 #+END_SRC
 
-Optional type scale settings, for future reference. Not used
-currently.
+Optional type scale settings. Not used currently.
 
 #+BEGIN_SRC emacs-lisp :tangle no
   (set-face-attribute 'org-document-title nil :height s3thi--type-scale-document-title)
@@ -476,6 +477,8 @@ currently.
 #+END_SRC
 
 * Markdown
+
+Set nice header sizes and line spacing for Markdown documents.
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -499,7 +502,18 @@ currently.
     :ensure t)
 #+END_SRC
 
-* Key Bindings
+* Programming
+
+** Raku
+
+This is the official Emacs mode for Raku.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package raku-mode
+    :ensure t)
+#+END_SRC
+
+* Additional Key Bindings
 
 Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI
 Emacs will minimize the editor, which is very annoying. This disables
@@ -511,55 +525,12 @@ the editor and go back to our shell.
     (global-unset-key (kbd "C-z")))
 #+END_SRC
 
-Good old =ibuffer=. I don't always need it, but it comes in handy sometimes.
+Convenient for editing this configuration file.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x C-b") #'ibuffer)
-#+END_SRC
-
-Make it slightly easier to quickly switch between windows.
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "M-o") #'other-window)
-#+END_SRC
-
-** Command Key Bindings
-
-Add a bunch of useful keybindings for the Command key on macOS. It's
-there, so might as well use it.
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-l") #'goto-line)
-  (global-set-key (kbd "s-w") #'kill-this-buffer)
-  (global-set-key (kbd "s-p") #'switch-to-buffer)
-  (global-set-key (kbd "s-g") #'magit-status)
-  (global-set-key (kbd "s-P") #'project-find-file)
-  (global-set-key (kbd "M-s-p") #'project-switch-project)
-  (global-set-key (kbd "s-,") (lambda ()
-                                (interactive)
-                                (find-file "~/.emacs.d/README.org")))
-  (global-set-key (kbd "s-s") #'save-buffer)
-  (global-set-key (kbd "s-z") #'undo-tree-undo)
-  (global-set-key (kbd "s-Z") #'undo-tree-redo)
-  (global-set-key (kbd "s-t") #'s3thi--cycle-theme)
-
-  (global-set-key (kbd "s-y") #'yas-expand)
-
-  (global-set-key (kbd "s-d") #'crux-duplicate-current-line-or-region)
-  (global-set-key (kbd "s-<backspace>") (lambda ()
-                                          (interactive)
-                                          (kill-line 0)))
-  (global-set-key (kbd "S-s-<backspace>") #'crux-kill-whole-line)
-
-  (global-set-key (kbd "s-0") #'delete-window)
-  (global-set-key (kbd "s-1") #'delete-other-windows)
-  (global-set-key (kbd "s-2") #'split-window-below)
-  (global-set-key (kbd "s-3") #'split-window-right)
-
-  (global-set-key (kbd "s-<up>") #'beginning-of-buffer)
-  (global-set-key (kbd "s-<down>") #'end-of-buffer)
-  (global-set-key (kbd "s-<up>") #'beginning-of-buffer)
-  (global-set-key (kbd "s-<up>") #'beginning-of-buffer)
+  (global-set-key (kbd "C-c i") (lambda ()
+                                  (interactive)
+                                  (find-file "~/.emacs.d/README.org")))
 #+END_SRC
 
 * Miscellaneous
@@ -569,7 +540,8 @@ write myself otherwise.
 
 #+BEGIN_SRC emacs-lisp
   (use-package crux
-    :ensure t)
+    :ensure t
+    :bind (("C-c d" . #'crux-duplicate-current-line-or-region)))
 #+END_SRC
 
 Start the Emacs server.
@@ -578,7 +550,7 @@ Start the Emacs server.
   (server-start)
 #+END_SRC
 
-* That's All, Folks
+* That's All, Folks!
 
 #+BEGIN_SRC emacs-lisp
   ;;; README.el ends here.
