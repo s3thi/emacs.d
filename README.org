@@ -437,6 +437,13 @@ hooks.
     (setq line-spacing s3thi--prose-line-spacing))
 #+END_SRC
 
+Sometimes it's useful to "unfill" paragraphs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package unfill
+    :ensure t)
+#+END_SRC
+
 ** Spell checking
 
 Use =aspell= instead of the default =ispell=. It's better, faster,
