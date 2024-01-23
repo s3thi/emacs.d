@@ -454,7 +454,8 @@ keep changing.
        (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 #+END_SRC
 
-To install all of them in one go, you can run the following code:
+To install all of them in one go, eval the following code. This will
+also update the grammars if they're already installed.
 
 #+BEGIN_SRC emacs-lisp :tangle no
   (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
@@ -501,6 +502,12 @@ about.
            (rust-ts-mode . lsp)
            (lsp-mode . lsp-enable-which-key-integration))
     :commands lsp)
+#+END_SRC
+
+To update all installed servers, eval the following code.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (lsp-update-servers)
 #+END_SRC
 
 ** Apheleia Code Formatter
