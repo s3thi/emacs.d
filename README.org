@@ -55,8 +55,7 @@ And add UI elements that are nice to have.
   (column-number-mode 1)
   (show-paren-mode)
   (setq confirm-kill-emacs #'yes-or-no-p)
-  (winner-mode 1)
-#+END_SRC
+  #+END_SRC
 
 Enable smooth scrolling.
 
@@ -69,18 +68,15 @@ platforms, so we check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi--is-a-mac
-    (set-frame-font "Berkeley Mono 15" nil t))
+    (set-frame-font "Berkeley Mono Variable 15" nil t))
 #+END_SRC
 
-Maximize the Emacs frame on startup. To start every new frame maximized
-instead of just the first frame, you can add the following options to
-=default-frame-alist= instead of =initial-frame-alist=. Additionally,
-it's possible to toggle the maximized status of an Emacs frame by
-calling =toggle-frame-maximized=, which is bound to =M-<f10>= by
-default.
-
-Currently disabled because I prefer to resize my Emacs manually, like
-some kind of a Neanderthal.
+Maximize the Emacs frame on startup. To start every new frame
+maximized instead of just the first frame, you can add the following
+options to =default-frame-alist= instead of =initial-frame-alist=.
+Additionally, it's possible to toggle the maximized status of an Emacs
+frame by calling =toggle-frame-maximized=, which is bound to =M-<f10>=
+by default.
 
 #+BEGIN_SRC emacs-lisp :tangle no
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -89,13 +85,13 @@ some kind of a Neanderthal.
 =scroll-conservatively= specifies the number of lines to scroll the
 buffer in order to bring the cursor back on the screen when it moves
 off-screen. If moving that much doesn't bring the cursor back, Emacs
-will scroll the buffer by as many lines as it takes to bring the cursor
-to the exact center of the screen.
+will scroll the buffer by as many lines as it takes to bring the
+cursor to the exact center of the screen.
 
-This behavior is irritating and jarring, causing huge jumps as you move
-around a file. Luckily, setting this variable to a number larger than
-100 tells Emacs to /never/ scroll by large amounts, and instead scroll
-the screen /just enough/ to keep the cursor visible.
+This behavior is irritating and jarring, causing huge jumps as you
+move around a file. Luckily, setting this variable to a number larger
+than 100 tells Emacs to /never/ scroll by large amounts, and instead
+scroll the screen /just enough/ to keep the cursor visible.
 
 In summary, setting =scroll-conservatively= to 101 will make Emacs
 behave like every other text editor on the planet.
@@ -121,7 +117,6 @@ Show total number of matches while searching:
 =undo-tree= lets me browse the Emacs undo history visually.
 
 #+BEGIN_SRC emacs-lisp
-
   (use-package undo-tree
     :ensure t
     :diminish undo-tree-mode
@@ -289,7 +284,8 @@ Save place in files.
 #+END_SRC
 
 If a read-only file is opened, use =view-mode= instead of the regular
-mode. This ensures you can't accidentally change or overwrite the file.
+mode. This ensures you can't accidentally change or overwrite the
+file.
 
 #+BEGIN_SRC emacs-lisp
   (setq view-read-only t)
@@ -322,10 +318,10 @@ makes functions that operate on prose behave better (such as those in
   (setq sentence-end-double-space nil)
 #+END_SRC
 
-Always use spaces for indentation. Affects all modes, unless we override
-it later. The only programming language I've used that mandates the use
-of tabs rather than spaces is Go, so it's safe to set this here and
-override it for Go if I ever write it again.
+Always use spaces for indentation. Affects all modes, unless we
+override it later. The only programming language I've used that
+mandates the use of tabs rather than spaces is Go, so it's safe to set
+this here and override it for Go if I ever write it again.
 
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -348,18 +344,19 @@ If there is some text already present in the system clipboard when we
 run an Emacs command that kills text, make sure that is preserved by
 pushing it into the kill ring.
 
-Since we've configured Emacs to put text into the system clipboard -- in
-addition to the kill ring -- when we kill it, this setting ensures that
-we never lose whatever might have already been in the clipboard when we
-perform a kill operation. Not always useful, but a nice to have.
+Since we've configured Emacs to put text into the system clipboard --
+in addition to the kill ring -- when we kill it, this setting ensures
+that we never lose whatever might have already been in the clipboard
+when we perform a kill operation. Not always useful, but a nice to
+have.
 
 #+BEGIN_SRC emacs-lisp
   (setq save-interprogram-paste-before-kill t)
 #+END_SRC
 
-Make word movement commands take CamelCase words into account. Also make
-sure we diminish this, otherwise it shows up as an irritating little
-comma in the modeline.
+Make word movement commands take CamelCase words into account. Also
+make sure we diminish this, otherwise it shows up as an irritating
+little comma in the modeline.
 
 #+BEGIN_SRC emacs-lisp
   (use-package subword
@@ -368,38 +365,7 @@ comma in the modeline.
     (global-subword-mode 1))
 #+END_SRC
 
-Use =visual-fill-column= to give us the same word-wrapping experience as
-a regular text editor inside Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package visual-fill-column
-    :ensure t
-    :init
-    ;; Let the column width be a bit more than fill-column. Otherwise
-    ;; things look odd.
-    (setq visual-fill-column-width (+ fill-column 4))
-    (setq visual-fill-column-enable-sensible-window-split t)
-    :config
-    (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
-#+END_SRC
-
-Define a function to enable =visual-fill-column= and center the text
-on the screen. This is mostly useful for editing Markdown files that
-don't have hard newlines.
-
-#+BEGIN_SRC emacs-lisp
-  (defun s3thi--center-and-fill ()
-    (interactive)
-    (if (and (boundp 'visual-fill-column-mode) visual-fill-column-mode)
-        (progn
-          (setq visual-fill-column-center-text nil)
-          (visual-fill-column-mode 0))
-      (progn
-        (setq visual-fill-column-center-text t)
-        (visual-fill-column-mode))))
-#+END_SRC
-
-Snippets using =yasnippet=.
+Snippets are useful, right?
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -410,31 +376,6 @@ Snippets using =yasnippet=.
     (define-key yas-minor-mode-map (kbd "<tab>") nil)
     (define-key yas-minor-mode-map (kbd "TAB") nil)
     (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand))
-#+END_SRC
-
-Define a type scale. This is useful for making =org-mode= and Markdown
-files pretty, but it really only works out for Markdown. I don't want
-differently sized headlines in =org-mode= because sometimes they are
-tasks or database entries, not just plain text.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar s3thi--type-scale-document-title 1.276)
-  (defvar s3thi--type-scale-level-1 1.216)
-  (defvar s3thi--type-scale-level-2 1.296)
-  (defvar s3thi--type-scale-level-3 1.157)
-  (defvar s3thi--type-scale-level-4 1.1025)
-  (defvar s3thi--type-scale-level-5 1.05)
-  (defvar s3thi--type-scale-level-6 1)
-#+END_SRC
-
-Define line spacing that we'll use later, and a function we can use for
-hooks.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar s3thi--prose-line-spacing 0.125)
-
-  (defun s3thi--set-prose-line-spacing ()
-    (setq line-spacing s3thi--prose-line-spacing))
 #+END_SRC
 
 Sometimes it's useful to "unfill" paragraphs.
@@ -460,46 +401,22 @@ bunch of dictionaries by default (unlike =hunspell=).
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :hook ((org-mode . flyspell-mode)
-           (org-mode . s3thi--set-prose-line-spacing)
            (org-mode . auto-fill-mode))
     :init
-    (setq org-directory "~/org/")
+    (setq org-directory "~/Org/")
     (setq org-startup-indented t)
     (setq org-special-ctrl-a/e t)
     (setq org-special-ctrl-k t)
-    (setq org-yank-adjusted-subtrees t)
-    (setq org-catch-invisible-edits 'error))
-#+END_SRC
-
-Optional type scale settings. Not used currently.
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (set-face-attribute 'org-document-title nil :height s3thi--type-scale-document-title)
-  (set-face-attribute 'org-level-1 nil :height s3thi--type-scale-level-1)
-  (set-face-attribute 'org-level-2 nil :height s3thi--type-scale-level-2)
-  (set-face-attribute 'org-level-3 nil :height s3thi--type-scale-level-3)
-  (set-face-attribute 'org-level-4 nil :height s3thi--type-scale-level-4)
-  (set-face-attribute 'org-level-5 nil :height s3thi--type-scale-level-5)
-  (set-face-attribute 'org-level-6 nil :height s3thi--type-scale-level-6)
+    (setq org-yank-adjusted-subtrees t))
 #+END_SRC
 
 * Markdown
-
-Set nice header sizes and line spacing for Markdown documents.
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :ensure t
     :mode (("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode))
-    :hook ((markdown-mode . s3thi--set-prose-line-spacing))
-    :config
-    (set-face-attribute 'markdown-header-face-1 nil :height s3thi--type-scale-level-1)
-    (set-face-attribute 'markdown-header-face-2 nil :height s3thi--type-scale-level-2)
-    (set-face-attribute 'markdown-header-face-3 nil :height s3thi--type-scale-level-3)
-    (set-face-attribute 'markdown-header-face-4 nil :height s3thi--type-scale-level-4)
-    (set-face-attribute 'markdown-header-face-5 nil :height s3thi--type-scale-level-5)
-    (set-face-attribute 'markdown-header-face-6 nil :height s3thi--type-scale-level-6))
+           ("\\.markdown\\'" . markdown-mode)))
 #+END_SRC
 
 * Version Control
@@ -511,14 +428,132 @@ Set nice header sizes and line spacing for Markdown documents.
 
 * Programming
 
-** Raku
+** Tree Sitter
 
-This is the official Emacs mode for Raku.
+Tell =tree-sitter= where to find the grammars for various languages.
+It's a good idea to maybe upgrade these from time to time, since they
+keep changing.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package raku-mode
+  (setq treesit-language-source-alist
+     '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+       (cmake "https://github.com/uyha/tree-sitter-cmake")
+       (css "https://github.com/tree-sitter/tree-sitter-css")
+       (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+       (go "https://github.com/tree-sitter/tree-sitter-go")
+       (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
+       (html "https://github.com/tree-sitter/tree-sitter-html")
+       (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+       (json "https://github.com/tree-sitter/tree-sitter-json")
+       (make "https://github.com/alemuller/tree-sitter-make")
+       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+       (python "https://github.com/tree-sitter/tree-sitter-python")
+       (toml "https://github.com/tree-sitter/tree-sitter-toml")
+       (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+       (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+#+END_SRC
+
+To install all of them in one go, you can run the following code:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+#+END_SRC
+
+Make sure we're using the =tree-sitter= versions of the modes we care
+about.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.css\\'" . css-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.js[mx]?\\'" . js-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+  (add-to-list 'auto-mode-alist '("^go\\.mod$" . go-mod-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.py[iw]?\\'" . python-ts-mode))
+#+END_SRC
+
+** Flycheck
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode))
+#+END_SRC
+
+** LSP
+
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :hook ((js-ts-mode . lsp)
+           (typescript-ts-mode . lsp)
+           (tsx-ts-mode . lsp)
+           (json-ts-mode . lsp)
+           (css-ts-mode . lsp)
+           (go-ts-mode . lsp)
+           (rust-ts-mode . lsp)
+           (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp)
+#+END_SRC
+
+** Apheleia Code Formatter
+
+#+BEGIN_SRC emacs-lisp
+  (use-package apheleia
+    :ensure t
+    :config (apheleia-global-mode +1))
+#+END_SRC
+
+** Terminal
+
+Use =vterm= as terminal emulator.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm
     :ensure t)
 #+END_SRC
+
+** =node_module= Paths
+
+#+BEGIN_SRC emacs-lisp
+  (setq s3thi--wants-node-modules-paths-extensions-list
+        '("js" "jsx" "ts" "tsx" "json" "css" "scss" "md"))
+
+  (defun s3thi--recursively-find-node-modules-bin-dirs ()
+    "Starting with the current directory and recursing up to the file system root, find all .bin directories that exist inside a node_modules directory."
+    (let ((dir (file-name-directory (or buffer-file-name default-directory)))
+          (directories '()))
+      (while (and dir (not (equal dir "/")))
+        (let* ((package-file (concat dir "package.json"))
+               (node-modules-dir (concat dir "node_modules"))
+               (node-modules-bin-dir (concat node-modules-dir "/.bin")))
+          (when (and (file-exists-p package-file)
+                     (file-directory-p node-modules-dir)
+                     (file-directory-p node-modules-bin-dir))
+            (setq directories (cons node-modules-bin-dir directories))))
+        (setq dir (file-name-directory (directory-file-name dir))))
+      directories))
+
+  (defun s3thi--add-node-modules-paths ()
+    "Adds node_modules bin directories to the exec-path."
+    (make-local-variable 'exec-path)
+    (dolist (dir (s3thi--recursively-find-node-modules-bin-dirs))
+      (add-to-list 'exec-path dir)))
+
+  (defun s3thi--maybe-add-node-modules-paths ()
+    (when (member (file-name-extension buffer-file-name)
+                  s3thi--wants-node-modules-paths-extensions-list)
+      (s3thi--add-node-modules-paths)))
+
+  (add-hook 'find-file-hook #'s3thi--maybe-add-node-modules-paths)
+  #+END_SRC
 
 * Additional Key Bindings
 
@@ -540,6 +575,12 @@ Convenient for editing this configuration file.
                                   (find-file "~/.emacs.d/README.org")))
 #+END_SRC
 
+This one is very useful for the way I work:
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-o") #'other-window)
+#+END_SRC
+
 * Miscellaneous
 
 =crux= contains a ton of useful Emacs Lisp functions that I'd have to
@@ -548,7 +589,8 @@ write myself otherwise.
 #+BEGIN_SRC emacs-lisp
   (use-package crux
     :ensure t
-    :bind (("C-c d" . #'crux-duplicate-current-line-or-region)))
+    :bind (("C-c d" . #'crux-duplicate-current-line-or-region)
+           ("C-c r" . #'crux-transpose-windows)))
 #+END_SRC
 
 Start the Emacs server.
