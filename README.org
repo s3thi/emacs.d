@@ -201,48 +201,10 @@ Enable annotations in the minibuffer using =marginalia=.
 
 ** Themes
 
-Install the =gruvbox= set of themes.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package gruvbox-theme
-    :ensure t)
-#+END_SRC
-
-Add the ability to toggle between light and dark themes. Instead of
-setting the theme on Emacs startup, just call the cycle theme function
-to pick up the first theme from this list.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar s3thi--favorite-themes
-    '(gruvbox-light-soft gruvbox-dark-soft))
-
-  (defun s3thi--current-theme ()
-      (car custom-enabled-themes))
-
-  (defun s3thi--next-theme-index ()
-    (let ((current (cl-position
-                    (s3thi--current-theme)
-                    s3thi--favorite-themes)))
-      (if (eq nil current)
-          0
-        (% (+ current 1) (length s3thi--favorite-themes)))))
-
-  (defun s3thi--cycle-theme ()
-    (interactive)
-    (let ((next (nth
-                 (s3thi--next-theme-index)
-                 s3thi--favorite-themes)))
-      (disable-theme (s3thi--current-theme))
-      (load-theme next t)))
-
-  (global-set-key (kbd "C-c t") #'s3thi--cycle-theme)
-
-  (s3thi--cycle-theme)
-#+END_SRC
-
 Settings for the included =modus= themes.
 
 #+BEGIN_SRC emacs-lisp
+  (load-theme 'modus-vivendi t)
   (setq modus-themes-org-blocks 'gray-background)
 #+END_SRC
 
@@ -472,7 +434,7 @@ about.
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
-  (add-to-list 'auto-mode-alist '("^go\\.mod$" . go-mod-ts-mode))
+  (add-to-list 'auto-mode-alist '("go\\.mod$" . go-mod-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.py[iw]?\\'" . python-ts-mode))
@@ -510,7 +472,11 @@ To update all installed servers, eval the following code.
   (lsp-update-servers)
 #+END_SRC
 
-** Apheleia Code Formatter
+** Apheleia
+
+This package runs code formatters on save for a couple of different
+languages, and should work without too much configuration. Get rid of
+it if things don't work as expected.
 
 #+BEGIN_SRC emacs-lisp
   (use-package apheleia
