@@ -204,8 +204,8 @@ Enable annotations in the minibuffer using =marginalia=.
 Settings for the included =modus= themes.
 
 #+BEGIN_SRC emacs-lisp
-  (load-theme 'modus-vivendi t)
   (setq modus-themes-org-blocks 'gray-background)
+  (load-theme 'modus-operandi t)
 #+END_SRC
 
 * Files and Directories
@@ -295,11 +295,10 @@ In modes where we are forced to use tabs, set the tab width to 4.
   (setq-default tab-width 4)
 #+END_SRC
 
-Set =fill-column= manually, to make sure it's always what I expect. The
-default of 70 is good enough for me.
+Set =fill-column= manually, to make sure it's always what I expect.
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default fill-column 70)
+  (setq-default fill-column 72)
 #+END_SRC
 
 If there is some text already present in the system clipboard when we
@@ -365,8 +364,7 @@ bunch of dictionaries by default (unlike =hunspell=).
     :hook ((org-mode . flyspell-mode)
            (org-mode . auto-fill-mode))
     :init
-    (setq org-directory "~/Org/")
-    (setq org-startup-indented t)
+    (setq org-directory "~/org/")
     (setq org-special-ctrl-a/e t)
     (setq org-special-ctrl-k t)
     (setq org-yank-adjusted-subtrees t))
