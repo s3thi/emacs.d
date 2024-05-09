@@ -205,7 +205,7 @@ Settings for the included =modus= themes.
 
 #+BEGIN_SRC emacs-lisp
   (setq modus-themes-org-blocks 'gray-background)
-  (load-theme 'modus-operandi t)
+  (load-theme 'modus-vivendi t)
 #+END_SRC
 
 * Files and Directories
