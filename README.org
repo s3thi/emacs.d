@@ -406,6 +406,13 @@ bunch of dictionaries by default (unlike =hunspell=).
     :init (global-flycheck-mode))
 #+END_SRC
 
+** Terminal
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm
+    :ensure t)
+#+END_SRC
+
 * Additional Key Bindings
 
 Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI
