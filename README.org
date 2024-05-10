@@ -63,6 +63,16 @@ Enable smooth scrolling.
   (pixel-scroll-precision-mode 1)
 #+END_SRC
 
+Allow resizing the frame by pixels instead of rounding the frame size to
+characters. This prevents an irritating situation on macOS where
+sometimes there's a bit of space left between the bottom of the Emacs
+frame and the bottom of the screen when maximizing Emacs using an
+external window manager.
+
+#+BEGIN_SRC emacs-lisp
+  (setq frame-resize-pixelwise t)
+#+END_SRC
+
 Set a nice font. The font size will have to be different across
 platforms, so we check the OS we're running on before setting it.
 
