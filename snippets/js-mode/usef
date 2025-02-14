@@ -1,8 +1,0 @@
-# -*- mode: snippet -*-
-# name: useEffect
-# key: usef
-# --
-
-useEffect(($1) => {
-  $0
-}, [$2]);

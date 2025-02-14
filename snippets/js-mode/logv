@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: console.log variable
-# key: logv
-# --
-
-console.log("${1:variableName}", $1);$0
