@@ -215,7 +215,19 @@ Settings for the included =modus= themes.
 
 #+BEGIN_SRC emacs-lisp
   (setq modus-themes-org-blocks 'gray-background)
-  (load-theme 'modus-operandi t)
+  (load-theme 'modus-vivendi t)
+#+END_SRC
+
+** Tweaks for writing prose
+
+Add =visual-fill-column= to limit text width in certain modes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package visual-fill-column
+    :ensure t
+    :config
+    (setq-default fill-column 72)
+    (global-set-key (kbd "C-c c") #'visual-fill-column-toggle-center-text))
 #+END_SRC
 
 * Files and Directories
@@ -385,8 +397,15 @@ bunch of dictionaries by default (unlike =hunspell=).
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :ensure t
+    :hook ((markdown-mode . visual-line-mode)
+           (markdown-mode . visual-fill-column-mode))
     :mode (("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode)))
+           ("\\.markdown\\'" . markdown-mode))
+    :config
+    (dolist (face '((markdown-header-face-1 . 1.75)
+                    (markdown-header-face-2 . 1.5)
+                    (markdown-header-face-3 . 1.25)))
+      (set-face-attribute (car face) nil :weight 'bold :height (cdr face))))
 #+END_SRC
 
 * Version Control
