@@ -24,15 +24,15 @@ Personal information.
 
 #+BEGIN_SRC emacs-lisp
   (setq user-full-name "Ankur Sethi"
-        user-mail-address "contact@ankursethi.in")
+        user-mail-address "contact@ankursethi.com")
 #+END_SRC
 
 Platform specific variables.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar s3thi--is-a-mac (eq system-type 'darwin))
-  (defvar s3thi--is-a-pc (eq system-type 'windows-nt))
-  (defvar s3thi--is-a-penguin (eq system-type 'gnu/linux))
+  (defvar s3thi/is-a-mac (eq system-type 'darwin))
+  (defvar s3thi/is-a-pc (eq system-type 'windows-nt))
+  (defvar s3thi/is-a-penguin (eq system-type 'gnu/linux))
 #+END_SRC
 
 * User Interface
@@ -77,7 +77,7 @@ Set a nice font. The font size will have to be different across
 platforms, so we check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
-  (when s3thi--is-a-mac
+  (when s3thi/is-a-mac
     (set-frame-font "Berkeley Mono Variable 15" nil t))
 #+END_SRC
 
@@ -368,30 +368,6 @@ Sometimes it's useful to "unfill" paragraphs.
     :ensure t)
 #+END_SRC
 
-** Spell checking
-
-Use =aspell= instead of the default =ispell=. It's better, faster,
-supports enabling multiple dictionaries at once, and ships with a
-bunch of dictionaries by default (unlike =hunspell=).
-
-#+BEGIN_SRC emacs-lisp
-  (setq ispell-program-name "aspell")
-  (setq ispell-dictionary "en_US")
-#+END_SRC
-
-* Org Mode
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :hook ((org-mode . flyspell-mode)
-           (org-mode . auto-fill-mode))
-    :init
-    (setq org-directory "~/org/")
-    (setq org-special-ctrl-a/e t)
-    (setq org-special-ctrl-k t)
-    (setq org-yank-adjusted-subtrees t))
-#+END_SRC
-
 * Markdown
 
 #+BEGIN_SRC emacs-lisp
@@ -468,12 +444,6 @@ write myself otherwise.
     :ensure t
     :bind (("C-c d" . #'crux-duplicate-current-line-or-region)
            ("C-c r" . #'crux-transpose-windows)))
-#+END_SRC
-
-Start the Emacs server.
-
-#+BEGIN_SRC emacs-lisp
-  (server-start)
 #+END_SRC
 
 * That's All, Folks!
