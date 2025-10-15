@@ -411,10 +411,6 @@ Sometimes it's useful to "unfill" paragraphs.
 ** Clojure
 
 #+BEGIN_SRC emacs-lisp
-  (use-package paredit
-    :ensure t
-    :hook ((clojure-mode . paredit-mode)))
-
   (use-package cider
     :ensure t)
 
