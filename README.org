@@ -35,9 +35,9 @@ Platform specific variables.
   (defvar s3thi/is-a-penguin (eq system-type 'gnu/linux))
 #+END_SRC
 
-* User Interface
+* User interface
 
-** General UI Enhancements
+** General UI enhancements
 
 Remove UI elements we don't like.
 
@@ -63,11 +63,7 @@ Enable smooth scrolling.
   (pixel-scroll-precision-mode 1)
 #+END_SRC
 
-Allow resizing the frame by pixels instead of rounding the frame size to
-characters. This prevents an irritating situation on macOS where
-sometimes there's a bit of space left between the bottom of the Emacs
-frame and the bottom of the screen when maximizing Emacs using an
-external window manager.
+Allow resizing the frame by pixels instead of rounding the frame size to characters. This prevents an irritating situation on macOS where sometimes there's a bit of space left between the bottom of the Emacs frame and the bottom of the screen when maximizing Emacs using an external window manager.
 
 #+BEGIN_SRC emacs-lisp
   (setq frame-resize-pixelwise t)
@@ -78,15 +74,15 @@ platforms, so we check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
-    (set-frame-font "Berkeley Mono Variable 15" nil t))
+    (set-face-attribute 'default nil
+                        :family "Berkeley Mono Variable"
+                        :height 160)
+    (set-face-attribute 'variable-pitch nil
+                        :family "Baskerville"
+                        :height 170))
 #+END_SRC
 
-Maximize the Emacs frame on startup. To start every new frame
-maximized instead of just the first frame, you can add the following
-options to =default-frame-alist= instead of =initial-frame-alist=.
-Additionally, it's possible to toggle the maximized status of an Emacs
-frame by calling =toggle-frame-maximized=, which is bound to =M-<f10>=
-by default.
+Maximize the Emacs frame on startup. To start every new frame maximized instead of just the first frame, you can add the following options to =default-frame-alist= instead of =initial-frame-alist=. Additionally, it's possible to toggle the maximized status of an Emacs frame by calling =toggle-frame-maximized=, which is bound to =M-<f10>= by default.
 
 #+BEGIN_SRC emacs-lisp :tangle no
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -115,7 +111,7 @@ bottom of the window. As soon as the cursor gets closer than this to the
 top of or bottom of a window, Emacs will start scrolling.
 
 #+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 3)
+  (setq scroll-margin 5)
 #+END_SRC
 
 Show total number of matches while searching:
@@ -165,7 +161,7 @@ use-package.
     :ensure t)
 #+END_SRC
 
-** Minibuffer Completion
+** Minibuffer completion
 
 Use =vertico= as the completion UI.
 
@@ -211,26 +207,41 @@ Enable annotations in the minibuffer using =marginalia=.
 
 ** Themes
 
+Let's install some Doom Emacs themes!
+
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :custom
+    ;; Global settings (defaults)
+    (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
+    (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    ;; for treemacs users
+    (doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+    :config
+    ;; Enable flashing mode-line on errors
+    (doom-themes-visual-bell-config)
+    ;; Enable custom neotree theme (nerd-icons must be installed!)
+    (doom-themes-neotree-config)
+    ;; or for treemacs users
+    (doom-themes-treemacs-config)
+    ;; Corrects (and improves) org-mode's native fontification.
+    (doom-themes-org-config))
+#+END_SRC
+
 Settings for the included =modus= themes.
 
 #+BEGIN_SRC emacs-lisp
   (setq modus-themes-org-blocks 'gray-background)
-  (load-theme 'modus-vivendi t)
 #+END_SRC
 
-** Tweaks for writing prose
-
-Add =visual-fill-column= to limit text width in certain modes.
+Load a theme.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package visual-fill-column
-    :ensure t
-    :config
-    (setq-default fill-column 72)
-    (global-set-key (kbd "C-c c") #'visual-fill-column-toggle-center-text))
+  (load-theme 'doom-one t)
 #+END_SRC
 
-* Files and Directories
+* Files and directories
 
 Store configuration created by custom in a separate file.
 
@@ -247,17 +258,24 @@ Don't create garbage files.
   (setq-default make-backup-files nil)
 #+END_SRC
 
+Don't pollute the current directory with auto-save files. Instead, put them all in one place.
+
+#+BEGIN_SRC emacs-lisp
+  (let ((auto-save-dir (expand-file-name "auto-save/" user-emacs-directory)))
+    (unless (file-exists-p auto-save-dir)
+      (make-directory auto-save-dir t))
+    (setq auto-save-file-name-transforms
+          `((".*" ,auto-save-dir t))))
+#+END_SRC
+
 Turn on =auto-revert-mode= for all files. This will automatically reload
 files from disk every time they're changed by another from outside
 Emacs.
 
-Also ensure that Dired buffers are reloaded on each visit, and that
-version control information is checked periodically to ensure that we're
-showing the correct VCS information in our modeline.
+Also ensure that Dired, VCS, etc. buffers are also auto reverted.
 
 #+BEGIN_SRC emacs-lisp
-  (setq dired-auto-revert-buffer t)
-  (setq auto-revert-check-vc-info t)
+  (setq global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1)
 #+END_SRC
 
@@ -284,7 +302,7 @@ Use =ripgrep= for searching.
     (rg-enable-default-bindings))
 #+END_SRC
 
-* Text Editing
+* Text editing
 
 Enable useful text editing commands that are disabled by default.
 
@@ -320,7 +338,7 @@ In modes where we are forced to use tabs, set the tab width to 4.
 Set =fill-column= manually, to make sure it's always what I expect.
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default fill-column 72)
+  (setq-default fill-column 80)
 #+END_SRC
 
 If there is some text already present in the system clipboard when we
@@ -368,23 +386,51 @@ Sometimes it's useful to "unfill" paragraphs.
     :ensure t)
 #+END_SRC
 
+* Improvements to writing prose
+
+Add =visual-fill-column= to limit text width in certain modes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package visual-fill-column
+    :ensure t
+    :init
+    (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust)
+    (global-set-key (kbd "<f12>") #'visual-fill-column-toggle-center-text))
+#+END_SRC
+
+* Org
+
+Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work well with =org-mode= when =org-indent-mode= is also turned on. If you're running into weird issues, it's probably because of that.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :hook ((org-mode . org-indent-mode)
+           (org-mode . visual-fill-column-mode)
+           (org-mode . visual-line-mode))
+    :config
+    (setq org-startup-folded 'content)
+    (setq org-M-RET-may-split-line '((headline . nil)))
+    (setq org-list-demote-modify-bullet
+          '(("-" . "+") ("+" . "*") ("*" . "-"))))
+#+END_SRC
+
 * Markdown
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :ensure t
     :hook ((markdown-mode . visual-line-mode)
-           (markdown-mode . visual-fill-column-mode))
+           (markdown-mode . visual-fill-column-mode)
+           (markdown-mode . visual-wrap-prefix-mode))
     :mode (("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
-    :config
-    (dolist (face '((markdown-header-face-1 . 1.75)
-                    (markdown-header-face-2 . 1.5)
-                    (markdown-header-face-3 . 1.25)))
-      (set-face-attribute (car face) nil :weight 'bold :height (cdr face))))
+  :init
+  (setq markdown-header-scaling t)
+  (setq markdown-header-scaling-values '(1.4 1.3 1.2 1.1 1.0 1.0))
+  (setq markdown-hide-urls t))
 #+END_SRC
 
-* Version Control
+* Version control
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -401,24 +447,7 @@ Sometimes it's useful to "unfill" paragraphs.
     :init (global-flycheck-mode))
 #+END_SRC
 
-** Terminal
-
-#+BEGIN_SRC emacs-lisp
-  (use-package vterm
-    :ensure t)
-#+END_SRC
-
-** Clojure
-
-#+BEGIN_SRC emacs-lisp
-  (use-package cider
-    :ensure t)
-
-  (use-package clojure-mode
-    :ensure t)
-#+END_SRC
-
-* Additional Key Bindings
+* Additional key bindings
 
 Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI
 Emacs will minimize the editor, which is very annoying. This disables
@@ -456,7 +485,136 @@ write myself otherwise.
            ("C-c r" . #'crux-transpose-windows)))
 #+END_SRC
 
-* That's All, Folks!
+* Claude suggestions
+
+** Performance Optimizations
+
+*** early-init.el Missing Essential Optimizations
+
+early-init.el:20 - Missing essential early-init optimizations that should be added:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; Add to early-init.el:
+  (setq package-enable-at-startup nil)  ;; Prevent double package initialization
+
+  ;; Disable GUI elements before they're loaded to speed up startup
+  (push '(menu-bar-lines . 0) default-frame-alist)
+  (push '(tool-bar-lines . 0) default-frame-alist)
+  (push '(vertical-scroll-bars) default-frame-alist)
+
+  ;; Adjust GC threshold during startup
+  (setq gc-cons-threshold most-positive-fixnum)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq gc-cons-threshold (* 16 1024 1024))))
+#+END_SRC
+
+*** Redundant Package Initialization
+
+init.el:14 - The =package-initialize= call is redundant in Emacs 27+ (it
+happens automatically).
+
+** Undo-tree Concerns
+
+README.org:135-143 - =undo-tree= is deprecated/unmaintained and can cause corruption issues. Consider switching to =vundo= (visual undo):
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; Alternative to undo-tree:
+  (use-package vundo
+    :ensure t
+    :bind (("C-x u" . vundo))
+    :config
+    (setq vundo-glyph-alist vundo-unicode-symbols))
+#+END_SRC
+
+** Missing Useful Configurations
+
+*** Recent Files Mode
+
+No recent files tracking. Add:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package recentf
+    :config
+    (setq recentf-max-saved-items 100)
+    (setq recentf-max-menu-items 15)
+    (setq recentf-exclude '("/tmp/" "/ssh:" "COMMIT_EDITMSG"))
+    (recentf-mode 1))
+#+END_SRC
+
+*** Winner Mode (Window Configuration Undo)
+
+You use =other-window= but might benefit from =winner-mode=:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package winner
+    :config
+    (winner-mode 1))
+  ;; Use C-c <left> and C-c <right> to undo/redo window configuration changes
+#+END_SRC
+
+*** Eldoc Configuration
+
+Useful for showing documentation in minibuffer, especially with LSP:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package eldoc
+    :diminish eldoc-mode
+    :config
+    (global-eldoc-mode 1)
+    (setq eldoc-idle-delay 0.2))
+#+END_SRC
+
+** Vertico Enhancements
+
+README.org:178-181 - Basic vertico setup. Consider adding consult for
+enhanced search/navigation:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package consult
+    :ensure t
+    :bind (("C-x b" . consult-buffer)
+           ("C-x 4 b" . consult-buffer-other-window)
+           ("C-x 5 b" . consult-buffer-other-frame)
+           ("C-x r b" . consult-bookmark)
+           ("M-y" . consult-yank-pop)
+           ("M-g g" . consult-goto-line)
+           ("M-g M-g" . consult-goto-line)
+           ("M-g o" . consult-outline)
+           ("M-g m" . consult-mark)
+           ("M-g k" . consult-global-mark)
+           ("M-g i" . consult-imenu)
+           ("M-s d" . consult-find)
+           ("M-s D" . consult-locate)
+           ("M-s g" . consult-grep)
+           ("M-s G" . consult-git-grep)
+           ("M-s r" . consult-ripgrep)
+           ("M-s l" . consult-line)
+           ("M-s L" . consult-line-multi)
+           ("M-s m" . consult-multi-occur)
+           ("M-s k" . consult-keep-lines)
+           ("M-s u" . consult-focus-lines)))
+
+  ;; Enable vertico-multiform for different completion styles
+  (use-package vertico-multiform
+    :after vertico
+    :config
+    (vertico-multiform-mode))
+#+END_SRC
+
+** Custom File Directory Issue
+
+README.org:248-250 - Consider creating the file if it doesn't exist:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; Ensure custom file exists before loading:
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (unless (file-exists-p custom-file)
+    (write-region "" nil custom-file))
+  (load-file custom-file)
+#+END_SRC
+
+* That's all, folks!
 
 #+BEGIN_SRC emacs-lisp
   ;;; README.el ends here.
