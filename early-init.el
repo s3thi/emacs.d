@@ -12,6 +12,10 @@
                        (format "%s:%s" value (getenv var-name))
                      value)))
 
+;; Disable UI elements early for faster startup.
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
 ;; Make sure Emacs can find GCC and libgccjit on macOS.
 (if (eq system-type 'darwin)
     (let ((gccjitpath "/opt/homebrew/lib/gcc/current:/opt/homebrew/lib"))

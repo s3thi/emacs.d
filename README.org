@@ -24,7 +24,7 @@ Personal information.
 
 #+BEGIN_SRC emacs-lisp
   (setq user-full-name "Ankur Sethi"
-        user-mail-address "contact@ankursethi.com")
+        user-mail-address "contact@ankursethi.in")
 #+END_SRC
 
 Platform specific variables.
@@ -49,11 +49,9 @@ Copy environment variables from the shell. This is needed on macOS and Linux bec
 
 ** General UI enhancements
 
-Remove UI elements we don't like.
+Remove UI elements we don't like. Note that =tool-bar-mode= and =scroll-bar-mode= are disabled in =early-init.el= for faster startup.
 
 #+BEGIN_SRC emacs-lisp
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
   (setq inhibit-startup-screen t)
   (setq initial-scratch-message nil)
   (setq ring-bell-function 'ignore)
@@ -63,7 +61,7 @@ And add UI elements that are nice to have.
 
 #+BEGIN_SRC emacs-lisp
   (column-number-mode 1)
-  (show-paren-mode)
+  (show-paren-mode 1)
   (setq confirm-kill-emacs #'yes-or-no-p)
   #+END_SRC
 
@@ -130,6 +128,15 @@ Show total number of matches while searching:
   (setq-default isearch-lazy-count t)
 #+END_SRC
 
+=diminish= prevents the modeline from getting polluted when too many
+modes are enabled for a single buffer. This conveniently integrates with
+use-package. We load it early so other packages can use =:diminish=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t)
+#+END_SRC
+
 =undo-tree= lets me browse the Emacs undo history visually.
 
 #+BEGIN_SRC emacs-lisp
@@ -152,23 +159,14 @@ Show total number of matches while searching:
 #+END_SRC
 
 =which-key= displays helpful suggestions in the minibuffer when you hit
-the first part of a long keychord.
+the first part of a long keychord. Note that =which-key= is built into
+Emacs 30+, so we only install it on older versions.
 
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
-    :ensure t
     :diminish
     :config
     (which-key-mode 1))
-#+END_SRC
-
-=diminish= prevents the modeline from getting polluted when too many
-modes are enabled for a single buffer. This conveniently integrates with
-use-package.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t)
 #+END_SRC
 
 ** Minibuffer completion
@@ -186,7 +184,6 @@ Use =savehist= to save minibuffer history.
 
 #+BEGIN_SRC emacs-lisp
   (use-package savehist
-    :ensure t
     :init
     (savehist-mode))
 #+END_SRC
@@ -226,15 +223,9 @@ Let's install some Doom Emacs themes!
     ;; Global settings (defaults)
     (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
     (doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    ;; for treemacs users
-    (doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
     :config
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
-    ;; Enable custom neotree theme (nerd-icons must be installed!)
-    (doom-themes-neotree-config)
-    ;; or for treemacs users
-    (doom-themes-treemacs-config)
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config))
 #+END_SRC
@@ -293,6 +284,15 @@ Save place in files.
 
 #+BEGIN_SRC emacs-lisp
   (save-place-mode 1)
+#+END_SRC
+
+Keep track of recently opened files.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package recentf
+    :config
+    (setq recentf-max-saved-items 200)
+    (recentf-mode 1))
 #+END_SRC
 
 If a read-only file is opened, use =view-mode= instead of the regular
@@ -541,6 +541,7 @@ This function finds =node_modules/.bin= directories from the current file's dire
 
 #+BEGIN_SRC emacs-lisp
   (use-package treesit-auto
+    :ensure t
     :config
     (global-treesit-auto-mode))
 #+END_SRC
@@ -549,10 +550,20 @@ This function finds =node_modules/.bin= directories from the current file's dire
 
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
+    :ensure t
     :init
     (setq lsp-keymap-prefix "C-c l")
-    :hook ((lsp-mode . lsp-enable-which-key-integration))
+    :hook (lsp-mode . lsp-enable-which-key-integration)
     :commands lsp)
+#+END_SRC
+
+** Prettier
+
+=prettier-js= formats code using Prettier on save.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package prettier-js
+    :ensure t)
 #+END_SRC
 
 ** Astro
@@ -560,9 +571,7 @@ This function finds =node_modules/.bin= directories from the current file's dire
 #+BEGIN_SRC emacs-lisp
   (use-package astro-ts-mode
     :ensure t
-    :mode "\\.astro\\'"
-    :hook ((astro-ts-mode . s3thi/add-node-modules-to-exec-path)
-           (astro-ts-mode . lsp)))
+    :mode "\\.astro\\'")
 
   (let ((astro-recipe (make-treesit-auto-recipe
                        :lang 'astro
@@ -571,6 +580,22 @@ This function finds =node_modules/.bin= directories from the current file's dire
                        :revision "master"
                        :source-dir "src")))
     (add-to-list 'treesit-auto-recipe-list astro-recipe))
+#+END_SRC
+
+** Web development setup
+
+Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to =exec-path= before LSP and Prettier start.
+
+#+BEGIN_SRC emacs-lisp
+  (defun s3thi/setup-web-dev ()
+    "Set up environment for JS/TS/Astro development."
+    (s3thi/add-node-modules-to-exec-path)
+    (prettier-js-mode)
+    (lsp))
+
+  (add-hook 'js-ts-mode-hook #'s3thi/setup-web-dev)
+  (add-hook 'typescript-ts-mode-hook #'s3thi/setup-web-dev)
+  (add-hook 'astro-ts-mode-hook #'s3thi/setup-web-dev)
 #+END_SRC
 
 * Additional key bindings
