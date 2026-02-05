@@ -35,6 +35,16 @@ Platform specific variables.
   (defvar s3thi/is-a-penguin (eq system-type 'gnu/linux))
 #+END_SRC
 
+Copy environment variables from the shell. This is needed on macOS and Linux because GUI Emacs doesn't inherit the shell environment.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :if (or s3thi/is-a-mac s3thi/is-a-penguin)
+    :config
+    (exec-path-from-shell-initialize))
+#+END_SRC
+
 * User interface
 
 ** General UI enhancements
@@ -489,12 +499,78 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
 
 * Programming
 
+** Node modules path
+
+This function finds =node_modules/.bin= directories from the current file's directory up to the home directory and adds them to the buffer-local =exec-path=. This allows Emacs to find project-local LSP servers and other tools without installing them globally.
+
+#+BEGIN_SRC emacs-lisp
+  (defun s3thi/add-node-modules-to-exec-path ()
+    "Add node_modules/.bin directories to exec-path for the current buffer.
+  Searches from the current file's directory up to and including the
+  user's home directory, adding any node_modules/.bin directories found
+  to a buffer-local exec-path."
+    (interactive)
+    (when buffer-file-name
+      (let ((dir (file-name-directory buffer-file-name))
+            (home (expand-file-name "~"))
+            (found-paths '()))
+        ;; Walk up the directory tree until we pass home
+        (while (and dir (string-prefix-p home dir))
+          (let ((node-bin (expand-file-name "node_modules/.bin" dir)))
+            (when (file-directory-p node-bin)
+              (push node-bin found-paths)))
+          ;; Move to parent directory
+          (let ((parent (file-name-directory (directory-file-name dir))))
+            (setq dir (unless (string= parent dir) parent))))
+        ;; Make exec-path buffer-local and add found paths
+        (when found-paths
+          (make-local-variable 'exec-path)
+          (dolist (path found-paths)
+            (add-to-list 'exec-path path))))))
+#+END_SRC
+
 ** Flycheck
 
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
     :init (global-flycheck-mode))
+#+END_SRC
+
+** Tree Sitter
+
+#+BEGIN_SRC emacs-lisp
+  (use-package treesit-auto
+    :config
+    (global-treesit-auto-mode))
+#+END_SRC
+
+** LSP
+
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :hook ((lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp)
+#+END_SRC
+
+** Astro
+
+#+BEGIN_SRC emacs-lisp
+  (use-package astro-ts-mode
+    :ensure t
+    :mode "\\.astro\\'"
+    :hook ((astro-ts-mode . s3thi/add-node-modules-to-exec-path)
+           (astro-ts-mode . lsp)))
+
+  (let ((astro-recipe (make-treesit-auto-recipe
+                       :lang 'astro
+                       :ts-mode 'astro-ts-mode
+                       :url "https://github.com/virchau13/tree-sitter-astro"
+                       :revision "master"
+                       :source-dir "src")))
+    (add-to-list 'treesit-auto-recipe-list astro-recipe))
 #+END_SRC
 
 * Additional key bindings
@@ -534,136 +610,6 @@ write myself otherwise.
     :bind (("C-c d" . #'crux-duplicate-current-line-or-region)
            ("C-c r" . #'crux-transpose-windows)))
 #+END_SRC
-
-* Claude suggestions
-
-** Performance Optimizations
-
-*** early-init.el Missing Essential Optimizations
-
-early-init.el:20 - Missing essential early-init optimizations that should be added:
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; Add to early-init.el:
-  (setq package-enable-at-startup nil)  ;; Prevent double package initialization
-
-  ;; Disable GUI elements before they're loaded to speed up startup
-  (push '(menu-bar-lines . 0) default-frame-alist)
-  (push '(tool-bar-lines . 0) default-frame-alist)
-  (push '(vertical-scroll-bars) default-frame-alist)
-
-  ;; Adjust GC threshold during startup
-  (setq gc-cons-threshold most-positive-fixnum)
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (setq gc-cons-threshold (* 16 1024 1024))))
-#+END_SRC
-
-*** Redundant Package Initialization
-
-init.el:14 - The =package-initialize= call is redundant in Emacs 27+ (it
-happens automatically).
-
-** Undo-tree Concerns
-
-README.org:135-143 - =undo-tree= is deprecated/unmaintained and can cause corruption issues. Consider switching to =vundo= (visual undo):
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; Alternative to undo-tree:
-  (use-package vundo
-    :ensure t
-    :bind (("C-x u" . vundo))
-    :config
-    (setq vundo-glyph-alist vundo-unicode-symbols))
-#+END_SRC
-
-** Missing Useful Configurations
-
-*** Recent Files Mode
-
-No recent files tracking. Add:
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package recentf
-    :config
-    (setq recentf-max-saved-items 100)
-    (setq recentf-max-menu-items 15)
-    (setq recentf-exclude '("/tmp/" "/ssh:" "COMMIT_EDITMSG"))
-    (recentf-mode 1))
-#+END_SRC
-
-*** Winner Mode (Window Configuration Undo)
-
-You use =other-window= but might benefit from =winner-mode=:
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package winner
-    :config
-    (winner-mode 1))
-  ;; Use C-c <left> and C-c <right> to undo/redo window configuration changes
-#+END_SRC
-
-*** Eldoc Configuration
-
-Useful for showing documentation in minibuffer, especially with LSP:
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package eldoc
-    :diminish eldoc-mode
-    :config
-    (global-eldoc-mode 1)
-    (setq eldoc-idle-delay 0.2))
-#+END_SRC
-
-** Vertico Enhancements
-
-README.org:178-181 - Basic vertico setup. Consider adding consult for
-enhanced search/navigation:
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package consult
-    :ensure t
-    :bind (("C-x b" . consult-buffer)
-           ("C-x 4 b" . consult-buffer-other-window)
-           ("C-x 5 b" . consult-buffer-other-frame)
-           ("C-x r b" . consult-bookmark)
-           ("M-y" . consult-yank-pop)
-           ("M-g g" . consult-goto-line)
-           ("M-g M-g" . consult-goto-line)
-           ("M-g o" . consult-outline)
-           ("M-g m" . consult-mark)
-           ("M-g k" . consult-global-mark)
-           ("M-g i" . consult-imenu)
-           ("M-s d" . consult-find)
-           ("M-s D" . consult-locate)
-           ("M-s g" . consult-grep)
-           ("M-s G" . consult-git-grep)
-           ("M-s r" . consult-ripgrep)
-           ("M-s l" . consult-line)
-           ("M-s L" . consult-line-multi)
-           ("M-s m" . consult-multi-occur)
-           ("M-s k" . consult-keep-lines)
-           ("M-s u" . consult-focus-lines)))
-
-  ;; Enable vertico-multiform for different completion styles
-  (use-package vertico-multiform
-    :after vertico
-    :config
-    (vertico-multiform-mode))
-#+END_SRC
-
-** Custom File Directory Issue
-
-README.org:248-250 - Consider creating the file if it doesn't exist:
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; Ensure custom file exists before loading:
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (unless (file-exists-p custom-file)
-    (write-region "" nil custom-file))
-  (load-file custom-file)
-#+END_SRC
-
 * That's all, folks!
 
 #+BEGIN_SRC emacs-lisp
