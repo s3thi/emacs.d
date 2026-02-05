@@ -75,11 +75,11 @@ platforms, so we check the OS we're running on before setting it.
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
     (set-face-attribute 'default nil
-                        :family "Berkeley Mono Variable"
+                        :family "Source Code Pro"
                         :height 160)
     (set-face-attribute 'variable-pitch nil
-                        :family "Baskerville"
-                        :height 170))
+                        :family "Source Sans 3"
+                        :height 200))
 #+END_SRC
 
 Maximize the Emacs frame on startup. To start every new frame maximized instead of just the first frame, you can add the following options to =default-frame-alist= instead of =initial-frame-alist=. Additionally, it's possible to toggle the maximized status of an Emacs frame by calling =toggle-frame-maximized=, which is bound to =M-<f10>= by default.
@@ -386,7 +386,30 @@ Sometimes it's useful to "unfill" paragraphs.
     :ensure t)
 #+END_SRC
 
+=jinx= is a fast, modern spell checker that checks the entire visible buffer at once.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package jinx
+    :ensure t
+    :hook ((markdown-mode . jinx-mode)
+           (org-mode . jinx-mode))
+    :bind (("M-$" . jinx-correct)
+           ("C-M-$" . jinx-languages))
+    :config
+    (setq jinx-languages "en_US en_GB"))
+#+END_SRC
+
 * Improvements to writing prose
+
+Line spacing for prose modes.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar s3thi/prose-line-spacing 0.2
+    "Line spacing to use in prose modes like Org and Markdown.")
+
+  (defvar s3thi/prose-header-scaling '(1.4 1.3 1.2 1.1 1.0 1.0)
+    "Header scaling values for levels 1-6 in prose modes.")
+#+END_SRC
 
 Add =visual-fill-column= to limit text width in certain modes.
 
@@ -394,8 +417,29 @@ Add =visual-fill-column= to limit text width in certain modes.
   (use-package visual-fill-column
     :ensure t
     :init
+    (setq-default visual-fill-column-center-text t)
     (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust)
     (global-set-key (kbd "<f12>") #'visual-fill-column-toggle-center-text))
+#+END_SRC
+
+=mixed-pitch= allows variable-pitch fonts for prose while keeping code blocks monospace.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package mixed-pitch
+    :ensure t
+    :hook ((markdown-mode . mixed-pitch-mode)
+           (org-mode . mixed-pitch-mode))
+    :config
+    (setq mixed-pitch-set-height t))
+#+END_SRC
+
+=centered-cursor-mode= provides typewriter-style scrolling where the cursor stays vertically centered.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package centered-cursor-mode
+    :ensure t
+    :diminish
+    :bind (("<f11>" . centered-cursor-mode)))
 #+END_SRC
 
 * Org
@@ -406,7 +450,8 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
   (use-package org
     :hook ((org-mode . org-indent-mode)
            (org-mode . visual-fill-column-mode)
-           (org-mode . visual-line-mode))
+           (org-mode . visual-line-mode)
+           (org-mode . (lambda () (setq-local line-spacing s3thi/prose-line-spacing))))
     :config
     (setq org-startup-folded 'content)
     (setq org-M-RET-may-split-line '((headline . nil)))
@@ -421,13 +466,18 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
     :ensure t
     :hook ((markdown-mode . visual-line-mode)
            (markdown-mode . visual-fill-column-mode)
-           (markdown-mode . visual-wrap-prefix-mode))
+           (markdown-mode . visual-wrap-prefix-mode)
+           (markdown-mode . (lambda () (setq-local line-spacing s3thi/prose-line-spacing))))
     :mode (("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
-  :init
-  (setq markdown-header-scaling t)
-  (setq markdown-header-scaling-values '(1.4 1.3 1.2 1.1 1.0 1.0))
-  (setq markdown-hide-urls t))
+    :init
+    (setq markdown-header-scaling t)
+    (setq markdown-header-scaling-values s3thi/prose-header-scaling)
+    (setq markdown-hide-urls t)
+    :config
+    (setq markdown-command "pandoc")
+    (setq markdown-fontify-code-blocks-natively t)
+    (setq markdown-asymmetric-header t))
 #+END_SRC
 
 * Version control
