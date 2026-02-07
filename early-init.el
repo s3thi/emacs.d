@@ -22,6 +22,11 @@
       (mapc (lambda (var-name) (s3thi/append-env-var var-name gccjitpath))
             '("LIBRARY_PATH" "LD_LIBRARY_PATH" "PATH"))))
 
+;; Enable MELPA.
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+
 (provide 'early-init)
 
 ;;; early-init.el ends here

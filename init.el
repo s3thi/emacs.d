@@ -1,32 +1,11 @@
 ;;; init.el --- Initialization file for Emacs -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; My personal initialization file for Emacs. This file only bootstraps up a
-;; package manager and some basic initialization settings. After that, it loads
-;; my literate Emacs configuration from a separate org-mode file.
+;; My personal initialization file for Emacs. This file only bootstraps up
+;; some basic initialization settings. After that, it loads my literate Emacs
+;; configuration from a separate org-mode file.
 
 ;;; Code:
-
-;; Initialize package and enable MELPA.
-(require 'package)
-(add-to-list 'package-archives
-             '( "melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
-
-;; Update package list if it doesn't exist.
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Initialize use-package.
-(require 'use-package)
-
-;; Set up auto-updating for installed packages.
-(use-package auto-package-update
-  :ensure t
-  :config
-  (setq auto-package-update-delete-old-versions t
-        auto-package-update-interval 4)
-  (auto-package-update-maybe))
 
 ;; Make sure we load org-mode before anything else so we can tangle our literate
 ;; configuration.

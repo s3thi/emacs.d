@@ -5,11 +5,10 @@
 /.DS_Store
 /forge-database.sqlite
 /.cache/
-/.last-package-update-day
+/.last-package-upgrade
 /.lsp-session-v1
 /projects
 /README.el
-/undo-tree/
 /eln-cache/
 /bookmarks
 /eshell/

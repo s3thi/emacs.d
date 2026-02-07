@@ -45,6 +45,38 @@ Copy environment variables from the shell. This is needed on macOS and Linux bec
     (exec-path-from-shell-initialize))
 #+END_SRC
 
+Remind me to upgrade packages if it has been more than 7 days since the last upgrade. The timestamp is stored in =~/.emacs.d/.last-package-upgrade=. Run =M-x package-upgrade-all= to upgrade and dismiss the reminder.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar s3thi/package-upgrade-reminder-interval 7
+    "Number of days between package upgrade reminders.")
+
+  (defvar s3thi/package-upgrade-timestamp-file
+    (expand-file-name ".last-package-upgrade" user-emacs-directory)
+    "File that stores the timestamp of the last package upgrade.")
+
+  (defun s3thi/package-upgrade-reminder ()
+    "Display a reminder if packages haven't been upgraded recently."
+    (let ((last-upgrade-time
+           (when (file-exists-p s3thi/package-upgrade-timestamp-file)
+             (with-temp-buffer
+               (insert-file-contents s3thi/package-upgrade-timestamp-file)
+               (seconds-to-time (string-to-number (buffer-string)))))))
+      (when (or (not last-upgrade-time)
+                (> (float-time (time-subtract (current-time) last-upgrade-time))
+                   (* s3thi/package-upgrade-reminder-interval 86400)))
+        (message "It's been more than %d days since your last package upgrade. Run M-x package-upgrade-all."
+                 s3thi/package-upgrade-reminder-interval))))
+
+  (defun s3thi/record-package-upgrade (&rest _)
+    "Record the current time as the last package upgrade time."
+    (write-region (number-to-string (float-time)) nil
+                  s3thi/package-upgrade-timestamp-file nil 'quiet))
+
+  (advice-add 'package-upgrade-all :after #'s3thi/record-package-upgrade)
+  (add-hook 'emacs-startup-hook #'s3thi/package-upgrade-reminder)
+#+END_SRC
+
 * User interface
 
 ** General UI enhancements
@@ -71,14 +103,19 @@ Enable smooth scrolling.
   (pixel-scroll-precision-mode 1)
 #+END_SRC
 
+Disable mouse wheel text scaling. This gets triggered accidentally and is never useful.
+
+#+BEGIN_SRC emacs-lisp
+  (defalias 'mouse-wheel-text-scale #'ignore)
+#+END_SRC
+
 Allow resizing the frame by pixels instead of rounding the frame size to characters. This prevents an irritating situation on macOS where sometimes there's a bit of space left between the bottom of the Emacs frame and the bottom of the screen when maximizing Emacs using an external window manager.
 
 #+BEGIN_SRC emacs-lisp
   (setq frame-resize-pixelwise t)
 #+END_SRC
 
-Set a nice font. The font size will have to be different across
-platforms, so we check the OS we're running on before setting it.
+Set a nice font. The font size will have to be different across platforms, so we check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
   (when s3thi/is-a-mac
@@ -96,30 +133,20 @@ Maximize the Emacs frame on startup. To start every new frame maximized instead 
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
-=scroll-conservatively= specifies the number of lines to scroll the
-buffer in order to bring the cursor back on the screen when it moves
-off-screen. If moving that much doesn't bring the cursor back, Emacs
-will scroll the buffer by as many lines as it takes to bring the
-cursor to the exact center of the screen.
+=scroll-conservatively= specifies the number of lines to scroll the buffer in order to bring the cursor back on the screen when it moves off-screen. If moving that much doesn't bring the cursor back, Emacs will scroll the buffer by as many lines as it takes to bring the cursor to the exact center of the screen.
 
-This behavior is irritating and jarring, causing huge jumps as you
-move around a file. Luckily, setting this variable to a number larger
-than 100 tells Emacs to /never/ scroll by large amounts, and instead
-scroll the screen /just enough/ to keep the cursor visible.
+This behavior is irritating and jarring, causing huge jumps as you move around a file. Luckily, setting this variable to a number larger than 100 tells Emacs to /never/ scroll by large amounts, and instead scroll the screen /just enough/ to keep the cursor visible.
 
-In summary, setting =scroll-conservatively= to 101 will make Emacs
-behave like every other text editor on the planet.
+In summary, setting =scroll-conservatively= to 101 will make Emacs behave like every other text editor on the planet.
 
 #+BEGIN_SRC emacs-lisp
     (setq scroll-conservatively 101)
 #+END_SRC
 
-=scroll-margin= specifies the number of lines of margin at the top or
-bottom of the window. As soon as the cursor gets closer than this to the
-top of or bottom of a window, Emacs will start scrolling.
+=scroll-margin= specifies the number of lines of margin at the top or bottom of the window. As soon as the cursor gets closer than this to the top of or bottom of a window, Emacs will start scrolling.
 
 #+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 5)
+  (setq scroll-margin 3)
 #+END_SRC
 
 Show total number of matches while searching:
@@ -128,45 +155,25 @@ Show total number of matches while searching:
   (setq-default isearch-lazy-count t)
 #+END_SRC
 
-=diminish= prevents the modeline from getting polluted when too many
-modes are enabled for a single buffer. This conveniently integrates with
-use-package. We load it early so other packages can use =:diminish=.
+=diminish= prevents the modeline from getting polluted when too many modes are enabled for a single buffer. This conveniently integrates with use-package. We load it early so other packages can use =:diminish=.
 
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
     :ensure t)
 #+END_SRC
 
-=undo-tree= lets me browse the Emacs undo history visually.
+=vundo= lets me browse the Emacs undo history visually. Unlike =undo-tree=, it works on top of the built-in undo system rather than replacing it, which avoids corruption issues. Call =M-x vundo= to open the tree, then use =f= / =b= to move between branches and =n= / =p= to move forward and back in time. Press =q= to quit.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
+  (use-package vundo
     :ensure t
-    :diminish undo-tree-mode
-    :config
-    (global-undo-tree-mode)
-    (setq undo-tree-visualizer-timestamps t)
-    (setq undo-tree-visualizer-diff t)
-    (setq undo-tree-history-directory-alist
-          `(("." . ,(concat user-emacs-directory "undo-tree/")))))
+    :bind ("C-x u" . vundo))
 #+END_SRC
 
-=browse-kill-ring= lets me browse the kill ring visually.
+=which-key= displays helpful suggestions in the minibuffer when you hit the first part of a long keychord. It is built into Emacs 30.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package browse-kill-ring
-    :ensure t)
-#+END_SRC
-
-=which-key= displays helpful suggestions in the minibuffer when you hit
-the first part of a long keychord. Note that =which-key= is built into
-Emacs 30+, so we only install it on older versions.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :diminish
-    :config
-    (which-key-mode 1))
+  (which-key-mode 1)
 #+END_SRC
 
 ** Minibuffer completion
@@ -230,12 +237,6 @@ Let's install some Doom Emacs themes!
     (doom-themes-org-config))
 #+END_SRC
 
-Settings for the included =modus= themes.
-
-#+BEGIN_SRC emacs-lisp
-  (setq modus-themes-org-blocks 'gray-background)
-#+END_SRC
-
 Load a theme.
 
 #+BEGIN_SRC emacs-lisp
@@ -243,6 +244,12 @@ Load a theme.
 #+END_SRC
 
 * Files and directories
+
+Start Dired with details hidden. Press =(= to toggle.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+#+END_SRC
 
 Store configuration created by custom in a separate file.
 
@@ -269,9 +276,7 @@ Don't pollute the current directory with auto-save files. Instead, put them all 
           `((".*" ,auto-save-dir t))))
 #+END_SRC
 
-Turn on =auto-revert-mode= for all files. This will automatically reload
-files from disk every time they're changed by another from outside
-Emacs.
+Turn on =auto-revert-mode= for all files. This will automatically reload files from disk every time they're changed by another from outside Emacs.
 
 Also ensure that Dired, VCS, etc. buffers are also auto reverted.
 
@@ -295,9 +300,7 @@ Keep track of recently opened files.
     (recentf-mode 1))
 #+END_SRC
 
-If a read-only file is opened, use =view-mode= instead of the regular
-mode. This ensures you can't accidentally change or overwrite the
-file.
+If a read-only file is opened, use =view-mode= instead of the regular mode. This ensures you can't accidentally change or overwrite the file.
 
 #+BEGIN_SRC emacs-lisp
   (setq view-read-only t)
@@ -322,18 +325,13 @@ Enable useful text editing commands that are disabled by default.
   (put 'scroll-left 'disabled nil)
 #+END_SRC
 
-Make sure sentences end with single spaces, not double spaces. This
-makes functions that operate on prose behave better (such as those in
-=org-mode= and =markdown-mode=).
+Make sure sentences end with single spaces, not double spaces. This makes functions that operate on prose behave better (such as those in =org-mode= and =markdown-mode=).
 
 #+BEGIN_SRC emacs-lisp
   (setq sentence-end-double-space nil)
 #+END_SRC
 
-Always use spaces for indentation. Affects all modes, unless we
-override it later. The only programming language I've used that
-mandates the use of tabs rather than spaces is Go, so it's safe to set
-this here and override it for Go if I ever write it again.
+Always use spaces for indentation. Affects all modes, unless we override it later. The only programming language I've used that mandates the use of tabs rather than spaces is Go, so it's safe to set this here and override it for Go if I ever write it again.
 
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -351,23 +349,15 @@ Set =fill-column= manually, to make sure it's always what I expect.
   (setq-default fill-column 80)
 #+END_SRC
 
-If there is some text already present in the system clipboard when we
-run an Emacs command that kills text, make sure that is preserved by
-pushing it into the kill ring.
+If there is some text already present in the system clipboard when we run an Emacs command that kills text, make sure that is preserved by pushing it into the kill ring.
 
-Since we've configured Emacs to put text into the system clipboard --
-in addition to the kill ring -- when we kill it, this setting ensures
-that we never lose whatever might have already been in the clipboard
-when we perform a kill operation. Not always useful, but a nice to
-have.
+Since we've configured Emacs to put text into the system clipboard -- in addition to the kill ring -- when we kill it, this setting ensures that we never lose whatever might have already been in the clipboard when we perform a kill operation. Not always useful, but a nice to have.
 
 #+BEGIN_SRC emacs-lisp
   (setq save-interprogram-paste-before-kill t)
 #+END_SRC
 
-Make word movement commands take CamelCase words into account. Also
-make sure we diminish this, otherwise it shows up as an irritating
-little comma in the modeline.
+Make word movement commands take CamelCase words into account. Also make sure we diminish this, otherwise it shows up as an irritating little comma in the modeline.
 
 #+BEGIN_SRC emacs-lisp
   (use-package subword
@@ -428,8 +418,7 @@ Add =visual-fill-column= to limit text width in certain modes.
     :ensure t
     :init
     (setq-default visual-fill-column-center-text t)
-    (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust)
-    (global-set-key (kbd "<f12>") #'visual-fill-column-toggle-center-text))
+    (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
 #+END_SRC
 
 =mixed-pitch= allows variable-pitch fonts for prose while keeping code blocks monospace.
@@ -443,23 +432,13 @@ Add =visual-fill-column= to limit text width in certain modes.
     (setq mixed-pitch-set-height t))
 #+END_SRC
 
-=centered-cursor-mode= provides typewriter-style scrolling where the cursor stays vertically centered.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package centered-cursor-mode
-    :ensure t
-    :diminish
-    :bind (("<f11>" . centered-cursor-mode)))
-#+END_SRC
-
 * Org
 
 Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work well with =org-mode= when =org-indent-mode= is also turned on. If you're running into weird issues, it's probably because of that.
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
-    :hook ((org-mode . org-indent-mode)
-           (org-mode . visual-fill-column-mode)
+    :hook ((org-mode . visual-fill-column-mode)
            (org-mode . visual-line-mode)
            (org-mode . (lambda () (setq-local line-spacing s3thi/prose-line-spacing))))
     :config
@@ -484,6 +463,7 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
     (setq markdown-header-scaling t)
     (setq markdown-header-scaling-values s3thi/prose-header-scaling)
     (setq markdown-hide-urls t)
+    (setq markdown-list-indent-width 4)
     :config
     (setq markdown-command "pandoc")
     (setq markdown-fontify-code-blocks-natively t)
@@ -557,13 +537,20 @@ This function finds =node_modules/.bin= directories from the current file's dire
     :commands lsp)
 #+END_SRC
 
-** Prettier
+** Code formatting
 
-=prettier-js= formats code using Prettier on save.
+=apheleia= formats code asynchronously on save without blocking Emacs. It supports Prettier and many other formatters out of the box, and preserves point position via RCS patching.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package prettier-js
-    :ensure t)
+  (use-package apheleia
+    :ensure t
+    :config
+    (setf (alist-get 'prettier-astro apheleia-formatters)
+          '("apheleia-npx" "prettier" "--stdin-filepath" filepath
+            "--plugin=prettier-plugin-astro" "--parser=astro"))
+    (setf (alist-get 'astro-ts-mode apheleia-mode-alist)
+          '(prettier-astro))
+    (apheleia-global-mode 1))
 #+END_SRC
 
 ** Astro
@@ -584,13 +571,12 @@ This function finds =node_modules/.bin= directories from the current file's dire
 
 ** Web development setup
 
-Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to =exec-path= before LSP and Prettier start.
+Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to =exec-path= before LSP starts. Code formatting is handled globally by =apheleia=.
 
 #+BEGIN_SRC emacs-lisp
   (defun s3thi/setup-web-dev ()
     "Set up environment for JS/TS/Astro development."
     (s3thi/add-node-modules-to-exec-path)
-    (prettier-js-mode)
     (lsp))
 
   (add-hook 'js-ts-mode-hook #'s3thi/setup-web-dev)
@@ -598,12 +584,23 @@ Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to
   (add-hook 'astro-ts-mode-hook #'s3thi/setup-web-dev)
 #+END_SRC
 
+** Project configuration
+
+=project-vc-extra-root-markers= is a list of file names or glob patterns which mark a project's root in addition to the default =.git=, =.hg= and other common markers. This allows you to mark non-code directories as projects that the built-in =project.el= recognizes.
+
+#+BEGIN_SRC emacs-lisp
+  (setq project-vc-extra-root-markers '(".project.el" ".projectile"))
+#+END_SRC
+
+Make sure the macOS =.DS_Store= files don't show up in =project-find-file=.
+
+#+BEGIN_SRC emacs-lisp
+  (setq project-vc-ignores '(".DS_Store"))
+#+END_SRC
+
 * Additional key bindings
 
-Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI
-Emacs will minimize the editor, which is very annoying. This disables
-that behavior. On terminal Emacs, this will still allow us to suspend
-the editor and go back to our shell.
+Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI Emacs will minimize the editor, which is very annoying. This disables that behavior. On terminal Emacs, this will still allow us to suspend the editor and go back to our shell.
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
@@ -618,23 +615,15 @@ Convenient for editing this configuration file.
                                   (find-file "~/.emacs.d/README.org")))
 #+END_SRC
 
-This one is very useful for the way I work:
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "M-o") #'other-window)
-#+END_SRC
-
 * Miscellaneous
 
-=crux= contains a ton of useful Emacs Lisp functions that I'd have to
-write myself otherwise.
+Bind some useful built-in commands.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package crux
-    :ensure t
-    :bind (("C-c d" . #'crux-duplicate-current-line-or-region)
-           ("C-c r" . #'crux-transpose-windows)))
+  (global-set-key (kbd "C-c d") #'duplicate-dwim)
+  (global-set-key (kbd "C-c r") #'window-swap-states)
 #+END_SRC
+
 * That's all, folks!
 
 #+BEGIN_SRC emacs-lisp
