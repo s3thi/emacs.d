@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration
-#+AUTHOR: Ankur Sethi <contact@ankursethi.in>
+#+AUTHOR: Ankur Sethi <contact@ankursethi.com>
 
 * Paperwork
 
@@ -24,7 +24,7 @@ Personal information.
 
 #+BEGIN_SRC emacs-lisp
   (setq user-full-name "Ankur Sethi"
-        user-mail-address "contact@ankursethi.in")
+        user-mail-address "contact@ankursethi.com")
 #+END_SRC
 
 Platform specific variables.
@@ -475,6 +475,13 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package majutsu
+    :ensure t
+    :vc (:url "https://github.com/0WD0/majutsu")
+    :bind (("C-x j" . majutsu)))
 #+END_SRC
 
 * Programming
