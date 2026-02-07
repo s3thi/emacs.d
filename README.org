@@ -470,18 +470,46 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
     (setq markdown-asymmetric-header t))
 #+END_SRC
 
+Highlight some of the tags I use commonly:
+
+#+BEGIN_SRC emacs-lisp
+  (font-lock-add-keywords
+   'markdown-mode
+   '(("#blog\\b" 0 'warning prepend)
+     ("#therapy\\b" 0 'warning prepend)
+     ("#programming\\b" 0 'warning prepend)
+     ("#idea\\b" 0 'warning prepend)
+     ("#homework\\b" 0 'warning prepend)
+     ("#writing\\b" 0 'warning prepend)
+     ("#hip-hop\\b" 0 'warning prepend)))
+#+END_SRC
+
 * Version control
+
+Love me some Magit.
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t)
 #+END_SRC
 
+And also some Majutsu.
+
 #+BEGIN_SRC emacs-lisp
   (use-package majutsu
     :ensure t
     :vc (:url "https://github.com/0WD0/majutsu")
     :bind (("C-x j" . majutsu)))
+#+END_SRC
+
+Highlight diffs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :ensure t
+    :diminish
+    :config
+    (global-diff-hl-mode))
 #+END_SRC
 
 * Programming
@@ -551,6 +579,7 @@ This function finds =node_modules/.bin= directories from the current file's dire
 #+BEGIN_SRC emacs-lisp
   (use-package apheleia
     :ensure t
+    :diminish
     :config
     (setf (alist-get 'prettier-astro apheleia-formatters)
           '("apheleia-npx" "prettier" "--stdin-filepath" filepath
@@ -628,7 +657,7 @@ Bind some useful built-in commands.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c d") #'duplicate-dwim)
-  (global-set-key (kbd "C-c r") #'window-swap-states)
+  (global-set-key (kbd "M-=") #'count-words)
 #+END_SRC
 
 * That's all, folks!
