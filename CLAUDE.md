@@ -34,6 +34,8 @@ The configuration uses `use-package` for package management with MELPA as the pa
 
 ## Conventions
 
+**Sentence-case for all headings and prose** — use "Daily notes and journal entries", not "Daily Notes and Journal Entries".
+
 **Custom variables and functions use the `s3thi/` prefix:**
 
 - `s3thi/is-a-mac`, `s3thi/is-a-pc`, `s3thi/is-a-penguin` - Platform detection
@@ -57,4 +59,13 @@ The configuration uses `use-package` for package management with MELPA as the pa
 
 ## Version control
 
-This project uses the Jujutsu version control system (`jj`) instead of Git. Never run any Git commands. Always use `jj` commands for VCS operations. If you're not sure how to accomplish something using `jj`, stop and ask the user.
+This project uses the Jujutsu version control system (`jj`) instead of Git. **Never run any Git commands.** Always use `jj` commands for VCS operations. If you're not sure how to accomplish something using `jj`, stop and ask the user.
+
+Common operations:
+
+- `jj status` — show working copy changes
+- `jj log` — show commit history
+- `jj describe -m "message"` — set description on the current change
+- `jj new` — create a new empty change on top of the current one
+- `jj file untrack <path>` — stop tracking a file
+- `jj diff` — show changes in the working copy

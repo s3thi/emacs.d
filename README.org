@@ -1,7 +1,7 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Ankur Sethi <contact@ankursethi.com>
 
-* Paperwork
+* Bootstrap
 
 File header.
 
@@ -94,7 +94,7 @@ Remind me to upgrade packages if it has been more than 7 days since the last upg
 
 * User interface
 
-** General UI enhancements
+** General
 
 Remove UI elements we don't like. Note that =tool-bar-mode= and =scroll-bar-mode= are disabled in =early-init.el= for faster startup.
 
@@ -112,56 +112,16 @@ And add UI elements that are nice to have.
   (setq confirm-kill-emacs #'yes-or-no-p)
 #+END_SRC
 
-Enable smooth scrolling.
-
-#+BEGIN_SRC emacs-lisp
-  (pixel-scroll-precision-mode 1)
-#+END_SRC
-
-Disable mouse wheel text scaling. This gets triggered accidentally and is never useful.
-
-#+BEGIN_SRC emacs-lisp
-  (defalias 'mouse-wheel-text-scale #'ignore)
-#+END_SRC
-
 Allow resizing the frame by pixels instead of rounding the frame size to characters. This prevents an irritating situation on macOS where sometimes there's a bit of space left between the bottom of the Emacs frame and the bottom of the screen when maximizing Emacs using an external window manager.
 
 #+BEGIN_SRC emacs-lisp
   (setq frame-resize-pixelwise t)
 #+END_SRC
 
-Set a nice font. The font size will have to be different across platforms, so we check the OS we're running on before setting it.
+Disable mouse wheel text scaling. This gets triggered accidentally and is never useful.
 
 #+BEGIN_SRC emacs-lisp
-  (when s3thi/is-a-mac
-    (set-face-attribute 'default nil
-                        :family "Berkeley Mono Variable"
-                        :height 160)
-    (set-face-attribute 'variable-pitch nil
-                        :family "iA Writer Duospace"
-                        :height 180))
-#+END_SRC
-
-Maximize the Emacs frame on startup. To start every new frame maximized instead of just the first frame, you can add the following options to =default-frame-alist= instead of =initial-frame-alist=. Additionally, it's possible to toggle the maximized status of an Emacs frame by calling =toggle-frame-maximized=, which is bound to =M-<f10>= by default.
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-#+END_SRC
-
-=scroll-conservatively= specifies the number of lines to scroll the buffer in order to bring the cursor back on the screen when it moves off-screen. If moving that much doesn't bring the cursor back, Emacs will scroll the buffer by as many lines as it takes to bring the cursor to the exact center of the screen.
-
-This behavior is irritating and jarring, causing huge jumps as you move around a file. Luckily, setting this variable to a number larger than 100 tells Emacs to /never/ scroll by large amounts, and instead scroll the screen /just enough/ to keep the cursor visible.
-
-In summary, setting =scroll-conservatively= to 101 will make Emacs behave like every other text editor on the planet.
-
-#+BEGIN_SRC emacs-lisp
-    (setq scroll-conservatively 101)
-#+END_SRC
-
-=scroll-margin= specifies the number of lines of margin at the top or bottom of the window. As soon as the cursor gets closer than this to the top of or bottom of a window, Emacs will start scrolling.
-
-#+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 3)
+  (defalias 'mouse-wheel-text-scale #'ignore)
 #+END_SRC
 
 Show total number of matches while searching:
@@ -179,6 +139,12 @@ Show total number of matches while searching:
     (minions-mode 1))
 #+END_SRC
 
+=which-key= displays helpful suggestions in the minibuffer when you hit the first part of a long keychord. It is built into Emacs 30.
+
+#+BEGIN_SRC emacs-lisp
+  (which-key-mode 1)
+#+END_SRC
+
 =vundo= lets me browse the Emacs undo history visually. Unlike =undo-tree=, it works on top of the built-in undo system rather than replacing it, which avoids corruption issues. Call =M-x vundo= to open the tree, then use =f= / =b= to move between branches and =n= / =p= to move forward and back in time. Press =q= to quit.
 
 #+BEGIN_SRC emacs-lisp
@@ -187,30 +153,48 @@ Show total number of matches while searching:
     :bind ("C-x u" . vundo))
 #+END_SRC
 
-=which-key= displays helpful suggestions in the minibuffer when you hit the first part of a long keychord. It is built into Emacs 30.
+Maximize the Emacs frame on startup. To start every new frame maximized instead of just the first frame, you can add the following options to =default-frame-alist= instead of =initial-frame-alist=. Additionally, it's possible to toggle the maximized status of an Emacs frame by calling =toggle-frame-maximized=, which is bound to =M-<f10>= by default.
 
-#+BEGIN_SRC emacs-lisp
-  (which-key-mode 1)
+#+BEGIN_SRC emacs-lisp :tangle no
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
-Use =ace-window= for navigating open windows.
+** Fonts
+
+Set a nice font. The font size will have to be different across platforms, so we check the OS we're running on before setting it.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-    :ensure t
-    :bind* (("M-o" . ace-window))
-    :init
-    (setq aw-dispatch-always t)
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-    (setq aw-scope 'frame))
+  (when s3thi/is-a-mac
+    (set-face-attribute 'default nil
+                        :family "Berkeley Mono Variable"
+                        :height 160)
+    (set-face-attribute 'variable-pitch nil
+                        :family "iA Writer Duospace"
+                        :height 180))
 #+END_SRC
 
-Use =avy= to jump around.
+** Scrolling
+
+=scroll-conservatively= specifies the number of lines to scroll the buffer in order to bring the cursor back on the screen when it moves off-screen. If moving that much doesn't bring the cursor back, Emacs will scroll the buffer by as many lines as it takes to bring the cursor to the exact center of the screen.
+
+This behavior is irritating and jarring, causing huge jumps as you move around a file. Luckily, setting this variable to a number larger than 100 tells Emacs to /never/ scroll by large amounts, and instead scroll the screen /just enough/ to keep the cursor visible.
+
+In summary, setting =scroll-conservatively= to 101 will make Emacs behave like every other text editor on the planet.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :ensure t
-    :bind* (("C-'" . avy-goto-char-2)))
+    (setq scroll-conservatively 101)
+#+END_SRC
+
+=scroll-margin= specifies the number of lines of margin at the top or bottom of the window. As soon as the cursor gets closer than this to the top of or bottom of a window, Emacs will start scrolling.
+
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-margin 3)
+#+END_SRC
+
+Enable smooth scrolling.
+
+#+BEGIN_SRC emacs-lisp
+  (pixel-scroll-precision-mode 1)
 #+END_SRC
 
 ** Minibuffer completion
@@ -256,7 +240,29 @@ Enable annotations in the minibuffer using =marginalia=.
     (marginalia-mode))
 #+END_SRC
 
-** Themes
+** Window navigation
+
+Use =ace-window= for navigating open windows.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :bind* (("M-o" . ace-window))
+    :init
+    (setq aw-dispatch-always t)
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    (setq aw-scope 'frame))
+#+END_SRC
+
+Use =avy= to jump around.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind* (("C-'" . avy-goto-char-2)))
+#+END_SRC
+
+** Theme
 
 Let's install some Doom Emacs themes!
 
@@ -296,7 +302,9 @@ This is currently not used anywhere.
         (face-remap-add-relative 'header-line :background bg))))
 #+END_SRC
 
-* Files and directories
+* Files and buffers
+
+** Dired
 
 Start Dired with details hidden. Press =(= to toggle.
 
@@ -309,6 +317,8 @@ If there are two =dired= buffers on the screen, automatically make the second bu
 #+BEGIN_SRC emacs-lisp
   (setq dired-dwim-target t)
 #+END_SRC
+
+** Backups and auto-save
 
 Store configuration created by custom in a separate file.
 
@@ -334,6 +344,8 @@ Don't pollute the current directory with auto-save files. Instead, put them all 
     (setq auto-save-file-name-transforms
           `((".*" ,auto-save-dir t))))
 #+END_SRC
+
+** Buffer behavior
 
 Turn on =auto-revert-mode= for all files. This will automatically reload files from disk every time they're changed by another from outside Emacs.
 
@@ -366,27 +378,19 @@ If a read-only file is opened, use =view-mode= instead of the regular mode. This
   (setq view-read-only t)
 #+END_SRC
 
-Use =ripgrep= for searching.
+** Projects
+
+=project-vc-extra-root-markers= is a list of file names or glob patterns which mark a project's root in addition to the default =.git=, =.hg= and other common markers. This allows you to mark non-code directories as projects that the built-in =project.el= recognizes.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package rg
-    :ensure t
-    :init
-    (setq rg-command-line-flags '("--sort path"))
-    :config
-    (rg-enable-default-bindings)
-    (dolist (tag s3thi/notes-tags)
-      (let ((name (nth 0 tag))
-            (key (nth 1 tag))
-            (label (nth 2 tag)))
-        (eval `(rg-define-search ,(intern (concat "search-notes-tag-" name))
-                 ,(format "Search for the #%s tag in notes" name)
-                 :query ,(concat "#" name)
-                 :format literal
-                 :files "*.md"
-                 :flags ("--sort path")
-                 :dir ,s3thi/notes-directory
-                 :menu ("Tags" ,key ,label))))))
+  (setq project-vc-extra-root-markers
+        '(".project.el" ".jj" "package.json" "deno.json"))
+#+END_SRC
+
+Make sure the macOS =.DS_Store= files don't show up in =project-find-file=.
+
+#+BEGIN_SRC emacs-lisp
+  (setq project-vc-ignores '(".DS_Store"))
 #+END_SRC
 
 * Text editing
@@ -458,20 +462,9 @@ Sometimes it's useful to "unfill" paragraphs.
     :ensure t)
 #+END_SRC
 
-=jinx= is a fast, modern spell checker that checks the entire visible buffer at once.
+* Writing
 
-#+BEGIN_SRC emacs-lisp
-  (use-package jinx
-    :ensure t
-    :hook ((markdown-mode . jinx-mode)
-           (org-mode . jinx-mode))
-    :bind (("M-$" . jinx-correct)
-           ("C-M-$" . jinx-languages))
-    :config
-    (setq jinx-languages "en_US en_GB hi"))
-#+END_SRC
-
-* Improvements to writing prose
+** Prose defaults
 
 Line spacing for prose modes.
 
@@ -493,6 +486,19 @@ Add =visual-fill-column= to limit text width in certain modes.
     (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
 #+END_SRC
 
+=jinx= is a fast, modern spell checker that checks the entire visible buffer at once.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package jinx
+    :ensure t
+    :hook ((markdown-mode . jinx-mode)
+           (org-mode . jinx-mode))
+    :bind (("M-$" . jinx-correct)
+           ("C-M-$" . jinx-languages))
+    :config
+    (setq jinx-languages "en_US en_GB hi"))
+#+END_SRC
+
 =mixed-pitch= allows variable-pitch fonts for prose while keeping code blocks monospace.
 
 #+BEGIN_SRC emacs-lisp
@@ -504,7 +510,7 @@ Add =visual-fill-column= to limit text width in certain modes.
     (setq mixed-pitch-set-height t))
 #+END_SRC
 
-* Org
+** Org
 
 Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work well with =org-mode= when =org-indent-mode= is also turned on. If you're running into weird issues, it's probably because of that.
 
@@ -520,7 +526,7 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
           '(("-" . "+") ("+" . "*") ("*" . "-"))))
 #+END_SRC
 
-* Markdown
+** Markdown
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -553,7 +559,7 @@ Highlight tags from =s3thi/notes-tags= in Markdown buffers:
            s3thi/notes-tags))
 #+END_SRC
 
-* Daily notes and journal entries
+** Daily notes and journal entries
 
 #+BEGIN_SRC emacs-lisp
   (defun s3thi/date-tree-path (root &optional time)
@@ -622,6 +628,31 @@ Can have get-prev-file-in-month, get-prev-month-in-year, and get-prev-year-in-ro
       if not current_year: break
 #+END_SRC
 
+* Search
+
+Use =ripgrep= for searching.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rg
+    :ensure t
+    :init
+    (setq rg-command-line-flags '("--sort path"))
+    :config
+    (rg-enable-default-bindings)
+    (dolist (tag s3thi/notes-tags)
+      (let ((name (nth 0 tag))
+            (key (nth 1 tag))
+            (label (nth 2 tag)))
+        (eval `(rg-define-search ,(intern (concat "search-notes-tag-" name))
+                 ,(format "Search for the #%s tag in notes" name)
+                 :query ,(concat "#" name)
+                 :format literal
+                 :files "*.md"
+                 :flags ("--sort path")
+                 :dir ,s3thi/notes-directory
+                 :menu ("Tags" ,key ,label))))))
+#+END_SRC
+
 * Version control
 
 Love me some Magit.
@@ -671,7 +702,7 @@ Use =multi-vterm= to manage multiple =vterm= buffers.
   (global-set-key (kbd "M-p") #'flymake-goto-prev-error)
 #+END_SRC
 
-** Tree Sitter
+** Tree-sitter
 
 #+BEGIN_SRC emacs-lisp
   (use-package treesit-auto
@@ -684,7 +715,35 @@ Use =multi-vterm= to manage multiple =vterm= buffers.
     (global-treesit-auto-mode))
 #+END_SRC
 
-** Astro
+** Eglot
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eglot
+    :config
+    (setq eglot-autoshutdown t)
+    (add-to-list 'eglot-server-programs
+                 `(astro-ts-mode . ,s3thi/astro-lsp-config))
+    (add-to-list 'eglot-server-programs
+                 '((js-mode js-ts-mode typescript-mode typescript-ts-mode) . s3thi/eglot-server-for-ts)))
+#+END_SRC
+
+** Code formatting
+
+=apheleia= formats code asynchronously on save without blocking Emacs. It supports Prettier and many other formatters out of the box, and preserves point position via RCS patching.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package apheleia
+      :ensure t
+      :config
+      (setf (alist-get 'prettier-astro apheleia-formatters)
+            '("apheleia-npx" "prettier" "--stdin-filepath" filepath
+              "--plugin=prettier-plugin-astro" "--parser=astro"))
+      (setf (alist-get 'astro-ts-mode apheleia-mode-alist)
+            '(prettier-astro))
+      (apheleia-global-mode 1))
+#+END_SRC
+
+** Node, Deno, and Astro
 
 #+BEGIN_SRC emacs-lisp
   (use-package astro-ts-mode
@@ -708,8 +767,6 @@ Define some configuration for the Astro LSP. We use this a few times later.
      :initializationOptions
      (:typescript (:tsdk "node_modules/typescript/lib"))))
 #+END_SRC
-
-** Node and Deno
 
 This function finds =node_modules/.bin= directories from the current file's directory up to the home directory and adds them to the buffer-local =exec-path=. This allows Emacs to find project-local LSP servers and other tools without installing them globally.
 
@@ -774,35 +831,7 @@ This function decides whether a project uses Node, Deno, or Astro and picks the 
         (list 'eglot-lsp-server "typescript-language-server" "--stdio")))))
 #+END_SRC
 
-** Eglot
-
-#+BEGIN_SRC emacs-lisp
-  (use-package eglot
-    :config
-    (setq eglot-autoshutdown t)
-    (add-to-list 'eglot-server-programs
-                 `(astro-ts-mode . ,s3thi/astro-lsp-config))
-    (add-to-list 'eglot-server-programs
-                 '((js-mode js-ts-mode typescript-mode typescript-ts-mode) . s3thi/eglot-server-for-ts)))
-#+END_SRC
-
-** Code formatting
-
-=apheleia= formats code asynchronously on save without blocking Emacs. It supports Prettier and many other formatters out of the box, and preserves point position via RCS patching.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package apheleia
-      :ensure t
-      :config
-      (setf (alist-get 'prettier-astro apheleia-formatters)
-            '("apheleia-npx" "prettier" "--stdin-filepath" filepath
-              "--plugin=prettier-plugin-astro" "--parser=astro"))
-      (setf (alist-get 'astro-ts-mode apheleia-mode-alist)
-            '(prettier-astro))
-      (apheleia-global-mode 1))
-#+END_SRC
-
-** Web development setup
+** Web development hooks
 
 Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to =exec-path= before Eglot starts. Code formatting is handled globally by =apheleia=.
 
@@ -817,22 +846,7 @@ Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to
     (add-hook 'astro-ts-mode-hook #'s3thi/setup-web-dev)
 #+END_SRC
 
-** Project configuration
-
-=project-vc-extra-root-markers= is a list of file names or glob patterns which mark a project's root in addition to the default =.git=, =.hg= and other common markers. This allows you to mark non-code directories as projects that the built-in =project.el= recognizes.
-
-#+BEGIN_SRC emacs-lisp
-  (setq project-vc-extra-root-markers
-        '(".project.el" ".jj" "package.json" "deno.json"))
-#+END_SRC
-
-Make sure the macOS =.DS_Store= files don't show up in =project-find-file=.
-
-#+BEGIN_SRC emacs-lisp
-  (setq project-vc-ignores '(".DS_Store"))
-#+END_SRC
-
-* Crux
+* Utilities and key bindings
 
 #+BEGIN_SRC emacs-lisp
   (use-package crux
@@ -844,16 +858,6 @@ Make sure the macOS =.DS_Store= files don't show up in =project-find-file=.
            ("C-c k" . crux-kill-other-buffers)
            ("C-c p" . crux-kill-buffer-truename)))
 #+END_SRC
-
-* Server
-
-Let's start the server.
-
-#+BEGIN_SRC emacs-lisp
-  (server-start)
-#+END_SRC
-
-* Additional key bindings
 
 Disable C-z to suspend in GUI Emacs. By default, hitting C-z in GUI Emacs will minimize the editor, which is very annoying. This disables that behavior. On terminal Emacs, this will still allow us to suspend the editor and go back to our shell.
 
@@ -886,6 +890,14 @@ Add a few things to the =C-x 8= bindings.
     (define-key iso-transl-ctl-x-8-map "r" [?₹])
     (define-key iso-transl-ctl-x-8-map ".3" [?…])
     (define-key iso-transl-ctl-x-8-map "m" [?—]))
+#+END_SRC
+
+* Server
+
+Let's start the server.
+
+#+BEGIN_SRC emacs-lisp
+  (server-start)
 #+END_SRC
 
 * That's all, folks!
