@@ -42,7 +42,7 @@ Platform specific variables and personal settings.
       ("homework"    "C-t h" "Homework")
       ("writing"     "C-t w" "Writing")
       ("hip-hop"     "C-t H" "Hip-hop")
-      ("todo"        "C-t T" "Todo"))
+      ("someday"     "C-t s" "Someday"))
     "List of tags used in notes. Each entry is (TAG-NAME MENU-KEY MENU-LABEL).")
 
   (defvar s3thi/notes-directory
@@ -170,11 +170,13 @@ Show total number of matches while searching:
   (setq-default isearch-lazy-count t)
 #+END_SRC
 
-=diminish= prevents the modeline from getting polluted when too many modes are enabled for a single buffer. This conveniently integrates with use-package. We load it early so other packages can use =:diminish=.
+=minions-mode= only shows the current major mode in the modeline, tucking away all the minor modes into a menu.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t)
+  (use-package minions
+    :ensure t
+    :config
+    (minions-mode 1))
 #+END_SRC
 
 =vundo= lets me browse the Emacs undo history visually. Unlike =undo-tree=, it works on top of the built-in undo system rather than replacing it, which avoids corruption issues. Call =M-x vundo= to open the tree, then use =f= / =b= to move between branches and =n= / =p= to move forward and back in time. Press =q= to quit.
@@ -189,6 +191,26 @@ Show total number of matches while searching:
 
 #+BEGIN_SRC emacs-lisp
   (which-key-mode 1)
+#+END_SRC
+
+Use =ace-window= for navigating open windows.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :bind* (("M-o" . ace-window))
+    :init
+    (setq aw-dispatch-always t)
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    (setq aw-scope 'frame))
+#+END_SRC
+
+Use =avy= to jump around.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind* (("C-'" . avy-goto-char-2)))
 #+END_SRC
 
 ** Minibuffer completion
@@ -258,7 +280,9 @@ Load a theme.
   (load-theme 'doom-one t)
 #+END_SRC
 
-The following function adds a top padding to the current buffer. It does so by setting the header line to an empty string, increasing its line height, and setting its background to be the same as the buffer background. The downside of doing this is that it may mess up the header line in modes that actually make use of it (e.g. LSP).
+The following function adds a top padding to the current buffer. It does so by setting the header line to an empty string, increasing its line height, and setting its background to be the same as the buffer background. The downside of doing this is that it may mess up the header line in modes that actually make use of it (e.g. Eglot).
+
+This is currently not used anywhere.
 
 #+BEGIN_SRC emacs-lisp
   (defun s3thi/add-top-padding ()
@@ -267,7 +291,7 @@ The following function adds a top padding to the current buffer. It does so by s
     (unless (bound-and-true-p s3thi/--top-padding-applied)
       (setq-local s3thi/--top-padding-applied t)
       (setq-local header-line-format "")
-      (face-remap-add-relative 'header-line :height 300)
+      (face-remap-add-relative 'header-line :height 400)
       (let ((bg (face-attribute 'default :background)))
         (face-remap-add-relative 'header-line :background bg))))
 #+END_SRC
@@ -278,6 +302,12 @@ Start Dired with details hidden. Press =(= to toggle.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+#+END_SRC
+
+If there are two =dired= buffers on the screen, automatically make the second buffer the target for move, copy, etc. operations.
+
+#+BEGIN_SRC emacs-lisp
+  (setq dired-dwim-target t)
 #+END_SRC
 
 Store configuration created by custom in a separate file.
@@ -312,6 +342,7 @@ Also ensure that Dired, VCS, etc. buffers are also auto reverted.
 #+BEGIN_SRC emacs-lisp
   (setq global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1)
+  (setq auto-revert-verbose t)
 #+END_SRC
 
 Save place in files.
@@ -400,11 +431,10 @@ Since we've configured Emacs to put text into the system clipboard -- in additio
   (setq save-interprogram-paste-before-kill t)
 #+END_SRC
 
-Make word movement commands take CamelCase words into account. Also make sure we diminish this, otherwise it shows up as an irritating little comma in the modeline.
+Make word movement commands take CamelCase words into account.
 
 #+BEGIN_SRC emacs-lisp
   (use-package subword
-    :diminish
     :config
     (global-subword-mode 1))
 #+END_SRC
@@ -414,7 +444,6 @@ Snippets are useful, right?
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t
-    :diminish yas-minor-mode
     :config
     (yas-global-mode 1)
     (define-key yas-minor-mode-map (kbd "<tab>") nil)
@@ -500,13 +529,14 @@ Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work wel
            (markdown-mode . visual-fill-column-mode)
            (markdown-mode . visual-wrap-prefix-mode)
            (markdown-mode . (lambda () (setq-local line-spacing s3thi/prose-line-spacing)))
-           (markdown-mode . (lambda () (setq-local fill-column 64)))
-           (markdown-mode . s3thi/add-top-padding))
+           (markdown-mode . (lambda () (setq-local fill-column 64))))
     :mode (("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
     :init
     (setq markdown-header-scaling t)
     (setq markdown-header-scaling-values s3thi/prose-header-scaling)
+    (setq markdown-hide-urls t)
+    (setq markdown-special-ctrl-a/e t)
     :config
     (setq markdown-command "pandoc")
     (setq markdown-fontify-code-blocks-natively t)
@@ -521,6 +551,75 @@ Highlight tags from =s3thi/notes-tags= in Markdown buffers:
    (mapcar (lambda (tag)
              (list (concat "#" (car tag) "\\b") 0 ''warning 'prepend))
            s3thi/notes-tags))
+#+END_SRC
+
+* Daily notes and journal entries
+
+#+BEGIN_SRC emacs-lisp
+  (defun s3thi/date-tree-path (root &optional time)
+    (let* ((year (format-time-string "%Y" time))
+           (month (format-time-string "%m" time))
+           (month-name (format-time-string "%B" time))
+           (day (format-time-string "%d" time))
+           (day-name (format-time-string "%A" time))
+           (month-directory (format "%s-%s %s" year month month-name))
+           (file-name (format "%s-%s-%s %s.md" year month day day-name))
+           (root-absolute-path (expand-file-name root s3thi/notes-directory))
+           (year-directory-path (expand-file-name year root-absolute-path))
+           (month-directory-path (expand-file-name month-directory year-directory-path))
+           (file-path (expand-file-name file-name month-directory-path)))
+      file-path))
+
+  (defun s3thi/find-daily-note (&optional time)
+    "Open today's daily note."
+    (interactive)
+    (find-file (s3thi/date-tree-path "02 Daily notes" time)))
+
+  (defun s3thi/find-journal-entry (&optional time)
+    "Open today's journal entry."
+    (interactive)
+    (find-file (s3thi/date-tree-path "03 Journal" time)))
+
+  (global-set-key (kbd "<f8>") #'s3thi/find-daily-note)
+  (global-set-key (kbd "C-<f8>") #'s3thi/find-journal-entry)
+#+END_SRC
+
+For prev, this is what I have to do:
+
+- Find all available entries in the current month
+- Parse them into date objects
+- Sort the objects in ascending order
+- If there's a previous date available this month, simply open it
+- If there's no previous date available this month, or if we're at the start of the month, then do this:
+  + Get current month as a number by parsing the month directory name
+  + Go up one directory and get a list of months
+  + Grab month numbers out of the list and sort them
+  + If there's a previous month available, list all the files inside it and do what we did for files before
+  + If there's no previous month available this year, or we're at the start of the year, do this:
+    * Go up one directory and get a list of years
+    * Sort them as numbers
+    * If there's a previous year available, go into it
+    * Then do what we did for months
+    * If there's no previous year available, give up with a message
+
+Next will be similar, just in the opposite direction.
+
+Can have get-prev-file-in-month, get-prev-month-in-year, and get-prev-year-in-root helpers.
+
+#+BEGIN_SRC python :tangle no
+  current = get_current_journal_entry()
+  current_year = get_current_year(current)
+  current_month = get_current_month(current)
+  prev = None
+  while not prev:
+      prev = get_prev_in_month(current_month)
+      if prev: break
+
+      current_month = get_prev_month_in_year(current_year)
+      if current_month: continue
+
+      current_year = get_prev_year_in_root()
+      if not current_year: break
 #+END_SRC
 
 * Version control
@@ -541,19 +640,76 @@ And also some Majutsu.
     :bind (("C-x j" . majutsu)))
 #+END_SRC
 
-Highlight diffs.
+* Terminal
+
+Use =vterm= as terminal emulator.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package diff-hl
+  (use-package vterm
     :ensure t
-    :diminish
-    :config
-    (global-diff-hl-mode))
+    :init
+    (setq vterm-buffer-name-string "vterm %s"))
+#+END_SRC
+
+Use =multi-vterm= to manage multiple =vterm= buffers.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package multi-vterm
+    :ensure t
+    :bind (("C-c t t" . multi-vterm)
+           ("C-c t d" . multi-vterm-dedicated-toggle)
+           ("C-c t n" . multi-vterm-next)
+           ("C-c t p" . multi-vterm-prev)))
 #+END_SRC
 
 * Programming
 
-** Node modules path
+** Flymake
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-n") #'flymake-goto-next-error)
+  (global-set-key (kbd "M-p") #'flymake-goto-prev-error)
+#+END_SRC
+
+** Tree Sitter
+
+#+BEGIN_SRC emacs-lisp
+  (use-package treesit-auto
+    :ensure t
+    :custom
+    (treesit-auto-install 'prompt)
+    :config
+    (setq treesit-auto-langs '(astro javascript typescript tsx python rust))
+    (treesit-auto-add-to-auto-mode-alist)
+    (global-treesit-auto-mode))
+#+END_SRC
+
+** Astro
+
+#+BEGIN_SRC emacs-lisp
+  (use-package astro-ts-mode
+    :ensure t
+    :mode "\\.astro\\'")
+
+  (let ((astro-recipe (make-treesit-auto-recipe
+                       :lang 'astro
+                       :ts-mode 'astro-ts-mode
+                       :url "https://github.com/virchau13/tree-sitter-astro"
+                       :revision "master"
+                       :source-dir "src")))
+    (add-to-list 'treesit-auto-recipe-list astro-recipe))
+#+END_SRC
+
+Define some configuration for the Astro LSP. We use this a few times later.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar s3thi/astro-lsp-config
+    '("astro-ls" "--stdio"
+     :initializationOptions
+     (:typescript (:tsdk "node_modules/typescript/lib"))))
+#+END_SRC
+
+** Node and Deno
 
 This function finds =node_modules/.bin= directories from the current file's directory up to the home directory and adds them to the buffer-local =exec-path=. This allows Emacs to find project-local LSP servers and other tools without installing them globally.
 
@@ -583,32 +739,51 @@ This function finds =node_modules/.bin= directories from the current file's dire
             (add-to-list 'exec-path path))))))
 #+END_SRC
 
-** Flycheck
+Configuring the language server for Deno here so I can use it later in the Eglot configuration section.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :init (global-flycheck-mode))
+  ;; We need to make sure eglot is loaded before we try any subclassing
+  ;; shenanigans.
+  (use-package eglot)
+
+  (defclass eglot-deno (eglot-lsp-server) ()
+    :documentation "A custom class for deno lsp.")
+
+  (cl-defmethod eglot-initialization-options ((server eglot-deno))
+    "Passes through required deno initialization options"
+    (list
+     :enable t
+     :unstable t))
 #+END_SRC
 
-** Tree Sitter
+This function decides whether a project uses Node, Deno, or Astro and picks the right TypeScript LSP server.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package treesit-auto
-    :ensure t
+  (defun s3thi/eglot-server-for-ts (&optional interactive)
+    "Returns the correct LSP server for TypeScript based on project type."
+    (let ((project-root (project-root (project-current))))
+      (cond
+       ((and project-root
+            (or (file-exists-p (expand-file-name "deno.json" project-root))
+                (file-exists-p (expand-file-name "deno.jsonc" project-root))))
+        (list 'eglot-deno "deno" "lsp"))
+       ((and project-root
+             (file-exists-p (expand-file-name "astro.config.mjs" project-root)))
+        s3thi/astro-lsp-config)
+       (t
+        (list 'eglot-lsp-server "typescript-language-server" "--stdio")))))
+#+END_SRC
+
+** Eglot
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eglot
     :config
-    (global-treesit-auto-mode))
-#+END_SRC
-
-** LSP
-
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :ensure t
-    :init
-    (setq lsp-keymap-prefix "C-c l")
-    :hook (lsp-mode . lsp-enable-which-key-integration)
-    :commands lsp)
+    (setq eglot-autoshutdown t)
+    (add-to-list 'eglot-server-programs
+                 `(astro-ts-mode . ,s3thi/astro-lsp-config))
+    (add-to-list 'eglot-server-programs
+                 '((js-mode js-ts-mode typescript-mode typescript-ts-mode) . s3thi/eglot-server-for-ts)))
 #+END_SRC
 
 ** Code formatting
@@ -618,7 +793,6 @@ This function finds =node_modules/.bin= directories from the current file's dire
 #+BEGIN_SRC emacs-lisp
   (use-package apheleia
       :ensure t
-      :diminish
       :config
       (setf (alist-get 'prettier-astro apheleia-formatters)
             '("apheleia-npx" "prettier" "--stdin-filepath" filepath
@@ -628,31 +802,15 @@ This function finds =node_modules/.bin= directories from the current file's dire
       (apheleia-global-mode 1))
 #+END_SRC
 
-** Astro
-
-#+BEGIN_SRC emacs-lisp
-  (use-package astro-ts-mode
-    :ensure t
-    :mode "\\.astro\\'")
-
-  (let ((astro-recipe (make-treesit-auto-recipe
-                       :lang 'astro
-                       :ts-mode 'astro-ts-mode
-                       :url "https://github.com/virchau13/tree-sitter-astro"
-                       :revision "master"
-                       :source-dir "src")))
-    (add-to-list 'treesit-auto-recipe-list astro-recipe))
-#+END_SRC
-
 ** Web development setup
 
-Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to =exec-path= before LSP starts. Code formatting is handled globally by =apheleia=.
+Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to =exec-path= before Eglot starts. Code formatting is handled globally by =apheleia=.
 
 #+BEGIN_SRC emacs-lisp
   (defun s3thi/setup-web-dev ()
       "Set up environment for JS/TS/Astro development."
       (s3thi/add-node-modules-to-exec-path)
-      (lsp))
+      (eglot-ensure))
 
     (add-hook 'js-ts-mode-hook #'s3thi/setup-web-dev)
     (add-hook 'typescript-ts-mode-hook #'s3thi/setup-web-dev)
@@ -664,13 +822,35 @@ Unified setup for JS, TS, and Astro modes. This ensures node_modules is added to
 =project-vc-extra-root-markers= is a list of file names or glob patterns which mark a project's root in addition to the default =.git=, =.hg= and other common markers. This allows you to mark non-code directories as projects that the built-in =project.el= recognizes.
 
 #+BEGIN_SRC emacs-lisp
-  (setq project-vc-extra-root-markers '(".project.el" ".projectile"))
+  (setq project-vc-extra-root-markers
+        '(".project.el" ".jj" "package.json" "deno.json"))
 #+END_SRC
 
 Make sure the macOS =.DS_Store= files don't show up in =project-find-file=.
 
 #+BEGIN_SRC emacs-lisp
   (setq project-vc-ignores '(".DS_Store"))
+#+END_SRC
+
+* Crux
+
+#+BEGIN_SRC emacs-lisp
+  (use-package crux
+    :ensure t
+    :bind (("C-c o" . crux-open-with)
+           ("C-x 4 t" . crux-transpose-windows)
+           ("C-c D" . crux-delete-file-and-buffer)
+           ("C-c r" . crux-rename-file-and-buffer)
+           ("C-c k" . crux-kill-other-buffers)
+           ("C-c p" . crux-kill-buffer-truename)))
+#+END_SRC
+
+* Server
+
+Let's start the server.
+
+#+BEGIN_SRC emacs-lisp
+  (server-start)
 #+END_SRC
 
 * Additional key bindings
@@ -686,17 +866,26 @@ Convenient for editing this configuration file.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c i") (lambda ()
+                                  "Open the Emacs configuration file."
                                   (interactive)
                                   (find-file "~/.emacs.d/README.org")))
 #+END_SRC
-
-* Miscellaneous
 
 Bind some useful built-in commands.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c d") #'duplicate-dwim)
   (global-set-key (kbd "M-=") #'count-words)
+#+END_SRC
+
+Add a few things to the =C-x 8= bindings.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package iso-transl
+    :config
+    (define-key iso-transl-ctl-x-8-map "r" [?₹])
+    (define-key iso-transl-ctl-x-8-map ".3" [?…])
+    (define-key iso-transl-ctl-x-8-map "m" [?—]))
 #+END_SRC
 
 * That's all, folks!

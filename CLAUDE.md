@@ -52,7 +52,7 @@ The configuration uses `use-package` for package management with MELPA as the pa
 
 - **Completion:** Vertico + Orderless + Marginalia
 - **Prose editing:** visual-fill-column, mixed-pitch, jinx (spell check), centered-cursor-mode
-- **Programming:** Flycheck, Company, LSP-mode
+- **Programming:** Flymake, Eglot
 - **Git:** Magit
 
 ## Version control
