@@ -510,6 +510,21 @@ Add =visual-fill-column= to limit text width in certain modes.
     (setq mixed-pitch-set-height t))
 #+END_SRC
 
+जब मैं =toggle-input-method= कॉल करूं तो कौनसा इन्पुट मैथड सेलेक्ट होना चाहिये.
+
+#+BEGIN_SRC emacs-lisp
+  (setq default-input-method "devanagari-itrans")
+#+END_SRC
+
+कभी चीटशीट देखने की ज़रूरत पढ़ जाये तो.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c I") (lambda ()
+                                  (interactive)
+                                  "Describe the devanagari-itrans input method"
+                                  (describe-input-method "devanagari-itrans")))
+#+END_SRC
+
 ** Org
 
 Note that =visual-wrap-prefix-mode=, which we use for Markdown, doesn't work well with =org-mode= when =org-indent-mode= is also turned on. If you're running into weird issues, it's probably because of that.
@@ -558,6 +573,8 @@ Highlight tags from =s3thi/notes-tags= in Markdown buffers:
              (list (concat "#" (car tag) "\\b") 0 ''warning 'prepend))
            s3thi/notes-tags))
 #+END_SRC
+
+TODO: this thing above should be a minor mode.
 
 ** Daily notes and journal entries
 
@@ -719,6 +736,11 @@ Use =multi-vterm= to manage multiple =vterm= buffers.
 
 #+BEGIN_SRC emacs-lisp
   (use-package eglot
+    :bind (:map eglot-mode-map
+                ("C-c l a" . eglot-code-actions)
+                ("C-c l r" . eglot-rename)
+                ("C-c l h" . eldoc)
+                ("C-c l R" . eglot-reconnect))
     :config
     (setq eglot-autoshutdown t)
     (add-to-list 'eglot-server-programs
