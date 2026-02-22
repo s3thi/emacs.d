@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is an Emacs configuration where the main configuration lives in `init.el`.
+This is an Emacs configuration split into modules under the `lisp/` directory.
 
 The setup focuses on:
 
@@ -18,11 +18,14 @@ The setup focuses on:
 Bootstrap sequence:
 
 1. `early-init.el` - Platform-specific setup (macOS library paths for native compilation, MELPA)
-2. `init.el` - The full configuration
+2. `init.el` - Thin loader that adds `lisp/` to `load-path` and `require`s each module
+3. `lisp/s3thi-*.el` - Configuration modules (explore `lisp/` to see the current set)
+
+`s3thi-bootstrap` must load first since other modules depend on its variables. The remaining modules are mostly independent of each other.
 
 ## Making changes
 
-To modify the configuration, edit `init.el` directly. The file is organized into sections with `;;;` and `;;;;` comment headings.
+Edit the appropriate module in `lisp/`. Each file is named `s3thi-<topic>.el` and covers a specific area of the configuration. Use `;;;` and `;;;;` comment headings within modules to organize subsections.
 
 The configuration uses `use-package` for package management with MELPA as the package repository.
 
@@ -38,6 +41,7 @@ The configuration uses `use-package` for package management with MELPA as the pa
 
 ## Key directories
 
+- `lisp/` - Configuration modules (`s3thi-*.el`)
 - `elpa/` - Installed packages (gitignored)
 - `snippets/` - Yasnippet templates
 - `auto-save/` - Auto-save files
