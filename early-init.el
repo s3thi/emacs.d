@@ -6,26 +6,26 @@
 
 ;;; Code:
 
-(defun s3thi/append-env-var (var-name value)
-  "Append VALUE to the beginning of current value of env variable VAR-NAME."
-  (setenv var-name (if (getenv var-name)
-                       (format "%s:%s" value (getenv var-name))
-                     value)))
+;; Increase GC threshold.
+(setq gc-cons-threshold (* 128 1024 1024))
 
 ;; Disable UI elements early for faster startup.
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-;; Make sure Emacs can find GCC and libgccjit on macOS.
-(if (eq system-type 'darwin)
-    (let ((gccjitpath "/opt/homebrew/lib/gcc/current:/opt/homebrew/lib"))
-      (mapc (lambda (var-name) (s3thi/append-env-var var-name gccjitpath))
-            '("LIBRARY_PATH" "LD_LIBRARY_PATH" "PATH"))))
+;; Use dark mode and transparent titlebar on macOS.
+(when (eq system-type 'darwin)
+  (push '(ns-appearance . dark) default-frame-alist)
+  (push '(ns-transparent-titlebar . t) default-frame-alist))
 
-;; Enable MELPA.
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+;; Don't resize frame when font size, scroll bars, etc. change.
+(setq frame-inhibit-implied-resize t)
+
+;; Don't make packages available at startup. We'll enable them later.
+(setq package-enable-at-startup nil)
+
+;; Suppress echo area message.
+(setq inhibit-startup-echo-area-message user-login-name)
 
 (provide 'early-init)
 

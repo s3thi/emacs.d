@@ -1,23 +1,27 @@
-;;; s3thi-ui.el --- User interface configuration -*- lexical-binding: t -*-
+;;; init-ui.el --- User interface configuration -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; General UI settings, fonts, scrolling, minibuffer completion, window
-;; navigation, and theme.
+;; UI settings, fonts, scrolling, window navigation, and theme.
 
 ;;; Code:
 
-;;;; General ----------------------------------------------------------------------
-
-;; Remove UI elements we don't like. Note that tool-bar-mode and
-;; scroll-bar-mode are disabled in early-init.el for faster startup.
+;; Remove UI elements we don't like. Some UI elements are configured in
+;; early-init.el for faster startup.
 (setq inhibit-startup-screen t)
+(setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (setq ring-bell-function 'ignore)
 
 ;; And add UI elements that are nice to have.
 (column-number-mode 1)
 (show-paren-mode 1)
+
+;; Ask before quitting.
 (setq confirm-kill-emacs #'yes-or-no-p)
+
+;; Enable right click menus.
+(when (display-graphic-p)
+  (context-menu-mode))
 
 ;; Allow resizing the frame by pixels instead of rounding the frame size to
 ;; characters. This prevents an irritating situation on macOS where sometimes
@@ -25,44 +29,35 @@
 ;; bottom of the screen when maximizing Emacs using an external window manager.
 (setq frame-resize-pixelwise t)
 
-;; Disable mouse wheel text scaling. This gets triggered accidentally and is
-;; never useful.
+;; Disable mouse wheel text scaling. This gets triggered accidentally on
+;; trackpads and is never useful.
 (defalias 'mouse-wheel-text-scale #'ignore)
 
 ;; Show total number of matches while searching.
 (setq-default isearch-lazy-count t)
 
-;; minions-mode only shows the current major mode in the modeline, tucking
-;; away all the minor modes into a menu.
+;; Use ibuffer instead of the default buffer list UI.
+(use-package ibuffer
+  :bind (("C-x C-b" . ibuffer)))
+
+;; minions-mode only shows the current major mode in the modeline, tucking away
+;; all the minor modes into a menu.
 (use-package minions
   :ensure t
   :config
   (minions-mode 1))
 
 ;; which-key displays helpful suggestions in the minibuffer when you hit the
-;; first part of a long keychord. It is built into Emacs 30.
+;; first part of a long keychord. Built into Emacs 30+.
 (which-key-mode 1)
 
-;; vundo lets me browse the Emacs undo history visually. Unlike undo-tree, it
-;; works on top of the built-in undo system rather than replacing it, which
-;; avoids corruption issues. Call M-x vundo to open the tree, then use f / b
-;; to move between branches and n / p to move forward and back in time. Press
-;; q to quit.
+;; Browse the Emacs undo history visually.
 (use-package vundo
   :ensure t
   :bind ("C-x u" . vundo))
 
-;; Maximize the Emacs frame on startup. To start every new frame maximized
-;; instead of just the first frame, you can add the following options to
-;; default-frame-alist instead of initial-frame-alist. Additionally, it's
-;; possible to toggle the maximized status of an Emacs frame by calling
-;; toggle-frame-maximized, which is bound to M-<f10> by default.
-;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-
-;;;; Fonts ------------------------------------------------------------------------
-
-;; Set a nice font. The font size will have to be different across platforms,
-;; so we check the OS we're running on before setting it.
+;; Set a nice font. The font size will have to be different across platforms, so
+;; we check the OS we're running on before setting it.
 (when s3thi/is-a-mac
   (set-face-attribute 'default nil
                       :family "Berkeley Mono Variable"
@@ -71,13 +66,11 @@
                       :family "iA Writer Duospace"
                       :height 180))
 
-;;;; Scrolling --------------------------------------------------------------------
-
 ;; scroll-conservatively specifies the number of lines to scroll the buffer in
 ;; order to bring the cursor back on the screen when it moves off-screen. If
-;; moving that much doesn't bring the cursor back, Emacs will scroll the
-;; buffer by as many lines as it takes to bring the cursor to the exact center
-;; of the screen.
+;; moving that much doesn't bring the cursor back, Emacs will scroll the buffer
+;; by as many lines as it takes to bring the cursor to the exact center of the
+;; screen.
 ;;
 ;; This behavior is irritating and jarring, causing huge jumps as you move
 ;; around a file. Luckily, setting this variable to a number larger than 100
@@ -88,46 +81,18 @@
 ;; like every other text editor on the planet.
 (setq scroll-conservatively 101)
 
-;; scroll-margin specifies the number of lines of margin at the top or bottom
-;; of the window. As soon as the cursor gets closer than this to the top of or
+;; scroll-margin specifies the number of lines of margin at the top or bottom of
+;; the window. As soon as the cursor gets closer than this to the top of or
 ;; bottom of a window, Emacs will start scrolling.
 (setq scroll-margin 3)
 
 ;; Enable smooth scrolling.
 (pixel-scroll-precision-mode 1)
 
-;;;; Minibuffer completion --------------------------------------------------------
-
-;; Use vertico as the completion UI.
-(use-package vertico
-  :ensure t
-  :init
-  (vertico-mode))
-
 ;; Use savehist to save minibuffer history.
 (use-package savehist
   :init
   (savehist-mode))
-
-;; Use orderless to filter completions.
-(use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
-
-;; Enable annotations in the minibuffer using marginalia.
-(use-package marginalia
-  :ensure t
-  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
-  ;; available in the *Completions* buffer, add it to the
-  ;; `completion-list-mode-map'.
-  :bind (:map minibuffer-local-map
-              ("M-A" . marginalia-cycle))
-  :init
-  (marginalia-mode))
-
-;;;; Window navigation ------------------------------------------------------------
 
 ;; Use ace-window for navigating open windows.
 (use-package ace-window
@@ -143,8 +108,6 @@
   :ensure t
   :bind* (("C-'" . avy-goto-char-2)))
 
-;;;; Theme ------------------------------------------------------------------------
-
 ;; Let's install some Doom Emacs themes!
 (use-package doom-themes
   :ensure t
@@ -157,6 +120,29 @@
   (doom-themes-visual-bell-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+
+;; Let's also use the nice modeline from Doom Emacs.
+(use-package doom-modeline
+  :ensure t
+  :init
+  ;; Use icons
+  (setq doom-modeline-icon t)
+  ;; Don't display encoding.
+  (setq doom-modeline-buffer-encoding nil)
+  ;; Don't display VCS state.
+  (setq doom-modeline-vcs-icon nil)
+  ;; Don't display error information.
+  (setq doom-modeline-check-icon t)
+  ;; Show project name.
+  (setq doom-modeline-project-name t)
+  ;; Show LSP status.
+  (setq doom-modeline-lsp t)
+  ;; Show word count.
+  (setq doom-modeline-enable-word-count t)
+  ;; Major modes in which to display word count continuously.
+  (setq doom-modeline-continuous-word-count-modes
+        '(markdown-mode gfm-mode org-mode))
+  (doom-modeline-mode 1))
 
 ;; Load a theme.
 (load-theme 'doom-one t)
@@ -178,6 +164,6 @@
     (let ((bg (face-attribute 'default :background)))
       (face-remap-add-relative 'header-line :background bg))))
 
-(provide 's3thi-ui)
+(provide 'init-ui)
 
-;;; s3thi-ui.el ends here
+;;; init-ui.el ends here

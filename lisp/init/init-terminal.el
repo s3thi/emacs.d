@@ -1,7 +1,7 @@
-;;; s3thi-terminal.el --- Terminal configuration -*- lexical-binding: t -*-
+;;; init-terminal.el --- Terminal configuration -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; vterm and multi-vterm setup.
+;; Terminal setup.
 
 ;;; Code:
 
@@ -19,6 +19,6 @@
          ("C-c t n" . multi-vterm-next)
          ("C-c t p" . multi-vterm-prev)))
 
-(provide 's3thi-terminal)
+(provide 'init-terminal)
 
-;;; s3thi-terminal.el ends here
+;;; init-terminal.el ends here

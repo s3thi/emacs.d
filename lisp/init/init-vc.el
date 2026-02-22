@@ -1,4 +1,4 @@
-;;; s3thi-vc.el --- Version control configuration -*- lexical-binding: t -*-
+;;; init-vc.el --- Version control configuration -*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;; Magit and other version control tools.
@@ -15,6 +15,6 @@
   :vc (:url "https://github.com/0WD0/majutsu")
   :bind (("C-x j" . majutsu)))
 
-(provide 's3thi-vc)
+(provide 'init-vc)
 
-;;; s3thi-vc.el ends here
+;;; init-vc.el ends here

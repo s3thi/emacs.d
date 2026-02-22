@@ -8,21 +8,30 @@
 
 ;;; Code:
 
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(add-to-list
+ 'load-path
+ (expand-file-name "lisp/init/" user-emacs-directory))
 
-(require 's3thi-bootstrap)
-(require 's3thi-ui)
-(require 's3thi-files)
-(require 's3thi-editing)
-(require 's3thi-writing)
-(require 's3thi-search)
-(require 's3thi-vc)
-(require 's3thi-terminal)
-(require 's3thi-programming)
-(require 's3thi-keys)
+(require 'init-package)
+(require 'init-essentials)
+(require 'init-ui)
+(require 'init-completion)
+(require 'init-dired)
+(require 'init-project)
+(require 'init-editing)
+(require 'init-prose)
+(require 'init-markdown)
+(require 'init-org)
+(require 'init-notes)
+(require 'init-search)
+(require 'init-vc)
+(require 'init-terminal)
+(require 'init-programming) ;; Break into general programming and web
+(require 'init-input-methods)
 
-;; Let's start the server.
-(server-start)
+;; Start the server.
+(unless (server-running-p)
+  (server-start))
 
 (provide 'init)
 

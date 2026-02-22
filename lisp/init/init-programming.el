@@ -1,8 +1,7 @@
-;;; s3thi-programming.el --- Programming configuration -*- lexical-binding: t -*-
+;;; init-programming.el --- Programming configuration -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Flymake, Tree-sitter, Eglot, code formatting, and language-specific
-;; setup for Node, Deno, and Astro.
+;; Programming tools and language support.
 
 ;;; Code:
 
@@ -43,14 +42,14 @@
 ;; supports Prettier and many other formatters out of the box, and preserves
 ;; point position via RCS patching.
 (use-package apheleia
-    :ensure t
-    :config
-    (setf (alist-get 'prettier-astro apheleia-formatters)
-          '("apheleia-npx" "prettier" "--stdin-filepath" filepath
-            "--plugin=prettier-plugin-astro" "--parser=astro"))
-    (setf (alist-get 'astro-ts-mode apheleia-mode-alist)
-          '(prettier-astro))
-    (apheleia-global-mode 1))
+  :ensure t
+  :config
+  (setf (alist-get 'prettier-astro apheleia-formatters)
+        '("apheleia-npx" "prettier" "--stdin-filepath" filepath
+          "--plugin=prettier-plugin-astro" "--parser=astro"))
+  (setf (alist-get 'astro-ts-mode apheleia-mode-alist)
+        '(prettier-astro))
+  (apheleia-global-mode 1))
 
 ;;;; Node, Deno, and Astro --------------------------------------------------------
 
@@ -69,8 +68,8 @@
 ;; Define some configuration for the Astro LSP. We use this a few times later.
 (defvar s3thi/astro-lsp-config
   '("astro-ls" "--stdio"
-   :initializationOptions
-   (:typescript (:tsdk "node_modules/typescript/lib"))))
+    :initializationOptions
+    (:typescript (:tsdk "node_modules/typescript/lib"))))
 
 ;; This function finds node_modules/.bin directories from the current file's
 ;; directory up to the home directory and adds them to the buffer-local
@@ -123,8 +122,8 @@ to a buffer-local exec-path."
   (let ((project-root (project-root (project-current))))
     (cond
      ((and project-root
-          (or (file-exists-p (expand-file-name "deno.json" project-root))
-              (file-exists-p (expand-file-name "deno.jsonc" project-root))))
+           (or (file-exists-p (expand-file-name "deno.json" project-root))
+               (file-exists-p (expand-file-name "deno.jsonc" project-root))))
       (list 'eglot-deno "deno" "lsp"))
      ((and project-root
            (file-exists-p (expand-file-name "astro.config.mjs" project-root)))
@@ -138,14 +137,15 @@ to a buffer-local exec-path."
 ;; added to exec-path before Eglot starts. Code formatting is handled globally
 ;; by apheleia.
 (defun s3thi/setup-web-dev ()
-    "Set up environment for JS/TS/Astro development."
-    (s3thi/add-node-modules-to-exec-path)
-    (eglot-ensure))
+  "Set up environment for JS/TS/Astro development."
+  (s3thi/add-node-modules-to-exec-path)
+  (eglot-ensure))
 
-  (add-hook 'js-ts-mode-hook #'s3thi/setup-web-dev)
-  (add-hook 'typescript-ts-mode-hook #'s3thi/setup-web-dev)
-  (add-hook 'astro-ts-mode-hook #'s3thi/setup-web-dev)
+(add-hook 'js-ts-mode-hook #'s3thi/setup-web-dev)
+(add-hook 'typescript-ts-mode-hook #'s3thi/setup-web-dev)
+(add-hook 'tsx-ts-mode-hook #'s3thi/setup-web-dev)
+(add-hook 'astro-ts-mode-hook #'s3thi/setup-web-dev)
 
-(provide 's3thi-programming)
+(provide 'init-programming)
 
-;;; s3thi-programming.el ends here
+;;; init-programming.el ends here

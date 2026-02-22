@@ -17,15 +17,15 @@ The setup focuses on:
 
 Bootstrap sequence:
 
-1. `early-init.el` - Platform-specific setup (macOS library paths for native compilation, MELPA)
-2. `init.el` - Thin loader that adds `lisp/` to `load-path` and `require`s each module
-3. `lisp/s3thi-*.el` - Configuration modules (explore `lisp/` to see the current set)
+1. `early-init.el` - Platform-specific setup (macOS dark mode, frame settings, disabling `package-enable-at-startup`)
+2. `init.el` - Thin loader that adds `lisp/init/` to `load-path` and `require`s each module
+3. `lisp/init/init-*.el` - Configuration modules (explore `lisp/init/` to see the current set)
 
-`s3thi-bootstrap` must load first since other modules depend on its variables. The remaining modules are mostly independent of each other.
+`init-package` and `init-essentials` must load first since other modules depend on their variables. The remaining modules are mostly independent of each other.
 
 ## Making changes
 
-Edit the appropriate module in `lisp/`. Each file is named `s3thi-<topic>.el` and covers a specific area of the configuration. Use `;;;` and `;;;;` comment headings within modules to organize subsections.
+Edit the appropriate module in `lisp/init/`. Each file is named `init-<topic>.el` and covers a specific area of the configuration. Use `;;;` and `;;;;` comment headings within modules to organize subsections.
 
 The configuration uses `use-package` for package management with MELPA as the package repository.
 
@@ -35,13 +35,13 @@ The configuration uses `use-package` for package management with MELPA as the pa
 
 **Custom variables and functions use the `s3thi/` prefix:**
 
-- `s3thi/is-a-mac`, `s3thi/is-a-pc`, `s3thi/is-a-penguin` - Platform detection
+- `s3thi/is-a-mac`, `s3thi/is-a-pc`, `s3thi/is-a-linux` - Platform detection
 - `s3thi/prose-line-spacing` - Line spacing for prose modes
 - `s3thi/prose-header-scaling` - Header font sizes
 
 ## Key directories
 
-- `lisp/` - Configuration modules (`s3thi-*.el`)
+- `lisp/init/` - Configuration modules (`init-*.el`)
 - `elpa/` - Installed packages (gitignored)
 - `snippets/` - Yasnippet templates
 - `auto-save/` - Auto-save files
