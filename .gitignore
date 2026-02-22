@@ -8,7 +8,6 @@
 /.last-package-upgrade
 /.lsp-session-v1
 /projects
-/README.el
 /eln-cache/
 /bookmarks
 /eshell/

@@ -2,9 +2,9 @@
 
 ## Overview
 
-This is a literate Emacs configuration where the main configuration lives in `README.org` and is tangled to `README.el`.
+This is an Emacs configuration where the main configuration lives in `init.el`.
 
-The setup focuses on: 
+The setup focuses on:
 
 - Writing prose (Markdown, Org)
 - Front-end development
@@ -17,18 +17,12 @@ The setup focuses on:
 
 Bootstrap sequence:
 
-1. `early-init.el` - Platform-specific setup (macOS library paths for native compilation)
-2. `init.el` - Package manager setup, use-package loading, triggers tangle of README.org
-3. `README.el` - Generated from README.org, contains the actual configuration
-
-**Key principle:** Edit `README.org`, not `README.el`. The .el file is auto-generated when the .org file is newer.
+1. `early-init.el` - Platform-specific setup (macOS library paths for native compilation, MELPA)
+2. `init.el` - The full configuration
 
 ## Making changes
 
-To modify the configuration:
-
-1. Edit the relevant section in `README.org`
-2. Restart Emacs (which auto-tangles) or manually run `org-babel-tangle`
+To modify the configuration, edit `init.el` directly. The file is organized into sections with `;;;` and `;;;;` comment headings.
 
 The configuration uses `use-package` for package management with MELPA as the package repository.
 
