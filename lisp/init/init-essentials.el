@@ -80,7 +80,7 @@
 (defun s3thi/edit-init-file ()
   "Open the Emacs configuration file."
   (interactive)
-  (find-file "~/.emacs.d/init.el"))
+  (find-file (expand-file-name "init.el" user-emacs-directory)))
 
 ;; Convenient shortcut for editing this configuration file.
 (global-set-key (kbd "C-c i") #'s3thi/edit-init-file)

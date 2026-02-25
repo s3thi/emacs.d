@@ -26,7 +26,8 @@
 (require 'init-search)
 (require 'init-vc)
 (require 'init-terminal)
-(require 'init-programming) ;; Break into general programming and web
+(require 'init-prog)
+(require 'init-prog-web)
 (require 'init-input-methods)
 
 ;; Start the server.

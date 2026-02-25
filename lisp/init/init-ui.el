@@ -84,7 +84,10 @@
 ;; scroll-margin specifies the number of lines of margin at the top or bottom of
 ;; the window. As soon as the cursor gets closer than this to the top of or
 ;; bottom of a window, Emacs will start scrolling.
-(setq scroll-margin 3)
+(setq scroll-margin 0)
+
+;; How many lines of continuity to maintain when scrolling by screenfuls.
+(setq next-screen-context-lines 5)
 
 ;; Enable smooth scrolling.
 (pixel-scroll-precision-mode 1)
@@ -122,6 +125,7 @@
   (doom-themes-org-config))
 
 ;; Let's also use the nice modeline from Doom Emacs.
+;; TODO: get rid of this and build a custom simpler modeline instead.
 (use-package doom-modeline
   :ensure t
   :init
@@ -132,7 +136,7 @@
   ;; Don't display VCS state.
   (setq doom-modeline-vcs-icon nil)
   ;; Don't display error information.
-  (setq doom-modeline-check-icon t)
+  (setq doom-modeline-check-icon nil)
   ;; Show project name.
   (setq doom-modeline-project-name t)
   ;; Show LSP status.
@@ -152,8 +156,6 @@
 ;; and setting its background to be the same as the buffer background. The
 ;; downside of doing this is that it may mess up the header line in modes that
 ;; actually make use of it (e.g. Eglot).
-;;
-;; This is currently not used anywhere.
 (defun s3thi/add-top-padding ()
   "Add top padding to the current buffer."
   (interactive)

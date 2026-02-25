@@ -24,6 +24,14 @@
   (setq markdown-fontify-code-blocks-natively t)
   (setq markdown-asymmetric-header t))
 
+;; CriticMarkup support.
+(use-package cm-mode
+  :ensure t
+  :hook ((markdown-mode . cm-mode))
+  :init
+  (setq cm-read-only-annotations nil)
+  (setq-default cm-author "s3thi"))
+
 (provide 'init-markdown)
 
 ;;; init-markdown.el ends here
