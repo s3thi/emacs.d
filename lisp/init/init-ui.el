@@ -122,10 +122,11 @@
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+  (doom-themes-org-config)
+  ;; Load the theme.
+  (load-theme 'doom-one t))
 
 ;; Let's also use the nice modeline from Doom Emacs.
-;; TODO: get rid of this and build a custom simpler modeline instead.
 (use-package doom-modeline
   :ensure t
   :init
@@ -148,8 +149,30 @@
         '(markdown-mode gfm-mode org-mode))
   (doom-modeline-mode 1))
 
-;; Load a theme.
-(load-theme 'doom-one t)
+;; We want nice icons.
+(use-package nerd-icons
+  :ensure t
+  :init
+  (setq nerd-icons-font-family "Symbols Nerd Font Mono"))
+
+;; ... and we want to show them in dired.
+(use-package nerd-icons-dired
+  :ensure t
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
+;; ... and in ibuffer.
+(use-package nerd-icons-ibuffer
+  :ensure t
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
+;; ... and in completion UIs.
+(use-package nerd-icons-completion
+  :ensure t
+  :after marginalia
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
 ;; The following function adds a top padding to the current buffer. It does so
 ;; by setting the header line to an empty string, increasing its line height,

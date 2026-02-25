@@ -5,9 +5,14 @@
 
 ;;; Code:
 
+;; Magit needs a newer transient than the one built into Emacs.
+(use-package transient
+  :ensure t)
+
 ;; Love me some Magit.
 (use-package magit
-  :ensure t)
+  :ensure t
+  :after transient)
 
 ;; And also some Majutsu.
 (use-package majutsu
