@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-;;;; Astro ------------------------------------------------------------------------
-
 (use-package astro-ts-mode
   :ensure t
   :mode "\\.astro\\'")
@@ -33,8 +31,6 @@
           "--plugin=prettier-plugin-astro" "--parser=astro"))
   (setf (alist-get 'astro-ts-mode apheleia-mode-alist)
         '(prettier-astro)))
-
-;;;; Node.js ----------------------------------------------------------------------
 
 ;; This function finds node_modules/.bin directories from the current file's
 ;; directory up to the home directory and adds them to the buffer-local
@@ -64,8 +60,6 @@ to a buffer-local exec-path."
         (dolist (path found-paths)
           (add-to-list 'exec-path path))))))
 
-;;;; Deno -------------------------------------------------------------------------
-
 ;; Eglot must be loaded before we can subclass eglot-lsp-server.
 (require 'eglot)
 
@@ -77,8 +71,6 @@ to a buffer-local exec-path."
   (list
    :enable t
    :unstable t))
-
-;;;; LSP server selection ---------------------------------------------------------
 
 ;; This function decides whether a project uses Node, Deno, or Astro and
 ;; picks the right TypeScript LSP server.
@@ -101,8 +93,6 @@ to a buffer-local exec-path."
              `(astro-ts-mode . ,s3thi/astro-lsp-config))
 (add-to-list 'eglot-server-programs
              '((js-mode js-ts-mode typescript-mode typescript-ts-mode) . s3thi/eglot-server-for-ts))
-
-;;;; Web development hooks --------------------------------------------------------
 
 ;; Unified setup for JS, TS, and Astro modes. This ensures node_modules is
 ;; added to exec-path before Eglot starts. Code formatting is handled globally

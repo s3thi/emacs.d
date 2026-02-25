@@ -1,18 +1,14 @@
 ;;; init-prog.el --- Programming configuration -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; General programming tools: diagnostics, tree-sitter, LSP, and formatting.
+;; General programming configuration.
 
 ;;; Code:
-
-;;;; Flymake ----------------------------------------------------------------------
 
 (use-package flymake
   :bind (:map flymake-mode-map
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
-
-;;;; Tree-sitter ------------------------------------------------------------------
 
 (use-package treesit-auto
   :ensure t
@@ -23,8 +19,6 @@
   (treesit-auto-add-to-auto-mode-alist)
   (global-treesit-auto-mode))
 
-;;;; Eglot ------------------------------------------------------------------------
-
 (use-package eglot
   :bind (:map eglot-mode-map
               ("C-c l a" . eglot-code-actions)
@@ -34,11 +28,6 @@
   :config
   (setq eglot-autoshutdown t))
 
-;;;; Code formatting --------------------------------------------------------------
-
-;; apheleia formats code asynchronously on save without blocking Emacs. It
-;; supports Prettier and many other formatters out of the box, and preserves
-;; point position via RCS patching.
 (use-package apheleia
   :ensure t
   :config
