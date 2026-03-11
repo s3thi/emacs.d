@@ -1,7 +1,7 @@
-;;; init-dired.el --- Dired configuration -*- lexical-binding: t -*-
+;;; init-file-management.el --- File management configuration -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Configure dired.
+;; Configure file management.
 
 ;;; Code:
 
@@ -21,6 +21,14 @@
 ;; Rename files using the version control system, if present.
 (setq dired-vc-rename-file t)
 
-(provide 'init-dired)
+;; Configure treemacs.
+(use-package treemacs
+  :ensure t
+  :config
+  (treemacs-project-follow-mode 1)
+  (treemacs-follow-mode 1)
+  (treemacs-filewatch-mode 1))
 
-;;; init-dired.el ends here
+(provide 'init-file-management)
+
+;;; init-file-management.el ends here

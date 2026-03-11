@@ -66,15 +66,27 @@
          (file-path (expand-file-name file-name month-directory-path)))
     file-path))
 
+(defun s3thi/find-or-create-note (path header)
+  "Open PATH, inserting HEADER followed by a newline if the file is new."
+  (let ((new-p (not (file-exists-p path))))
+    (find-file path)
+    (when new-p
+      (insert header)
+      (newline))))
+
 (defun s3thi/find-daily-note (&optional time)
   "Open today's daily note."
   (interactive)
-  (find-file (s3thi/date-tree-path "02 Daily notes" time)))
+  (s3thi/find-or-create-note
+   (s3thi/date-tree-path "02 Daily notes" time)
+   (format "# Daily note: %s" (format-time-string "%A, %d %B %Y" time))))
 
 (defun s3thi/find-journal-entry (&optional time)
   "Open today's journal entry."
   (interactive)
-  (find-file (s3thi/date-tree-path "03 Journal" time)))
+  (s3thi/find-or-create-note
+   (s3thi/date-tree-path "03 Journal" time)
+   (format "# Personal journal: %s" (format-time-string "%A, %d %B %Y" time))))
 
 (global-set-key (kbd "<f8>") #'s3thi/find-daily-note)
 (global-set-key (kbd "C-<f8>") #'s3thi/find-journal-entry)

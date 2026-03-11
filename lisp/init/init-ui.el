@@ -64,7 +64,7 @@
                       :height 160)
   (set-face-attribute 'variable-pitch nil
                       :family "iA Writer Duospace"
-                      :height 180))
+                      :height 170))
 
 ;; scroll-conservatively specifies the number of lines to scroll the buffer in
 ;; order to bring the cursor back on the screen when it moves off-screen. If
@@ -84,7 +84,10 @@
 ;; scroll-margin specifies the number of lines of margin at the top or bottom of
 ;; the window. As soon as the cursor gets closer than this to the top of or
 ;; bottom of a window, Emacs will start scrolling.
-(setq scroll-margin 0)
+;;
+;; Having a nonzero scroll margin makes mouse scrolling basically impossible.
+;; Eh, whatever.
+(setq scroll-margin 3)
 
 ;; How many lines of continuity to maintain when scrolling by screenfuls.
 (setq next-screen-context-lines 5)
@@ -130,7 +133,7 @@
 (use-package doom-modeline
   :ensure t
   :init
-  ;; Use icons
+  ;; Use icons.
   (setq doom-modeline-icon t)
   ;; Don't display encoding.
   (setq doom-modeline-buffer-encoding nil)

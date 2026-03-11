@@ -18,11 +18,9 @@
   (setq markdown-header-scaling t)
   (setq markdown-header-scaling-values s3thi/prose-header-scaling)
   (setq markdown-hide-urls t)
-  (setq markdown-special-ctrl-a/e t)
   :config
   (setq markdown-command "pandoc")
-  (setq markdown-fontify-code-blocks-natively t)
-  (setq markdown-asymmetric-header t))
+  (setq markdown-fontify-code-blocks-natively t))
 
 ;; CriticMarkup support.
 (use-package cm-mode

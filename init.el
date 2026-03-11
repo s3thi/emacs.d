@@ -16,7 +16,7 @@
 (require 'init-essentials)
 (require 'init-ui)
 (require 'init-completion)
-(require 'init-dired)
+(require 'init-file-management)
 (require 'init-project)
 (require 'init-editing)
 (require 'init-prose)

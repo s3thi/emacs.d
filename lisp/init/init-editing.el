@@ -48,16 +48,24 @@
   :config
   (global-subword-mode 1))
 
-;; Snippets are useful, right?
+;; Snippets are useful, right? I don't use snippets a lot, I only enable this
+;; package in case I need complex snippets for programming modes. For most
+;; simple insertions, I use dabbrev. A bonus is that dabbrev works in the
+;; minibuffer too.
 (use-package yasnippet
   :ensure t
+  :bind (:map yas-minor-mode-map
+              ("C-c y" . yas-insert-snippet)
+              ("C-c Y" . yas-new-snippet))
   :init
   (setq yas-verbosity 2)
   :config
-  (yas-global-mode 1)
-  (define-key yas-minor-mode-map (kbd "<tab>") nil)
-  (define-key yas-minor-mode-map (kbd "TAB") nil)
-  (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand))
+  (yas-global-mode 1))
+
+;; Define some useful global abbrevs.
+(define-abbrev global-abbrev-table "date"  "" (lambda () (insert (format-time-string "%d %B %Y"))))
+(define-abbrev global-abbrev-table "ddate"  "" (lambda () (insert (format-time-string "%A, %d %B %Y"))))
+(define-abbrev global-abbrev-table "idate" "" (lambda () (insert (format-time-string "%Y-%m-%d"))))
 
 ;; Sometimes it's useful to "unfill" paragraphs.
 (use-package unfill
