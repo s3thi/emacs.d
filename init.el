@@ -22,7 +22,6 @@
 (require 'init-prose)
 (require 'init-markdown)
 (require 'init-org)
-(require 'init-notes)
 (require 'init-search)
 (require 'init-vc)
 (require 'init-terminal)

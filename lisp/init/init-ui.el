@@ -30,7 +30,7 @@
 (setq frame-resize-pixelwise t)
 
 ;; Disable mouse wheel text scaling. This gets triggered accidentally on
-;; trackpads and is never useful.
+;; trackpads.
 (defalias 'mouse-wheel-text-scale #'ignore)
 
 ;; Show total number of matches while searching.
@@ -48,7 +48,7 @@
   (minions-mode 1))
 
 ;; which-key displays helpful suggestions in the minibuffer when you hit the
-;; first part of a long keychord. Built into Emacs 30+.
+;; first part of a long keychord.
 (which-key-mode 1)
 
 ;; Browse the Emacs undo history visually.
@@ -114,68 +114,10 @@
   :ensure t
   :bind* (("C-'" . avy-goto-char-2)))
 
-;; Let's install some Doom Emacs themes!
-(use-package doom-themes
+;; Install Prot's ef-themes package.
+(use-package ef-themes
   :ensure t
-  :custom
-  ;; Global settings (defaults)
-  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
-  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  :config
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config)
-  ;; Load the theme.
-  (load-theme 'doom-one t))
-
-;; Let's also use the nice modeline from Doom Emacs.
-(use-package doom-modeline
-  :ensure t
-  :init
-  ;; Use icons.
-  (setq doom-modeline-icon t)
-  ;; Don't display encoding.
-  (setq doom-modeline-buffer-encoding nil)
-  ;; Don't display VCS state.
-  (setq doom-modeline-vcs-icon nil)
-  ;; Don't display error information.
-  (setq doom-modeline-check-icon nil)
-  ;; Show project name.
-  (setq doom-modeline-project-name t)
-  ;; Show LSP status.
-  (setq doom-modeline-lsp t)
-  ;; Show word count.
-  (setq doom-modeline-enable-word-count t)
-  ;; Major modes in which to display word count continuously.
-  (setq doom-modeline-continuous-word-count-modes
-        '(markdown-mode gfm-mode org-mode))
-  (doom-modeline-mode 1))
-
-;; We want nice icons.
-(use-package nerd-icons
-  :ensure t
-  :init
-  (setq nerd-icons-font-family "Symbols Nerd Font Mono"))
-
-;; ... and we want to show them in dired.
-(use-package nerd-icons-dired
-  :ensure t
-  :hook
-  (dired-mode . nerd-icons-dired-mode))
-
-;; ... and in ibuffer.
-(use-package nerd-icons-ibuffer
-  :ensure t
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
-
-;; ... and in completion UIs.
-(use-package nerd-icons-completion
-  :ensure t
-  :after marginalia
-  :config
-  (nerd-icons-completion-mode)
-  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+  :config (load-theme 'ef-dream t))
 
 ;; The following function adds a top padding to the current buffer. It does so
 ;; by setting the header line to an empty string, increasing its line height,

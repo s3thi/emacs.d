@@ -62,11 +62,6 @@
   :config
   (yas-global-mode 1))
 
-;; Define some useful global abbrevs.
-(define-abbrev global-abbrev-table "date"  "" (lambda () (insert (format-time-string "%d %B %Y"))))
-(define-abbrev global-abbrev-table "ddate"  "" (lambda () (insert (format-time-string "%A, %d %B %Y"))))
-(define-abbrev global-abbrev-table "idate" "" (lambda () (insert (format-time-string "%Y-%m-%d"))))
-
 ;; Sometimes it's useful to "unfill" paragraphs.
 (use-package unfill
   :ensure t)
