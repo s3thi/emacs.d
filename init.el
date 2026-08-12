@@ -24,7 +24,6 @@
 (require 'init-org)
 (require 'init-search)
 (require 'init-vc)
-(require 'init-terminal)
 (require 'init-prog)
 (require 'init-prog-web)
 (require 'init-input-methods)
