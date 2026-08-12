@@ -11,7 +11,7 @@
          (markdown-mode . visual-fill-column-mode)
          (markdown-mode . visual-wrap-prefix-mode)
          (markdown-mode . (lambda () (setq-local line-spacing s3thi/prose-line-spacing)))
-         (markdown-mode . (lambda () (setq-local fill-column 64))))
+         (markdown-mode . (lambda () (setq-local fill-column 72))))
   :mode (("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init
