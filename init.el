@@ -26,6 +26,7 @@
 (require 'init-vc)
 (require 'init-prog)
 (require 'init-prog-web)
+(require 'init-prog-rust)
 (require 'init-input-methods)
 
 ;; Start the server.

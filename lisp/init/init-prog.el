@@ -5,6 +5,10 @@
 
 ;;; Code:
 
+;; No soft wrapping in prog-mode.
+(add-hook 'prog-mode-hook
+          (lambda () (setq-local truncate-lines t)))
+
 (use-package flymake
   :bind (:map flymake-mode-map
               ("M-n" . flymake-goto-next-error)
