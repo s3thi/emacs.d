@@ -61,9 +61,9 @@
 (when s3thi/is-a-mac
   (set-face-attribute 'default nil
                       :family "Berkeley Mono Variable"
-                      :height 160)
+                      :height 150)
   (set-face-attribute 'variable-pitch nil
-                      :family "iA Writer Duospace"
+                      :family "iA Writer Duo V"
                       :height 170))
 
 ;; scroll-conservatively specifies the number of lines to scroll the buffer in

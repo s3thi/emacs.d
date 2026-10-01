@@ -12,6 +12,10 @@
  'load-path
  (expand-file-name "lisp/init/" user-emacs-directory))
 
+;; Unfortunately, Astro's autoloads call `treesit-ready-p' without loading
+;; treesit first, so this dependency has to live here before package activation.
+(require 'treesit)
+
 (require 'init-package)
 (require 'init-essentials)
 (require 'init-ui)

@@ -5,8 +5,10 @@
 
 ;;; Code:
 
-;; No soft wrapping in prog-mode.
+;; No soft wrapping in programming and configuration modes.
 (add-hook 'prog-mode-hook
+          (lambda () (setq-local truncate-lines t)))
+(add-hook 'conf-mode-hook
           (lambda () (setq-local truncate-lines t)))
 
 (use-package flymake
@@ -20,7 +22,8 @@
   (treesit-auto-install 'prompt)
   :config
   (setq treesit-auto-langs '(astro javascript typescript tsx python rust))
-  (treesit-auto-add-to-auto-mode-alist)
+  ;; Register missing grammars too, so visiting files prompts to install them.
+  (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
 (use-package eglot
